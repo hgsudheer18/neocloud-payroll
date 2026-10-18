@@ -1,0 +1,8 @@
+location_id,name,country,state,company_id,netsuite_location_id
+SF,San Francisco HQ,USA,CA,NC-US,101
+SJ,San Jose Data Center,USA,CA,NC-US,102
+AUS,Austin Data Center,USA,TX,NC-US,103
+REMOTE-US,Remote - US,USA,,NC-US,199
+LON,London,GBR,ENG,NC-UK,301
+TOR,Toronto,CAN,ON,NC-CA,201
+BLR,Bangalore,IND,KA,NC-IN,401

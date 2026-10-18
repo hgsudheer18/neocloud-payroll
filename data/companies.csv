@@ -1,0 +1,5 @@
+company_id,name,country,currency,netsuite_subsidiary_id,netsuite_subsidiary_name
+NC-US,NeoCloud Inc.,USA,USD,1,NeoCloud Inc. (US)
+NC-CA,NeoCloud Canada Ltd.,CAN,CAD,2,NeoCloud Canada Ltd.
+NC-UK,NeoCloud UK Ltd.,GBR,GBP,3,NeoCloud UK Ltd.
+NC-IN,NeoCloud India Pvt. Ltd.,IND,INR,4,NeoCloud India Pvt. Ltd.

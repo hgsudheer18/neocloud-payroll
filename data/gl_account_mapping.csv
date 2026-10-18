@@ -1,0 +1,25 @@
+workday_account,workday_account_name,netsuite_account,netsuite_account_name,type,owner
+6100,Salaries & Wages,60100,Payroll : Salaries and Wages,Expense,Controller
+6110,Overtime & Double Time,60110,Payroll : Overtime,Expense,Controller
+6120,Shift Differential & Premium Pay,60120,Payroll : Premium Pay,Expense,Controller
+6130,Bonus,60130,Payroll : Bonus,Expense,Controller
+6200,Employer Payroll Taxes,60200,Payroll : Employer Taxes,Expense,Controller
+6300,Employee Benefits (Employer),60300,Payroll : Benefits,Expense,Controller
+6400,Intercompany Service Cost,60400,Intercompany : Service Cost,Expense,Controller
+6900,Intercompany Recharge (contra),60900,Intercompany : Payroll Recharge,Expense,Controller
+1300,Intercompany Receivable,13000,Intercompany Receivable,Liability,Controller
+2100,Net Pay Payable,21000,Accrued Payroll : Net Pay Clearing,Liability,Payroll Manager
+2110,Federal Income Tax Withheld,21100,Payroll Liabilities : Federal Withholding,Liability,Payroll Manager
+2111,FICA Payable (EE + ER),21110,Payroll Liabilities : FICA,Liability,Payroll Manager
+2112,FUTA Payable,21120,Payroll Liabilities : FUTA,Liability,Payroll Manager
+2113,SUI Payable,21130,Payroll Liabilities : SUI,Liability,Payroll Manager
+2114,State Income Tax Withheld,21140,Payroll Liabilities : State Withholding,Liability,Payroll Manager
+2115,State Disability / PFL / LTC Withheld,21150,Payroll Liabilities : State Programs,Liability,Payroll Manager
+2116,Employer Statutory Contributions (Intl),21160,Payroll Liabilities : Employer Statutory,Liability,Payroll Manager
+2117,Employee Statutory Withholdings (Intl),21170,Payroll Liabilities : Employee Statutory,Liability,Payroll Manager
+2120,401(k) Deferrals Payable,21200,Benefit Liabilities : 401(k),Liability,Benefits Manager
+2121,Medical Premiums Payable,21210,Benefit Liabilities : Medical,Liability,Benefits Manager
+2122,Garnishments Payable,21220,Payroll Liabilities : Garnishments,Liability,Payroll Manager
+2130,Accrued Benefits (Employer),21300,Accrued Benefits,Liability,Benefits Manager
+2150,Accrued PTO,21500,Accrued Vacation,Liability,Controller
+2300,Intercompany Payable,23000,Intercompany Payable,Liability,Controller

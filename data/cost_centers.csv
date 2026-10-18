@@ -1,0 +1,14 @@
+cost_center_id,name,department,supervisory_org,company_id,netsuite_department_id,netsuite_class
+CC1100,GPU Cloud - Product & Sales,GPU Cloud,GPU Cloud (E0002),NC-US,110,Sales & Marketing
+CC1200,GPU Cloud - Cloud Operations,GPU Cloud,Cloud Operations (E0002),NC-US,120,Cost of Revenue
+CC1300,GPU Cloud - UK Sales,GPU Cloud,GPU Cloud UK (E0002),NC-UK,130,Sales & Marketing
+CC2100,On-Prem - Data Center Operations,On-Prem,Data Center Ops (E0005),NC-US,210,Cost of Revenue
+CC2200,On-Prem - Solutions & Field Sales,On-Prem,On-Prem Solutions (E0005),NC-US,220,Sales & Marketing
+CC2300,On-Prem - UK Field Operations,On-Prem,On-Prem UK (E0005),NC-UK,230,Cost of Revenue
+CC3100,Engineering - Platform,Engineering,Platform Engineering (E0007),NC-US,310,Research & Development
+CC3200,Engineering - Infrastructure,Engineering,Infrastructure Engineering (E0007),NC-US,320,Research & Development
+CC3300,Engineering - India,Engineering,Engineering India (E0007),NC-IN,330,Research & Development
+CC3400,Engineering - Canada,Engineering,Engineering Canada (E0007),NC-CA,340,Research & Development
+CC4100,G&A - Finance & Accounting,G&A,Finance (E0010),NC-US,410,General & Administrative
+CC4200,G&A - People,G&A,People (E0010),NC-US,420,General & Administrative
+CC4300,"G&A - Legal, IT & Security",G&A,Legal & IT (E0010),NC-US,430,General & Administrative

@@ -1,0 +1,7 @@
+employee_id,event,effective_date,field,old_value,new_value,entered_on,reason
+E0057,Comp Change,2026-10-10,annualSalary,175000,195000,2026-10-08,Promotion adjustment
+E0088,Location Change,2026-10-06,workState,CA,CO,2026-10-02,Relocated to Denver (remote)
+E0088,Location Change,2026-10-06,locationId,SF,REMOTE-US,2026-10-02,Relocated to Denver (remote)
+E0149,Leave of Absence,2026-10-08,status,Active,On Leave,2026-10-13,Unpaid personal leave
+E0318,Leave of Absence,2026-08-03,status,Active,On Leave - Paid,2026-07-20,Statutory maternity leave (enhanced to full pay for 26 weeks)
+E0330,Comp Change,2026-10-01,annualSalary,3200000,3600000,2026-10-22,Annual merit (approved late)

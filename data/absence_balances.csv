@@ -1,0 +1,366 @@
+employee_id,plan,balance,unit,last_accrual_date,notes
+E0000,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0001,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0002,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0003,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0004,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0005,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0007,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0010,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0012,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0015,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0021,US_HOURLY_VAC,46.5,hours,2026-10-01,Accrues per hour worked
+E0021,CA_SICK,28,hours,2026-10-01,
+E0023,US_HOURLY_VAC,83,hours,2026-10-01,Accrues per hour worked
+E0023,CA_SICK,19.5,hours,2026-10-01,
+E0024,US_HOURLY_VAC,73,hours,2026-10-01,Accrues per hour worked
+E0024,CA_SICK,19.5,hours,2026-10-01,
+E0025,US_HOURLY_VAC,24,hours,2026-10-01,Accrues per hour worked
+E0025,CA_SICK,30,hours,2026-10-01,
+E0026,US_HOURLY_VAC,9.5,hours,2026-10-01,Accrues per hour worked
+E0026,CA_SICK,30.5,hours,2026-10-01,
+E0027,US_HOURLY_VAC,25.5,hours,2026-10-01,Accrues per hour worked
+E0027,CA_SICK,10,hours,2026-10-01,
+E0028,US_HOURLY_VAC,33.5,hours,2026-10-01,Accrues per hour worked
+E0028,CA_SICK,10,hours,2026-10-01,
+E0029,US_HOURLY_VAC,71,hours,2026-10-01,Accrues per hour worked
+E0029,CA_SICK,18.5,hours,2026-10-01,
+E0030,US_HOURLY_VAC,9.5,hours,2026-10-01,Accrues per hour worked
+E0030,CA_SICK,14,hours,2026-10-01,
+E0031,US_HOURLY_VAC,25.5,hours,2026-10-01,Accrues per hour worked
+E0031,CA_SICK,13.5,hours,2026-10-01,
+E0032,US_HOURLY_VAC,73,hours,2026-10-01,Accrues per hour worked
+E0032,CA_SICK,21,hours,2026-10-01,
+E0033,US_HOURLY_VAC,43.5,hours,2026-10-01,Accrues per hour worked
+E0033,CA_SICK,34.5,hours,2026-10-01,
+E0034,US_HOURLY_VAC,70,hours,2026-10-01,Accrues per hour worked
+E0034,CA_SICK,27.5,hours,2026-10-01,
+E0035,US_HOURLY_VAC,27,hours,2026-10-01,Accrues per hour worked
+E0035,CA_SICK,27.5,hours,2026-10-01,
+E0036,US_HOURLY_VAC,38.5,hours,2026-10-01,Accrues per hour worked
+E0036,CA_SICK,23,hours,2026-10-01,
+E0022,US_HOURLY_VAC,35,hours,2026-10-01,Accrues per hour worked
+E0037,US_HOURLY_VAC,14.5,hours,2026-10-01,Accrues per hour worked
+E0038,US_HOURLY_VAC,87.5,hours,2026-10-01,Accrues per hour worked
+E0039,US_HOURLY_VAC,26.5,hours,2026-10-01,Accrues per hour worked
+E0040,US_HOURLY_VAC,13.5,hours,2026-10-01,Accrues per hour worked
+E0041,US_HOURLY_VAC,16,hours,2026-10-01,Accrues per hour worked
+E0042,US_HOURLY_VAC,39.5,hours,2026-10-01,Accrues per hour worked
+E0043,US_HOURLY_VAC,21.5,hours,2026-10-01,Accrues per hour worked
+E0044,US_HOURLY_VAC,19.5,hours,2026-10-01,Accrues per hour worked
+E0045,US_HOURLY_VAC,8.5,hours,2026-10-01,Accrues per hour worked
+E0057,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0088,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0148,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0148,US_HOURLY_VAC,31,hours,2026-10-01,Payout on termination
+E0149,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0203,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0345,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0346,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0011,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0013,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0014,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0016,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0017,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0018,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0019,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0020,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0046,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0047,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0048,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0049,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0050,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0051,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0052,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0053,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0054,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0055,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0056,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0058,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0059,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0060,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0061,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0062,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0063,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0064,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0065,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0066,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0067,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0068,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0069,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0070,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0071,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0072,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0073,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0074,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0075,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0076,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0077,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0078,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0079,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0080,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0081,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0082,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0083,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0084,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0085,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0086,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0087,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0089,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0090,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0091,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0092,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0093,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0094,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0095,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0096,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0097,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0098,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0099,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0100,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0101,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0102,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0103,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0104,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0105,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0106,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0107,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0108,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0109,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0110,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0111,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0112,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0113,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0114,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0115,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0116,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0117,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0118,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0119,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0120,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0121,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0122,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0123,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0124,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0125,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0126,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0127,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0128,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0129,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0130,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0131,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0132,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0133,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0134,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0135,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0136,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0137,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0138,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0139,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0140,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0141,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0142,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0143,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0144,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0145,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0146,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0147,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0150,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0151,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0152,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0153,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0154,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0155,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0156,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0157,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0158,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0159,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0160,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0161,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0162,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0163,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0164,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0165,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0166,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0167,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0168,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0169,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0170,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0171,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0172,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0173,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0174,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0175,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0176,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0177,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0178,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0179,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0180,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0181,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0182,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0183,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0184,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0185,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0186,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0187,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0188,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0189,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0190,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0191,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0192,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0193,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0194,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0195,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0196,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0197,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0198,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0199,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0200,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0201,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0202,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0204,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0205,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0206,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0207,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0208,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0209,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0210,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0211,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0212,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0213,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0214,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0215,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0216,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0217,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0218,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0219,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0220,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0221,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0222,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0223,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0224,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0225,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0226,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0227,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0228,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0229,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0230,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0231,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0232,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0233,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0234,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0235,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0236,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0237,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0238,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0239,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0240,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0241,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0242,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0243,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0244,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0245,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0246,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0247,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0248,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0249,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0250,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0251,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0252,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0253,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0254,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0255,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0256,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0257,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0258,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0259,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0260,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0261,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0262,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0263,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0264,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0265,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0266,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0267,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0268,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0269,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0270,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0271,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0272,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0273,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0274,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0275,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0276,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0277,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0278,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0279,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0280,US_FLEX_PTO,unlimited,hours,,Non-balance plan
+E0006,UK_ANNUAL,14.5,days,2026-10-01,Holiday year Jan–Dec
+E0008,CAN_ON_VAC,9,days,2026-10-01,"Ontario, 3 weeks/year"
+E0009,IND_EL,11,days,2026-10-01,Karnataka S&E Act
+E0315,UK_ANNUAL,14.5,days,2026-10-01,Holiday year Jan–Dec
+E0318,UK_ANNUAL,3,days,2026-10-01,Holiday year Jan–Dec
+E0330,IND_EL,14,days,2026-10-01,Karnataka S&E Act
+E0340,CAN_ON_VAC,0,days,2026-10-01,"Ontario, 3 weeks/year"
+E0300,UK_ANNUAL,4,days,2026-10-01,Holiday year Jan–Dec
+E0301,UK_ANNUAL,15,days,2026-10-01,Holiday year Jan–Dec
+E0302,UK_ANNUAL,12.5,days,2026-10-01,Holiday year Jan–Dec
+E0303,UK_ANNUAL,15,days,2026-10-01,Holiday year Jan–Dec
+E0304,UK_ANNUAL,4,days,2026-10-01,Holiday year Jan–Dec
+E0305,UK_ANNUAL,3,days,2026-10-01,Holiday year Jan–Dec
+E0306,UK_ANNUAL,10,days,2026-10-01,Holiday year Jan–Dec
+E0307,UK_ANNUAL,14.5,days,2026-10-01,Holiday year Jan–Dec
+E0308,UK_ANNUAL,9.5,days,2026-10-01,Holiday year Jan–Dec
+E0309,UK_ANNUAL,10,days,2026-10-01,Holiday year Jan–Dec
+E0310,UK_ANNUAL,3,days,2026-10-01,Holiday year Jan–Dec
+E0311,UK_ANNUAL,8,days,2026-10-01,Holiday year Jan–Dec
+E0312,UK_ANNUAL,6.5,days,2026-10-01,Holiday year Jan–Dec
+E0313,UK_ANNUAL,6.5,days,2026-10-01,Holiday year Jan–Dec
+E0314,UK_ANNUAL,9,days,2026-10-01,Holiday year Jan–Dec
+E0316,UK_ANNUAL,15,days,2026-10-01,Holiday year Jan–Dec
+E0317,UK_ANNUAL,5.5,days,2026-10-01,Holiday year Jan–Dec
+E0319,UK_ANNUAL,10,days,2026-10-01,Holiday year Jan–Dec
+E0320,UK_ANNUAL,13.5,days,2026-10-01,Holiday year Jan–Dec
+E0321,UK_ANNUAL,8.5,days,2026-10-01,Holiday year Jan–Dec
+E0322,CAN_ON_VAC,5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0323,CAN_ON_VAC,8,days,2026-10-01,"Ontario, 3 weeks/year"
+E0324,CAN_ON_VAC,9,days,2026-10-01,"Ontario, 3 weeks/year"
+E0325,CAN_ON_VAC,5.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0326,CAN_ON_VAC,12,days,2026-10-01,"Ontario, 3 weeks/year"
+E0327,CAN_ON_VAC,11,days,2026-10-01,"Ontario, 3 weeks/year"
+E0328,CAN_ON_VAC,6.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0329,CAN_ON_VAC,12.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0331,CAN_ON_VAC,9,days,2026-10-01,"Ontario, 3 weeks/year"
+E0332,CAN_ON_VAC,15.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0333,CAN_ON_VAC,11,days,2026-10-01,"Ontario, 3 weeks/year"
+E0334,CAN_ON_VAC,12.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0335,CAN_ON_VAC,7.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0336,CAN_ON_VAC,11.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0337,CAN_ON_VAC,12,days,2026-10-01,"Ontario, 3 weeks/year"
+E0338,CAN_ON_VAC,3,days,2026-10-01,"Ontario, 3 weeks/year"
+E0339,CAN_ON_VAC,6.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0341,CAN_ON_VAC,4,days,2026-10-01,"Ontario, 3 weeks/year"
+E0342,CAN_ON_VAC,3,days,2026-10-01,"Ontario, 3 weeks/year"
+E0343,CAN_ON_VAC,12.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0344,CAN_ON_VAC,6,days,2026-10-01,"Ontario, 3 weeks/year"
+E0347,CAN_ON_VAC,4,days,2026-10-01,"Ontario, 3 weeks/year"
+E0348,CAN_ON_VAC,12.5,days,2026-10-01,"Ontario, 3 weeks/year"
+E0349,CAN_ON_VAC,3,days,2026-10-01,"Ontario, 3 weeks/year"
+E0350,IND_EL,21.5,days,2026-10-01,Karnataka S&E Act
+E0351,IND_EL,3.5,days,2026-10-01,Karnataka S&E Act
+E0352,IND_EL,24,days,2026-10-01,Karnataka S&E Act
+E0353,IND_EL,25,days,2026-10-01,Karnataka S&E Act
+E0354,IND_EL,11.5,days,2026-10-01,Karnataka S&E Act
+E0355,IND_EL,20.5,days,2026-10-01,Karnataka S&E Act
+E0356,IND_EL,25,days,2026-10-01,Karnataka S&E Act
+E0357,IND_EL,14,days,2026-10-01,Karnataka S&E Act
+E0358,IND_EL,29,days,2026-10-01,Karnataka S&E Act
+E0359,IND_EL,3,days,2026-10-01,Karnataka S&E Act
+E0360,IND_EL,15.5,days,2026-10-01,Karnataka S&E Act
+E0361,IND_EL,15.5,days,2026-10-01,Karnataka S&E Act
+E0362,IND_EL,10,days,2026-10-01,Karnataka S&E Act
+E0363,IND_EL,28.5,days,2026-10-01,Karnataka S&E Act
+E0364,IND_EL,16,days,2026-10-01,Karnataka S&E Act
+E0365,IND_EL,14,days,2026-10-01,Karnataka S&E Act
+E0366,IND_EL,25.5,days,2026-10-01,Karnataka S&E Act
+E0367,IND_EL,12.5,days,2026-10-01,Karnataka S&E Act
