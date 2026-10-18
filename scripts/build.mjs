@@ -4,6 +4,7 @@
 import * as esbuild from "esbuild";
 import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 
 const root = process.cwd();
 const dist = join(root, "dist");
@@ -41,7 +42,7 @@ export function copyStatic() {
   writeFileSync(join(dist, "docs/manifest.json"), JSON.stringify(meta));
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   rmSync(dist, { recursive: true, force: true });
   mkdirSync(dist, { recursive: true });
   await esbuild.build(buildOptions);
