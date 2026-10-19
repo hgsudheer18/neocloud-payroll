@@ -82,8 +82,8 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
             <Bars rows={rows.map((x) => ({ label: by === "location" ? (data!.ds.locations.find((l) => l.id === x.key)?.name ?? x.key) : by === "costCenter" ? `${x.key} ${data!.ds.costCenters.find((c) => c.id === x.key)?.name.split(" - ")[1] ?? ""}` : x.key, parts: [x.gross, x.erTaxes, x.benefits], total: x.burdened }))} />
             <div className="legend">
               <span><i style={{ background: "var(--ledger)" }} />Gross</span>
-              <span><i style={{ background: "#6fa592" }} />Employer taxes</span>
-              <span><i style={{ background: "#b7d2c6" }} />Benefits</span>
+              <span><i style={{ background: "#777777" }} />Employer taxes</span>
+              <span><i style={{ background: "#bbbbbb" }} />Benefits</span>
             </div>
           </div>
           <div className="table-wrap">

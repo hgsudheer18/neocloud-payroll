@@ -1,25 +1,25 @@
 /* NeoCloud Payroll Console
-   Direction: the payroll register as it used to be printed — green-bar
+   Direction: the payroll register as it used to be printed — banded
    ledger paper — rendered for a screen. Banded registers are the one bold
    element; everything around them stays quiet. */
 
 :root {
-  --paper: #f3f5f2;
+  --paper: #ffffff;
   --sheet: #ffffff;
-  --ink: #17231f;
-  --ink-soft: #4d5b55;
-  --ink-faint: #7b8782;
-  --rule: #d5ddd7;
-  --band: #e6f0e8; /* green-bar band */
-  --ledger: #1f6b57; /* primary: ledger green */
-  --ledger-deep: #134536;
+  --ink: #111111;
+  --ink-soft: #555555;
+  --ink-faint: #777777;
+  --rule: #dddddd;
+  --band: #f2f2f2; /* grey-bar band */
+  --ledger: #111111; /* primary: black */
+  --ledger-deep: #000000;
   --amber: #a86a05; /* variance / attention */
   --amber-wash: #fbf1dc;
   --red: #a63a28;
   --red-wash: #f8e4df;
   --blue: #2f5d8a; /* information */
   --blue-wash: #e3ecf5;
-  --ok-wash: #ddefe5;
+  --ok-wash: #ececec;
 
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --cond: "IBM Plex Sans Condensed", "IBM Plex Sans", "Arial Narrow", system-ui, sans-serif;
@@ -52,29 +52,29 @@ button, select, input { font: inherit; color: inherit; }
 /* ---------- shell ---------- */
 .shell { display: grid; grid-template-columns: 236px minmax(0, 1fr); min-height: 100vh; }
 .side {
-  background: var(--ledger-deep);
-  color: #e3eee8;
+  background: #ffffff; border-right: 1px solid var(--rule);
+  color: #111111;
   padding: var(--s5) var(--s4);
   position: sticky; top: 0; height: 100vh; overflow-y: auto;
   display: flex; flex-direction: column; gap: var(--s5);
 }
-.brand { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; color: #fff; }
-.brand small { display: block; font-weight: 400; font-size: 13px; color: #a9c4b8; letter-spacing: 0; }
+.brand { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; color: #000000; }
+.brand small { display: block; font-weight: 400; font-size: 13px; color: #555555; letter-spacing: 0; }
 .stamp {
-  border: 1px solid #3c6f5f; border-radius: var(--radius);
-  padding: var(--s3); font-size: 13px; line-height: 1.45; color: #cfe1d8;
+  border: 1px solid #dddddd; border-radius: var(--radius);
+  padding: var(--s3); font-size: 13px; line-height: 1.45; color: #333333;
 }
-.stamp strong { color: #fff; font-weight: 600; display: block; font-size: 14px; }
+.stamp strong { color: #111111; font-weight: 600; display: block; font-size: 14px; }
 .nav { display: flex; flex-direction: column; gap: 2px; }
 .nav a {
-  color: #cfe1d8; text-decoration: none; padding: 7px 10px; border-radius: var(--radius-sm);
+  color: #333333; text-decoration: none; padding: 7px 10px; border-radius: var(--radius-sm);
   font-size: 14px; display: flex; justify-content: space-between; align-items: center;
 }
-.nav a:hover { background: #1d5949; color: #fff; }
-.nav a[aria-current="page"] { background: #f3f5f2; color: var(--ledger-deep); font-weight: 600; }
+.nav a:hover { background: #f2f2f2; color: #000000; }
+.nav a[aria-current="page"] { background: #111111; color: #ffffff; font-weight: 600; }
 .nav .count { font-size: 12px; color: inherit; opacity: 0.75; }
-.nav-group { font-size: 12px; color: #8fb3a4; margin: var(--s3) 10px var(--s1); }
-.side-foot { margin-top: auto; font-size: 12px; color: #8fb3a4; }
+.nav-group { font-size: 12px; color: #777777; margin: var(--s3) 10px var(--s1); }
+.side-foot { margin-top: auto; font-size: 12px; color: #777777; }
 
 .main { padding: var(--s6) var(--s7) var(--s7); max-width: 1400px; width: 100%; min-width: 0; }
 .page-head { margin-bottom: var(--s5); max-width: 78ch; }
@@ -112,7 +112,7 @@ h3 { font-size: 15px; font-weight: 600; margin: 0 0 var(--s2); }
 .tie .side-val { text-align: right; }
 .tie .side-val small { display: block; color: var(--ink-faint); font-size: 12px; }
 
-/* ---------- tables: green-bar register ---------- */
+/* ---------- tables: banded register ---------- */
 .table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--sheet); }
 table.reg { border-collapse: collapse; width: 100%; font-size: 14px; }
 table.reg th {
@@ -121,11 +121,11 @@ table.reg th {
   position: sticky; top: 0; white-space: nowrap; z-index: 1;
 }
 table.reg td { padding: 7px 12px; border-bottom: 1px solid transparent; vertical-align: top; }
-/* green-bar: bands of three rows, like continuous-form ledger paper */
+/* grey-bar: bands of three rows, like continuous-form ledger paper */
 table.reg tbody tr:nth-child(6n + 1) td, table.reg tbody tr:nth-child(6n + 2) td, table.reg tbody tr:nth-child(6n + 3) td { background: var(--band); }
 table.reg tbody tr.click { cursor: pointer; }
-table.reg tbody tr.click:hover td { background: #d3e6d9; }
-table.reg tbody tr.sel td { background: #cfe3d6 !important; box-shadow: inset 0 1px 0 var(--ledger), inset 0 -1px 0 var(--ledger); }
+table.reg tbody tr.click:hover td { background: #e6e6e6; }
+table.reg tbody tr.sel td { background: #dedede !important; box-shadow: inset 0 1px 0 var(--ledger), inset 0 -1px 0 var(--ledger); }
 table.reg td.n, table.reg th.n { text-align: right; white-space: nowrap; }
 table.reg tfoot td { border-top: 2px solid var(--ink); font-weight: 600; padding: 9px 12px; background: var(--sheet); }
 table.reg td.wrap { white-space: normal; min-width: 260px; }
@@ -163,8 +163,8 @@ select, input[type="search"], input[type="text"] {
 .bar-row { display: grid; grid-template-columns: minmax(110px, 180px) minmax(0, 1fr) 110px; gap: var(--s3); align-items: center; font-size: 14px; }
 .bar-track { height: 18px; background: var(--paper); border-radius: 2px; position: relative; overflow: hidden; }
 .bar-fill { position: absolute; inset: 0 auto 0 0; background: var(--ledger); }
-.bar-fill.er { background: #6fa592; }
-.bar-fill.ben { background: #b7d2c6; }
+.bar-fill.er { background: #777777; }
+.bar-fill.ben { background: #bbbbbb; }
 .legend { display: flex; gap: var(--s4); font-size: 13px; color: var(--ink-soft); margin-top: var(--s3); flex-wrap: wrap; }
 .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
 
@@ -225,9 +225,9 @@ select, input[type="search"], input[type="text"] {
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 
 /* ---------- ERP: sidebar selectors, forms, steps ---------- */
-.side-select { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #a9c4b8; }
-.side-select select { background: #1d5949; color: #fff; border: 1px solid #3c6f5f; min-width: 0; width: 100%; font-size: 13px; }
-.side-note { color: #cfe1d8; font-size: 12px; }
+.side-select { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #555555; }
+.side-select select { background: #ffffff; color: #111111; border: 1px solid #dddddd; min-width: 0; width: 100%; font-size: 13px; }
+.side-note { color: #333333; font-size: 12px; }
 .badge { background: var(--amber); color: #fff; border-radius: 10px; font-size: 11px; font-weight: 700; padding: 0 7px; line-height: 18px; }
 .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--s3) var(--s4); }
 .field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
