@@ -77,6 +77,8 @@ export interface WorkerPayInput {
   absencesTaken: AbsenceTaken[];
   ytd?: Ytd;
   garnishment?: Garnishment;
+  /** Difference from recalculating a completed period after later changes (Workday retro). */
+  priorPeriodRetro?: { amount: Cents; explain: string };
 }
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -236,6 +238,9 @@ export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: Pay
     ...(w.payType === "Salary" ? salaryLines(input, period) : []),
     ...timeLines(input),
     ...absenceLines(input, period),
+    ...(input.priorPeriodRetro && input.priorPeriodRetro.amount !== 0
+      ? [line("RETRO", input.priorPeriodRetro.amount, input.priorPeriodRetro.explain, { state: input.timeline[input.timeline.length - 1].workState, costCenterId: input.timeline[input.timeline.length - 1].costCenterId })]
+      : []),
   ];
   const gross = earnings.reduce((s, l) => s + l.amount, 0);
   const k401Base = earnings.filter((l) => COMPONENT[l.code].k401Eligible).reduce((s, l) => s + l.amount, 0);

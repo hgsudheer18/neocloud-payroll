@@ -64,18 +64,23 @@ export interface Worker {
   k401Pct: number; // 0.06 = 6% pre-tax 401(k)
   medicalPerPeriod: number; // major units, Section 125 pre-tax
   shift: "Day" | "Night" | "";
+  /** Date the record was entered (ERP transactions); CSV workers default to hire date. */
+  enteredOn?: ISODate;
+  /** "erp" when created by a business process in the app rather than the CSV package. */
+  source?: "erp";
 }
 
 /** Effective-dated change to one worker attribute. */
 export interface WorkerEvent {
   employeeId: string;
-  event: "Comp Change" | "Location Change" | "Leave of Absence" | "Return from Leave" | "Cost Center Change";
+  event: "Comp Change" | "Location Change" | "Leave of Absence" | "Return from Leave" | "Cost Center Change" | "Termination";
   effectiveDate: ISODate;
   field: "annualSalary" | "hourlyRate" | "workState" | "locationId" | "status" | "costCenterId";
   oldValue: string;
   newValue: string;
   enteredOn: ISODate;
   reason: string;
+  source?: "erp";
 }
 
 export interface TimeRow {
@@ -91,6 +96,7 @@ export interface TimeRow {
   correctsRowId: string;
   enteredOn: ISODate;
   notes: string;
+  source?: "erp";
 }
 
 export interface AbsenceBalance {
@@ -109,6 +115,7 @@ export interface AbsenceTaken {
   quantity: number;
   unit: "hours" | "days";
   status: "Approved" | "Submitted";
+  source?: "erp";
 }
 
 export interface Ytd {

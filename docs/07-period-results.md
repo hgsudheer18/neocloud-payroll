@@ -130,7 +130,7 @@ E0148 payout flowing to payroll: **$2,629.69** (33.15 hrs (31.00 opening + 2.15 
 |---|---|---|---|
 | = | Workers on file | 354 | All rows in the worker file. |
 | − | Contingent workers (contractors) | 5 | C0001, C0002, C0003, C0004, C0005 |
-| − | International employees | 69 | Monthly pay groups (UK, Canada, India), paid by in-country providers. |
+| − | Other pay groups | 69 | Not in US Semi-Monthly: international monthly pay groups (paid by in-country providers). |
 | − | Terminated before period | 0 | No earnings in this period. |
 | − | Hire date after period end | 0 | Future-dated hires; first paid next period. |
 | = | US employees eligible this period | 280 | In the US Semi-Monthly pay group with at least one day employed. |

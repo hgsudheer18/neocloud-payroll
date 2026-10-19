@@ -27,6 +27,8 @@ export interface Variant {
   noMealPremium?: boolean;
   noRetro?: boolean;
   treatAsEmployee?: boolean;
+  /** Leave out everything entered through the app's business processes (not known to legacy). */
+  excludeErpEntries?: boolean;
 }
 
 export interface UsWorkerCalc {
@@ -42,12 +44,16 @@ export function isUsPayrollWorker(w: Worker): boolean {
   return w.workerType === "Employee" && w.payGroup === "US Semi-Monthly";
 }
 
-export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Variant = {}): UsWorkerCalc {
+export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Variant = {}, retro?: WorkerPayInput["priorPeriodRetro"]): UsWorkerCalc {
   let w: Worker = { ...w0 };
   if (v.treatAsEmployee) w = { ...w, workerType: "Employee", payGroup: "US Semi-Monthly", flsa: "Exempt" };
   if (v.hireAtPeriodStart && w.hireDate > period.start) w = { ...w, hireDate: period.start };
+  if (v.excludeErpEntries) {
+    const t = ds.events.find((e) => e.employeeId === w.id && e.source === "erp" && e.event === "Termination");
+    if (t) w = { ...w, terminationDate: t.oldValue };
+  }
 
-  let events: WorkerEvent[] = ds.events.filter((e) => e.employeeId === w.id);
+  let events: WorkerEvent[] = ds.events.filter((e) => e.employeeId === w.id && !(v.excludeErpEntries && e.source === "erp"));
   if (v.ignoreLeave) events = events.filter((e) => e.field !== "status");
   if (v.ignoreLocationChange) events = events.filter((e) => e.field !== "workState" && e.field !== "locationId");
   if (v.compFromPeriodStart)
@@ -59,7 +65,7 @@ export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Vari
 
   let time: WorkerTimeResult | undefined;
   if (w.payType === "Hourly") {
-    let rows: TimeRow[] = ds.time.filter((r) => r.employeeId === w.id);
+    let rows: TimeRow[] = ds.time.filter((r) => r.employeeId === w.id && !(v.excludeErpEntries && r.source === "erp"));
     if (v.noRetro) rows = rows.filter((r) => r.entryType !== "Correction");
     time = calcWorkerTime(w.id, rows, w.workState, w.hourlyRate, period.start, period.end, {
       dedupe: !v.keepDuplicatePunches,
@@ -72,7 +78,7 @@ export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Vari
   const hoursWorkedBasis = time ? "time tracking" : `work schedule: ${paidWorkingDays} paid days × ${STANDARD_DAILY_HOURS}`;
   const terminated = !!w.terminationDate && w.terminationDate >= period.start && w.terminationDate <= period.end;
   const unpaidLeaveDays = timeline.filter((d) => d.employed && d.onLeave).length;
-  const taken = ds.absences.filter((a) => a.employeeId === w.id);
+  const taken = ds.absences.filter((a) => a.employeeId === w.id && !(v.excludeErpEntries && a.source === "erp"));
 
   const absence = plansForWorker(w, ds.balances).map((plan) =>
     calcAbsenceLine(
@@ -92,6 +98,7 @@ export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Vari
     absencesTaken: taken,
     ytd: ds.ytd.find((y) => y.employeeId === w.id),
     garnishment: v.noGarnishment ? undefined : ds.garnishments.find((g) => g.employeeId === w.id),
+    priorPeriodRetro: v.excludeErpEntries ? undefined : retro,
   };
   const pay = calcUSWorker(input, period, v.ssBaseActual ? { ssWageBase: ACTUAL_2026_SS_WAGE_BASE } : {});
   return { worker: w, input, time, absence, pay, hoursWorkedBasis };

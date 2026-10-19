@@ -15,7 +15,7 @@ const tone = (s: EmployeeRecon["status"]) => (s === "Matched" ? "ok" : s === "Un
 export default function Reconciliation({ id, query }: { id?: string; query: URLSearchParams }) {
   const { data } = useData();
   const r = data!.result;
-  const tab = query.get("tab") ?? (id ? "legacy" : "legacy");
+  const tab = query.get("tab") ?? (r.reconciled ? "legacy" : "headcount");
   const showMatched = query.get("all") === "1";
   const setTab = (t: string) => setQuery(`/reconciliation${id ? `/${id}` : ""}`, { tab: t, all: showMatched ? "1" : "" });
   const sel = id ? r.recon.employees.find((e) => e.employeeId === id) : undefined;
@@ -34,7 +34,8 @@ export default function Reconciliation({ id, query }: { id?: string; query: URLS
 
       {tab === "headcount" && <Headcount />}
       {tab === "commentary" && <Commentary />}
-      {tab === "legacy" && (
+      {tab === "legacy" && !r.reconciled && <div className="callout info">This period is after go-live, so there is no legacy register to compare with: Workday is the only payroll system. Select the Oct 1–15 parallel-run period in the sidebar to see the reconciliation to Rippling. Headcount reconciliation still applies.</div>}
+      {tab === "legacy" && r.reconciled && (
         <>
           <div className="figures">
             {(["Matched", "Explained", "Only in legacy", "Only in Workday", "Unexplained"] as const).map((k) => (
@@ -177,6 +178,7 @@ function Headcount() {
           </div>
         </Section>
       </div>
+      {r.reconciled && (
       <Section title="Workday paid versus legacy paid">
         <div className="table-wrap">
           <table className="reg">
@@ -190,6 +192,7 @@ function Headcount() {
         </div>
         {paid + legacyOnly.length - wdOnly.length === legacyCount ? <div className="callout ok">Headcount ties: {paid} + {legacyOnly.length} − {wdOnly.length} = {legacyCount}.</div> : <div className="callout bad">Headcount does not tie.</div>}
       </Section>
+      )}
     </>
   );
 }

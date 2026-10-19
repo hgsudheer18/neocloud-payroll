@@ -130,7 +130,7 @@ export function outboundChanges(ds: Dataset, workers: Worker[], p: MonthlyPeriod
   const ids = new Set(workers.map((w) => w.id));
   for (const w of workers) {
     if (w.hireDate >= p.start && w.hireDate <= p.end)
-      out.push({ employeeId: w.id, country: w.country, changeType: "Hire", effectiveDate: w.hireDate, detail: `${w.jobProfile}, ${w.annualSalary.toLocaleString("en-US")} ${w.currency}`, enteredOn: w.hireDate, inCutoff: true });
+      out.push({ employeeId: w.id, country: w.country, changeType: "Hire", effectiveDate: w.hireDate, detail: `${w.jobProfile}, ${w.annualSalary.toLocaleString("en-US")} ${w.currency}`, enteredOn: w.enteredOn ?? w.hireDate, inCutoff: (w.enteredOn ?? w.hireDate) <= p.changeCutoff });
     if (w.terminationDate && w.terminationDate >= p.start && w.terminationDate <= p.end)
       out.push({ employeeId: w.id, country: w.country, changeType: "Termination", effectiveDate: w.terminationDate, detail: "Leaver; final pay and leave payout", enteredOn: w.terminationDate, inCutoff: true });
   }
@@ -154,6 +154,11 @@ export function reconcileProvider(ds: Dataset, results: IntlWorkerResult[], prov
   for (const r of results) {
     const pr = byId.get(r.worker.id);
     if (!pr) {
+      const entered = r.worker.enteredOn ?? r.worker.hireDate;
+      if (entered > p.changeCutoff) {
+        out.push({ employeeId: r.worker.id, country: r.worker.country, currency: r.currency, field: "missing", expected: r.gross, provider: 0, delta: -r.gross, category: "Timing", explanation: `Hire entered ${pretty(entered)}, after the ${pretty(p.changeCutoff)} cutoff, so it was not in this month's file.`, action: "The provider pays this month's salary as arrears next month, or run an off-cycle if the worker must be paid now." });
+        continue;
+      }
       out.push({ employeeId: r.worker.id, country: r.worker.country, currency: r.currency, field: "missing", expected: r.gross, provider: 0, delta: -r.gross, category: "Unexplained", explanation: "Worker expected but not in provider results.", action: "Hold GL posting for this entity; confirm with provider before funding." });
       continue;
     }

@@ -4,33 +4,47 @@ NeoCloud pays roughly 280 US employees semi-monthly on Workday Payroll. Most are
 
 ## 1. Pay groups and period schedules
 
-### Recommendation: one pay group, `US Semi-Monthly`
+### Recommendation: two US pay groups
 
-| Setting | Value |
+| Setting | US Semi-Monthly (salaried) | US Biweekly (hourly) |
+|---|---|---|
+| Who | US exempt, salaried employees | US non-exempt, hourly employees (data center technicians) |
+| Period | 1st–15th and 16th–last day; 24 per year | Two Sunday–Saturday workweeks; 26 per year |
+| Check date | Period end + 5 calendar days (prior business day if a weekend or holiday) | Friday after period end (6 days) |
+| Time period schedule | n/a (exception-based time off only) | Same biweekly periods, aligned to the FLSA workweek |
+| Proration | Working days (Mon–Fri) per comp segment | Hours from approved time |
+| Per-period deductions | Annual ÷ 24 | Annual ÷ 26 (benefit deduction schedule set per pay group) |
+
+### Why hourly workers are biweekly
+
+- **Overtime is measured per 7-day workweek** (FLSA, and California's weekly rule). A biweekly period is exactly two complete Sunday–Saturday workweeks, so a workweek is never split between two pay periods.
+- With semi-monthly periods, a workweek often straddles the 15th or month end. Weekly overtime and the regular-rate adjustment for that week then have to be paid "as worked" and trued up the next period. That is extra retro, harder audits and more questions from employees. The engine handles it (see the Oct 11–17 workweek in the parallel run), but the design should avoid it.
+- Daily overtime, double time, seventh-day premiums and the night differential all fall inside whole weeks, so each pay period's time results are self-contained.
+- Compliance: California Labor Code 204 allows biweekly pay for non-exempt employees; Texas requires at least semi-monthly, which biweekly exceeds.
+
+### Why salaried workers stay semi-monthly
+
+- Salaried pay doesn't depend on workweeks: 24 equal periods give the same pay every period and line up with monthly benefit premiums and month-end close.
+- Exempt employees in the legacy system are already paid semi-monthly; changing their pay frequency is an employee-relations change with no calculation benefit.
+
+### Trade-offs, accepted
+
+| Cost of two pay groups | Mitigation |
 |---|---|
-| Pay group | US Semi-Monthly (company NeoCloud Inc., all US work states) |
-| Period schedule | 1st–15th and 16th–last day of month, 24 periods |
-| Check date | Period end + 5 calendar days, moved to the prior business day for weekends and bank holidays (Oct 1–15 period pays Tue Oct 20) |
-| Pay calculation | Opens at period end after the time-approval cutoff; complete by check date − 2 business days for ACH |
-| Proration | Working days (Mon–Fri, company holidays excluded) for salary segments |
-| Time period schedule (Time Tracking) | Same semi-monthly periods; Sunday–Saturday workweek for overtime |
+| Two calendars and two pay runs (but the hourly run has only ~25 people) | Same business process, controls and journal design; the hourly run is small and quick to audit |
+| Two journals per cycle on different dates | Accounting date = period end; biweekly periods that straddle month end are accrued and reversed (see the GL document) |
+| 26 vs 24 periods: per-period deductions converted, and twice a year a month has three paydays | Benefit deduction schedules per pay group; communicated to the 25 employees at go-live |
 
-### Why one pay group for exempt and hourly
+### Transition at go-live
 
-- FLSA status does not change when or how often people are paid. It changes which pay components and time rules apply, and those are driven by worker eligibility (time entry template, time calculation set, pay component eligibility), not by the pay group.
-- One pay group means one pay calculation, one audit cycle, one settlement and bank file, one tax deposit schedule and one journal per period. Two pay groups double the run-book, approvals and reconciliations every half month for about 25 people.
-- California Labor Code 204 allows semi-monthly pay as long as wages for the 1st–15th are paid by the 26th and wages for the 16th–month end by the 10th of the next month. A five-day lag is compliant for both populations and gives managers time to approve time and payroll time to run the audit.
-- Paying hourly workers for the same calendar period (rather than a lagged one) keeps hours, absence and pay aligned to one period, which is what makes the time-to-pay tie-out in the app possible.
+- **Oct 1–15 (parallel run)** stays semi-monthly for everyone, because it must match the legacy Rippling register.
+- **Go-live, hourly:** the first biweekly run is a transition period Oct 16–31: a 2-day stub (Fri Oct 16 and Sat Oct 17) that completes the Oct 11–17 workweek, plus the full workweeks Oct 18–31. From then on, normal 14-day periods (Nov 1–14, paid Fri Nov 20).
+- **Go-live, salaried:** continue semi-monthly with Oct 16–31, paid Nov 5.
+- Per-period deductions for hourly workers convert from ÷ 24 to ÷ 26 at the transition. The app does all of this; see the Pay runs page.
 
-### Alternatives considered
+### Alternative considered: one semi-monthly pay group for everyone
 
-| Option | Why not |
-|---|---|
-| Separate `US Semi-Monthly Salaried` (paid current on the 15th) and `US Semi-Monthly Hourly` (lagged) | Two runs, two sets of controls and two journals per period for 25 people. Only worth it if exempt employees must keep being paid on the 15th, which is a change-management question for People, not a technical one. |
-| Biweekly for hourly | Aligns with the workweek, but creates a third calendar, 26 vs 24 periods for benefit deductions and a monthly accrual mismatch. |
-| Current-period pay for everyone | Forces estimating hourly time or paying it a period late, both of which create retro every period. |
-
-> Open item for the People team: confirm Rippling's current check dates. If salaried employees are paid on the 15th today, moving them to the 20th needs a communication plan; the configuration does not change.
+One run and one calendar per half month, which is simpler to operate. Rejected because every period would contain at least one split workweek for the hourly population, so overtime would routinely be paid in two parts. At NeoCloud's scale (~25 hourly workers, growing with data center expansion), clean overtime and simpler audits outweigh one extra small pay run.
 
 ## 2. Pay component catalog
 

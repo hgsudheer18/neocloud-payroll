@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useData } from "../state.tsx";
+import { useErp } from "../erp.tsx";
 import { PageHead, Pill, Section, downloadText, sevTone } from "../ui.tsx";
 import { FILES } from "../../lib/data/load.ts";
 import { parseCsv } from "../../lib/util/csv.ts";
@@ -22,6 +23,18 @@ const PURPOSE: Record<string, string> = {
 
 export default function DataFiles() {
   const { data, replaceFiles, reset } = useData();
+  const erpCtx = useErp();
+  const [demoMsg, setDemoMsg] = useState("");
+  const loadDemo = async (list: FileList | null) => {
+    const f = list?.[0];
+    if (!f) return;
+    try {
+      const err = erpCtx.importState(JSON.parse(await f.text()));
+      setDemoMsg(err ?? `Loaded ${f.name}.`);
+    } catch {
+      setDemoMsg("Could not read that file: it must be a demo data file downloaded from this page.");
+    }
+  };
   const [over, setOver] = useState(false);
   const [msg, setMsg] = useState("");
   const read = async (list: FileList | null) => {
@@ -36,9 +49,20 @@ export default function DataFiles() {
 
   return (
     <>
-      <PageHead title="Data files">
-        The app ingests the CSV package and recalculates everything from it. Upload replacement files to rerun the period in your browser; nothing is sent to a server.
+      <PageHead title="Data and demo">
+        The app starts from the CSV data package and adds everything entered through business processes. Both are processed in your browser; nothing is sent to a server.
       </PageHead>
+
+      <Section title="Demo data" lede={`${erpCtx.erp.bps.length} business processes and ${Object.values(erpCtx.erp.payRuns).filter((p) => p.status !== "Not started").length} pay runs entered in this browser.`}>
+        <div className="row">
+          <button className="btn ghost" onClick={() => downloadText(`neocloud-demo-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(erpCtx.erp, null, 2), "application/json")}>Download my demo data</button>
+          <label className="btn ghost">Load demo data<input type="file" accept=".json" hidden onChange={(e) => loadDemo(e.target.files)} /></label>
+          <button className="btn ghost" onClick={() => { if (window.confirm("Remove every business process and pay run entered in this browser?")) { erpCtx.reset(); setDemoMsg("Demo data reset to the original package."); } }}>Reset demo data</button>
+        </div>
+        {demoMsg && <div className="callout info">{demoMsg}</div>}
+      </Section>
+
+      <Section title="CSV data package">
 
       <div
         className={`dropzone ${over ? "over" : ""}`}
@@ -54,6 +78,7 @@ export default function DataFiles() {
         {data!.source === "uploaded" && <button className="btn ghost" onClick={() => { reset(); setMsg("Restored the bundled data package."); }}>Restore bundled package</button>}
       </div>
       {msg && <div className="callout info">{msg}</div>}
+      </Section>
 
       <Section title="Validation" lede="Checked on load: required columns, date and time formats, numeric fields, duplicate IDs and references to cost centers, locations and workers.">
         {data!.issues.length === 0 ? <div className="callout ok">All files loaded with no validation issues.</div> : (

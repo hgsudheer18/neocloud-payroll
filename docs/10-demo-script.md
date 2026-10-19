@@ -1,68 +1,57 @@
-# Demo script (about 15 minutes)
+# Demo script (about 20 minutes)
 
-A walkthrough for the CFO, Controller and Head of People Technology. Each step names the screen, what to click and the point to make.
+A hands-on walkthrough for the CFO, Controller and Head of People Technology. Start from a clean state: **Data and demo → Reset demo data**. The role switcher ("Signed in as") and the pay period selector are at the top of the sidebar.
 
-## 1. Does the period tie? (2 min) — Period overview
+## Part 1. The parallel run ties (4 min)
 
-- Open the overview. The first thing on screen is the control-total ledger, not a chart: "Before anyone looks at a number, the question is whether the period ties."
-- Walk the eight ties: gross to net, journal balances, register to journal, time hours to paid hours, PTO taken to PTO paid, payout hours, headcount, and every legacy variance explained.
-- Point out the sidebar: the calculation ran in the browser in about 130 ms from the CSV package.
+**Signed in as:** anyone. **Pay period:** Oct 1–15 semi-monthly (parallel run, all US).
 
-## 2. Burdened cost (1 min) — Period overview, rollup
+1. **Period overview.** The first thing on screen is the control-total ledger: "Before anyone looks at a number, the question is whether the period ties." Walk through the eight ties.
+2. **Payroll register → E0148.** Termination: 7 of 11 days of salary, plus the vacation payout of 33.15 hours (31.00 opening + 2.15 final accrual) at $165,000 ÷ 2,080 = $2,629.69. The red banner says California final pay is due on the last day, so it goes on an on-demand payment.
+3. **Time calculation → E0021.** Oct 1 late meal (the brief didn't flag it), Oct 2 double time, Oct 3 missed meal plus 8 hours of weekly overtime because Sep 28–Oct 2 already reached 40.
+4. **Reconciliation → E0203.** Every variance is proven by recalculating with the cause. Then **E0003**: "Here legacy is right. The brief's $168,600 is the 2024 Social Security wage base; 2026 is $184,500. In a real parallel I'd fix Workday."
 
-- Switch Group by between Department, Location and Cost center; filter Department = On-Prem.
-- "US and international on one view, international translated at the reporting rates."
+## Part 2. Run the first payroll (3 min)
 
-## 3. One payslip, every number explained (3 min) — Payroll register
+5. **Signed in as Sam Ortiz, Payroll Specialist → Pay runs → Calculate pay.** The figures show 280 workers, all ties, and 1 critical audit item.
+6. Try to approve: Sam can't. "Segregation of duties: the person who calculates can't approve."
+7. **Signed in as Priya Nair, Payroll Approver → Pay runs.** Enter the resolution for the critical item (*"E0148 final pay issued as on-demand payment on Oct 9"*), then **Approve pay run** and **Complete pay run**. The period is now locked.
 
-- Search **E0148** (termination): salary 7/11 days; vacation payout 33.15 hours = 31.00 + 2.15 final accrual, at $165,000 ÷ 2,080. The red banner: CA final pay is due on the last day, so this goes on an on-demand payment, not the regular check.
-- Open **E0088** (CA → CO move): two salary lines, one per state; CA SDI only on CA wages; CO tax on CO wages.
-- Open **E0057** (comp change on the 10th): two segments.
-- Mention E0203 (new hire 4/11), E0149 (unpaid leave 5/11), E0031 (garnishment within the CCPA limit).
+## Part 3. Hire to terminate (5 min)
 
-## 4. Time (3 min) — Time calculation
+8. **Signed in as Jordan Reyes, HR Partner → Organization setup.** Show supervisory orgs and cost centers, locations, companies, job profiles, and **Pay groups and calendars**: salaried semi-monthly, hourly biweekly. Optionally create a job profile or location.
+9. **Workers → Hire a worker.** Name *Alex Morgan*, hire date today, job profile *Data Center Technician* (the form shows Non-Exempt, Hourly), org *Data Center Ops (E0005)*, location *San Jose*, rate **$15**: the form blocks it ("Below the 2026 California minimum wage"). Change to **$40** and submit. It goes to the inbox.
+10. **Signed in as Ethan Fischer, Manager → Inbox → Approve.** Alex is now a worker, in the US Biweekly pay group.
+11. **Signed in as Jordan (HR) → Workers → E0057 → Change pay:** effective **Oct 12** (inside the completed period), new salary **205,000**. Submit; **Ethan approves** it.
+12. Optional: **Workers → E0088 → Terminate** or **Start leave** to show the other business processes.
 
-- Open **E0021**: Oct 1 late meal (the brief didn't flag it: 11:15 is after the 5th hour), Oct 2 double time over 12 hours, Oct 3 missed meal and 8 hours of weekly OT because Sep 28–Oct 2 already reached 40 regular hours. Point at the greyed prior-period rows: "this is why the prior week's punches are in the file."
-- Open **E0025**: seventh consecutive day in the workweek, 8 hrs at 1.5x and 1.5 at 2x.
-- Open **E0022** (Texas): seven days in a row but no premium, and the night shift crossing midnight stays on one workday.
-- Exceptions table: filter to duplicate punch (E0035) and retro correction (E0033).
+## Part 4. Time and absence (4 min)
 
-## 5. Absence (1 min) — Absence balances
+13. **Signed in as Emma Kim, Employee → Enter time.** Add a time block for a day in Oct 16–31 with the meal at **11:30**: the app warns that a CA meal premium will be paid. Try to enter the same block again: it's blocked as a duplicate.
+14. **Time off:** request a day of US Hourly Vacation. The available balance is shown and checked.
+15. **Signed in as Sam (Payroll Specialist) → Enter time → Dates: Oct 16–31 → Auto-fill scheduled shifts for all technicians.**
+16. **Signed in as Ethan (Manager) → Inbox → Approve all.**
 
-- Sample workers table: ending balances, the E0148 payout flowing to payroll, and international accruals.
-- Plan configuration table: eligibility, accrual, caps, payout per country.
+## Part 5. Run the next cycle (3 min)
 
-## 6. Reconciliation to Rippling (3 min) — Reconciliation
+17. **Pay period: Oct 16–31 semi-monthly (salaried). Signed in as Sam → Pay runs → Calculate.** The blue banner shows **E0057 retro $151.51**: the raise backdated into the completed period, paid now. Open **Payroll register → E0057** to show the RETRO line and its explanation.
+18. Point out that year-to-date carried forward: E0012 crossed the Social Security wage base in Oct 1–15, so no Social Security now.
+19. **Pay period: Oct 16–31 biweekly transition (hourly). Pay runs → Calculate.** 26 technicians, including Alex. Explain the 2-day stub that completes the Oct 11–17 workweek, then clean two-week periods.
+20. **Signed in as Priya → Approve → Complete.** Then **General ledger**: the biweekly journal balances and is ready for NetSuite.
 
-- Headcount tab: 354 on file → 280 paid; Workday 280 + 1 contractor only in legacy − 1 hire only in Workday = 280 legacy rows.
-- Legacy tab: 262 match to the cent, 19 explained, 0 unexplained.
-- Open **E0203**: the explanation is proven by re-performance: recalculating with the legacy hire date reproduces every legacy column to the cent.
-- Open **E0003**: Social Security wage base. "Here legacy is right: the brief's $168,600 is the 2024 base; 2026 is $184,500. In a real parallel, I'd fix Workday's tax configuration."
-- Controller commentary tab: deterministic draft; explain the guardrails if asked about AI.
+## Part 6. Close (1 min)
 
-## 7. GL and NetSuite (1.5 min) — General ledger
-
-- Five journals, all balanced and fully mapped; the US journal is 82 summarized lines.
-- Account mapping and segment mapping tabs; who owns changes.
-- Download the NetSuite CSV.
-
-## 8. International (1 min) — International
-
-- E0006, E0008, E0009 employer cost in local currency and USD.
-- E0330 provider variance: late comp change after the PECI cutoff → timing, paid as retro in November.
-- E0008's intercompany recharge from Canada to the US cost center.
-
-## 9. Controls (0.5 min) — Controls and audit
-
-- Pre-payroll audit findings (the E0148 critical item), control matrix and security groups.
+21. **Controls and audit:** control matrix and security groups; **Inbox → Business process log:** every change, who started it, who approved it, when.
+22. **Data and demo → Download my demo data:** "This is how I'd hand you my scenario."
 
 ## Likely questions
 
 | Question | Short answer |
 |---|---|
-| Why one pay group? | FLSA status changes components and time rules, not pay frequency. One run, one audit, one journal. CA Labor Code 204 allows the 5-day lag. |
-| How do you know an explanation is right? | It is re-performed: the calculation under that cause reproduces the legacy number to the cent. |
-| What happens with 5,000 employees? | The engine is pure functions with no UI dependency; run it server-side or in a background job. Same tests. |
-| Why not Next.js and a database? | The brief is calculate-reconcile-visualize from files. No database means nothing to secure or migrate, and uploaded payroll files never leave the browser. |
-| How did you use AI? | It wrote most of the code; I specified the rules and edge cases, checked every calculation against hand-worked examples, and the README lists where it was wrong. |
-| Why is the overtime adjustment line there? | The regular rate includes the night differential, so OT at 1.5 × base underpays night workers. |
+| Why biweekly for hourly? | Overtime is per 7-day workweek; a biweekly period is exactly two workweeks, so overtime is never split across periods. Salaried stay semi-monthly. |
+| What happens when you change a period that's already paid? | The paid period stays exactly as completed. The next run recalculates it and pays the difference as retro, like Workday. |
+| How do you know a reconciliation explanation is right? | It's re-performed: recalculating with that cause reproduces the legacy number to the cent. |
+| Where is the data stored? | In the browser for this demo, so every visitor has a private sandbox. In production Workday is the database; the business-process log maps directly to a table behind an API. |
+| What about 5,000 employees? | The engine is pure functions with no UI dependency; it moves to a server or background job unchanged, with the same tests. |
+| Can someone approve their own change? | No. Initiator and approver must differ for every business process and for the pay run. |
+| How did you use AI? | It wrote most of the code; I specified the rules and edge cases, checked calculations against hand-worked examples, and the README lists where it was wrong. |

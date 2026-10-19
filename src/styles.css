@@ -223,3 +223,23 @@ select, input[type="search"], input[type="text"] {
   .doc { padding: var(--s5); }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ---------- ERP: sidebar selectors, forms, steps ---------- */
+.side-select { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #a9c4b8; }
+.side-select select { background: #1d5949; color: #fff; border: 1px solid #3c6f5f; min-width: 0; width: 100%; font-size: 13px; }
+.side-note { color: #cfe1d8; font-size: 12px; }
+.badge { background: var(--amber); color: #fff; border-radius: 10px; font-size: 11px; font-weight: 700; padding: 0 7px; line-height: 18px; }
+.form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--s3) var(--s4); }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
+.field.wide { grid-column: 1 / -1; }
+.field-label { color: var(--ink-soft); font-weight: 500; }
+.field-hint { color: var(--ink-faint); font-size: 12px; }
+.field input, .field select { min-width: 0; width: 100%; border: 1px solid var(--rule); background: var(--sheet); border-radius: var(--radius-sm); padding: 7px 10px; }
+.field input[readonly] { background: var(--paper); }
+.checks { margin-top: var(--s3); }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border: 1px solid var(--rule); border-radius: var(--radius); background: var(--sheet); margin-bottom: var(--s3); overflow: hidden; }
+.step { padding: var(--s3) var(--s4); display: flex; flex-direction: column; gap: 2px; border-left: 1px solid var(--rule); color: var(--ink-faint); }
+.step:first-child { border-left: 0; }
+.step.done { background: var(--ok-wash); color: var(--ledger-deep); }
+.step.done strong::before { content: "✓ "; }
+@media (max-width: 820px) { .steps { grid-template-columns: 1fr; } .step { border-left: 0; border-top: 1px solid var(--rule); } }

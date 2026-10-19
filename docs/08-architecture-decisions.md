@@ -15,7 +15,7 @@ Each decision lists the context, the options considered, the choice and why. The
 
 **Decision.** React + TypeScript single-page app. esbuild bundles it (one small build script instead of a framework), hash routing so any static host works, plain CSS. One optional Vercel function exists only for the AI commentary, because it must hold an API key.
 
-The first plan (before the full brief arrived) was Next.js + Postgres with hire-to-terminate screens. It was dropped once the requirements made clear the deliverable is a calculation and reconciliation over provided files.
+The first plan (before the full brief arrived) was Next.js + Postgres with hire-to-terminate screens. The first build delivered the brief's calculation and reconciliation over the provided files. The ERP layer (hire to terminate, time, absence, pay runs with approvals) was then added on top without changing the engine: see ADR-14 to ADR-17.
 
 ## ADR-02: Calculation logic is a pure TypeScript engine, separate from the UI
 
@@ -95,7 +95,7 @@ The legacy Rippling register is produced by running the engine with Rippling's a
 
 ## ADR-10: What is deliberately out of scope
 
-- **Persistence, logins and transaction entry.** Not required by the brief and would add security surface. In production, Workday is the system of record; this app plays the role of the parallel-run and reconciliation workbench.
+- **Server-side persistence and real logins.** Transactions are saved in the browser and roles are switched with a persona selector (ADR-15). In production, Workday is the system of record and identity comes from SSO.
 - **Full tax engine.** Out of scope per the brief; structure is complete, rates are approximations, documented in config.
 - **Colorado FAMLI, NY SDI, local taxes, supplemental withholding method choices.** Noted in the design where relevant.
 
@@ -104,7 +104,7 @@ The legacy Rippling register is produced by running the engine with Rippling's a
 - `node:test` with Node's built-in TypeScript type stripping: no test framework to install.
 - **Golden values computed by hand** before asserting them: overtime (CA daily, TX weekly, no pyramiding, seventh day, consecutive days across workweeks, regular rate), meal premiums, duplicate punch, retro, proration (hire, leave, comp change, state split), termination accrual and payout, garnishment limit, wage base, GL validation, absence accruals, re-performance.
 - **End-to-end ties**: a test fails if any control total stops tying or any variance becomes unexplained.
-- 31 tests, under one second.
+- 46 tests, about two seconds: calculation rules, plus the ERP layer (business processes, completed-period reproducibility, retro, roll-forward, biweekly go-live, entry validations).
 
 ## ADR-12: AI in payroll operations (bonus feature)
 
@@ -116,13 +116,59 @@ The legacy Rippling register is produced by running the engine with Rippling's a
 
 A payroll console for a CFO, Controller and payroll analysts: dense tables with tabular numerals, sentence-case labels, and one memorable element, the register tables banded like green-bar ledger paper. The overview opens with the control totals (does the period tie?) rather than with headline numbers, because that is the question the Controller asks first. Every number links to its explanation (payslip lines, daily time, reconciliation causes).
 
+## ADR-14: ERP layer as business processes over the data package
+
+**Context.** The panel and an observer will use the app hands-on: hire, change, terminate, enter time, request time off, and run payroll, like Workday.
+
+| Option | Assessment |
+|---|---|
+| Edit the CSV rows in place | No history, no approvals, and a completed period would change under you |
+| CRUD screens over tables | Easy, but nothing records who changed what, when, or effective when |
+| **Business processes, applied on top of the base package** | Mirrors Workday: every change is a BP with initiator, approver, effective date and entry time |
+
+**Decision.** Every change is a business process (`lib/erp/types.ts`): Hire, Change Compensation, Change Cost Center, Change Location, Leave of Absence, Return from Leave, Terminate, Enter Time, Request Time Off, and configuration (company, location, cost center, job profile). The dataset the engine calculates is always **base package + business processes approved up to a moment** (`lib/erp/apply.ts`). The engine did not change: a hire becomes a worker row, a raise becomes an effective-dated event, a timesheet becomes a time block.
+
+**Consequences.**
+- **Bitemporal by construction.** Every change has an effective date (when it applies) and a decision time (when it was known). A completed pay period is reproduced exactly by applying only the BPs approved before it was completed, so a locked period never changes.
+- **Retro is automatic.** For the next period the engine recalculates the completed period with everything known now and pays the difference as RETRO. A raise backdated into a paid period, a late termination (negative retro, flagged as an overpayment) and late time all work the same way.
+- **Approvals and segregation of duties are rules, not screens.** `BP_RULES` lists who may start and who may approve each process; the approver can never be the initiator. Pay runs require a different approver from the calculator, and critical audit findings need a recorded resolution.
+
+## ADR-15: Where the data is stored: the browser, for now
+
+**Context.** An observer must be able to use the app tomorrow from a link, with no setup, and without affecting anyone else's demo.
+
+| Option | For | Against |
+|---|---|---|
+| **Browser storage (localStorage)** | Zero setup; each visitor gets a private sandbox; no payroll data on a server; nothing to break during the demo | Not shared between people or devices |
+| Hosted database (e.g. Postgres on Neon or Supabase) | Shared, persistent, multi-user | Accounts, credentials, migrations and a running service: more setup and more failure points before a demo; holds personal data |
+
+**Decision.** Browser storage, with **Download my demo data / Load demo data** so a prepared scenario can be handed to someone else, and **Reset demo data** to return to the original package. Reads and writes are wrapped so the app still works if storage is blocked.
+
+**Production path.** The business-process log is an append-only list, so it maps directly onto a database table (one row per BP) behind an API, with SSO for identity. In the real implementation Workday is that database.
+
+## ADR-16: Pay groups: hourly biweekly, salaried semi-monthly
+
+**Decision.** At go-live hourly (non-exempt) workers move to a US Biweekly pay group: each period is exactly two Sunday–Saturday workweeks, so weekly overtime, double time, seventh-day and regular-rate adjustments never split across periods. Salaried workers stay semi-monthly. The Oct 1–15 parallel run stays semi-monthly for everyone to match the legacy register. The transition period Oct 16–31 contains a 2-day stub completing the Oct 11–17 workweek. Details and trade-offs are in the Workday Payroll design document.
+
+**Implementation.** Pay periods are configuration with a "builds on" link (`PRIOR_PERIOD`). Each period starts from its prior period as completed: YTD taxable wages and absence balances roll forward, and per-period deductions convert from 24 to 26 periods for the biweekly group.
+
+## ADR-17: Validations at entry, not only at payroll
+
+**Decision.** The same rules that the payroll audit reports are enforced when data is entered (`lib/erp/validate.ts`):
+- **Time:** duplicate or overlapping blocks and shifts over 16 hours are blocked; CA meal problems and long shifts are warned and recorded on the BP.
+- **Hire:** 2026 California minimum wage ($16.90) and exempt salary threshold ($70,304), supported work states, required fields.
+- **Time off:** eligibility, balance including pending requests, waiting period, double booking.
+
+Preventing a bad entry is cheaper than explaining it in a reconciliation.
+
 ## What the AI tool decided, and what was overridden
 
 | Area | AI tool generated | Human decision or override |
 |---|---|---|
 | Overall approach | Proposed Next.js + Postgres with HR transaction screens | Overridden after reading the full brief: stateless CSV-ingesting app (ADR-01) |
 | Engine code | Generated nearly all of `lib/` | Rules, order of evaluation and edge-case treatments specified and reviewed line by line against hand calculations |
-| Pay group design | Proposed one pay group | Accepted, with the check-date change flagged as a People decision |
+| Pay group design | Proposed one semi-monthly pay group for everyone | Overridden: hourly workers on a biweekly pay group so overtime weeks are never split (ADR-16) |
+| Scope | Built the brief's calculate-and-reconcile app first | Extended to a working ERP with business processes and pay runs, because the panel will use it hands-on (ADR-14) |
 | Wage base | Flagged that the brief's $168,600 is the 2024 figure | Decision: keep the brief's value, record the actual, surface it as a configuration difference |
 | Reconciliation method | Proposed re-performance of hypotheses | Accepted; added the rule that the reconciler never reads the seeded-error list |
 | Data generation | Generated the population and edge cases | Required all sample rows kept verbatim; required generated data to pass the same validation as uploaded data |

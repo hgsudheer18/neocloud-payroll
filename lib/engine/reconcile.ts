@@ -184,6 +184,18 @@ export const HYPOTHESES: Hypothesis[] = [
     },
     action: () => "Expected timing difference. Confirm legacy does not also pay it next cycle (double payment risk at cutover); after go-live only Workday pays retro.",
   },
+  {
+    id: "excludeErpEntries",
+    label: "Changes entered in Workday after the legacy run",
+    category: "Timing",
+    correct: "Workday",
+    applies: (c) =>
+      c.ds.events.some((e) => e.employeeId === c.worker.id && e.source === "erp") ||
+      c.ds.time.some((r) => r.employeeId === c.worker.id && r.source === "erp") ||
+      c.ds.absences.some((a) => a.employeeId === c.worker.id && a.source === "erp"),
+    explain: () => "Transactions entered through Workday business processes after the legacy register was produced (job, location, leave, termination, time or time off). Legacy never received them.",
+    action: () => "Expected in a parallel run. Confirm each transaction is approved; in production Workday is the only system of record, so this cannot occur after cutover.",
+  },
 ];
 
 export interface VarianceCause {
@@ -230,14 +242,14 @@ export function reconcileEmployee(ds: Dataset, worker: Worker, period: PayPeriod
   const base: EmployeeRecon = { employeeId: worker.id, name: worker.name, status: "Matched", workday, legacy, delta, causes: [], residual: delta };
 
   if (!legacy && workday) {
-    const late = worker.hireDate >= period.legacyInputCutoff;
+    const late = (worker.enteredOn ?? worker.hireDate) >= period.legacyInputCutoff;
     return {
       ...base,
       status: "Only in Workday",
       causes: [{
         hypothesis: { id: "notInLegacy", label: "Not in legacy register", category: "Timing", correct: "Workday", applies: () => true, explain: () => "", action: () => "" },
         impact: Object.fromEntries(COLUMNS.map((c) => [c, delta[c]])),
-        explanation: late ? `New hire starting ${pretty(worker.hireDate)} was entered after the legacy input cutoff (${pretty(period.legacyInputCutoff)}).` : "Worker paid in Workday but missing from legacy.",
+        explanation: late ? `New hire starting ${pretty(worker.hireDate)} was entered ${worker.enteredOn ? `on ${pretty(worker.enteredOn)}, ` : ""}after the legacy input cutoff (${pretty(period.legacyInputCutoff)}).` : "Worker paid in Workday but missing from legacy.",
         action: late ? "Expected timing difference. Confirm legacy pays them in the next run (or not at all after cutover) so they are not paid twice or missed." : "Investigate.",
       }],
       residual: late ? diff(null, null) : delta,

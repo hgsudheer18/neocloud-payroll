@@ -3,6 +3,8 @@ import { rollup } from "../../lib/engine/run.ts";
 import { Bars, Money, PageHead, Pill, Section, Select } from "../ui.tsx";
 import { setQuery } from "../router.tsx";
 import { fmt } from "../../lib/util/money.ts";
+import { pretty } from "../../lib/util/dates.ts";
+import { PERIOD_LABEL } from "../../lib/config/period.ts";
 
 const tieValue = (name: string, v: number) => (/hours|hrs/i.test(name) ? `${(v / 100).toFixed(2)} hrs` : /Headcount|variance/i.test(name) ? String(v) : fmt(v));
 
@@ -23,9 +25,9 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead title="October 1–15, 2026 payroll">
-        {r.us.length} US employees paid on the semi-monthly run, {fmt(r.totals.burdened)} burdened cost. {r.intl.length} international employees in the October provider run,{" "}
-        {fmt(r.totals.intlUsd)} in USD. {allOk ? "Every control total ties" : "Some control totals do not tie"} and {r.recon.counts.Unexplained === 0 ? `all ${variances} legacy variances are explained` : `${r.recon.counts.Unexplained} legacy variances are unexplained`}.
+      <PageHead title={`${PERIOD_LABEL[r.period.id] ?? r.period.id}`}>
+        {r.us.length} employees paid in the {r.period.payGroup} run ({pretty(r.period.start)} to {pretty(r.period.end)}, check date {pretty(r.period.checkDate)}), {fmt(r.totals.burdened)} burdened cost. {r.intl.length} international employees in the October provider run,{" "}
+        {fmt(r.totals.intlUsd)} in USD. {allOk ? "Every control total ties" : "Some control totals do not tie"}{r.reconciled ? <> and {r.recon.counts.Unexplained === 0 ? `all ${variances} legacy variances are explained` : `${r.recon.counts.Unexplained} legacy variances are unexplained`}</> : null}.
       </PageHead>
 
       <div className="tieout" aria-label="Control totals">
@@ -49,7 +51,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
         ))}
       </div>
 
-      <Section title="US semi-monthly totals">
+      <Section title={`${r.period.payGroup} totals`}>
         <div className="figures">
           {[
             ["Gross pay", r.totals.gross],
@@ -123,7 +125,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
         </div>
       </Section>
 
-      <Section title="Legacy register variances by root cause" right={<a href="#/reconciliation">Open the reconciliation</a>}>
+      {r.reconciled && <Section title="Legacy register variances by root cause" right={<a href="#/reconciliation">Open the reconciliation</a>}>
         <div className="table-wrap">
           <table className="reg">
             <thead>
@@ -153,7 +155,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
           </table>
         </div>
         <p className="small muted">Impact is legacy minus Workday: a positive number means the legacy register paid more.</p>
-      </Section>
+      </Section>}
     </>
   );
 }

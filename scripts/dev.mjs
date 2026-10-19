@@ -13,4 +13,4 @@ await ctx.watch();
 for (const d of ["data", "docs", "src"]) watch(join(process.cwd(), d), { recursive: true }, () => copyStatic());
 const port = Number(process.env.PORT || 5173);
 await ctx.serve({ servedir: dist, port });
-console.log(`NeoCloud Payroll running at http://localhost:${port}`);
+console.log(`NeoCloud Payroll running at http://127.0.0.1:${port}`);

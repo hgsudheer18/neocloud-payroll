@@ -14,7 +14,7 @@ About 25 non-exempt data center technicians in On-Prem record time: 15 in San Jo
 | Work schedule calendars | `DC Day 06:00–14:30`, `DC Swing 14:00–22:30`, `DC Night 22:00–06:30`, each with a 30-minute meal; rotating calendars for 4-on/3-off coverage |
 | Workday definition | Workday = the shift's start date. California requires a fixed, recurring 24-hour workday; the night-shift group's workday is defined as 18:00–18:00 so a 22:00–06:30 shift sits entirely in one workday |
 | Workweek | Sunday 00:00 to Saturday 24:00 (fixed, recurring 168 hours) |
-| Time period schedule | Semi-monthly, same as the US Semi-Monthly pay group; time-approval cutoff period end + 1 business day |
+| Time period schedule | Biweekly from go-live (two Sunday–Saturday workweeks, matching the US Biweekly pay group); the Oct 1–15 parallel run is semi-monthly. Time-approval cutoff: period end + 1 business day |
 
 ### Time entry codes
 

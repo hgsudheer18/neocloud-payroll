@@ -1,16 +1,26 @@
-// Loads the CSV package, runs the period once, and shares the result.
-// The calculation runs in the browser: uploaded payroll files never leave
-// the user's machine.
+// Loads the CSV package (the base data), applies the business processes
+// entered in the app, and runs the selected pay period. Everything runs in the
+// browser: uploaded payroll files never leave the user's machine.
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { loadDataset, type LoadIssue } from "../lib/data/load.ts";
-import { runPeriod, type PeriodResult } from "../lib/engine/run.ts";
+import type { PeriodResult } from "../lib/engine/run.ts";
 import type { Dataset } from "../lib/data/types.ts";
+import { assignGoLivePayGroups, computePeriod, type PeriodView } from "../lib/erp/periods.ts";
+import { applyBps } from "../lib/erp/apply.ts";
+import { US_PERIOD_2 } from "../lib/config/period.ts";
+import { useErp } from "./erp.tsx";
 
 export interface AppData {
+  /** Base package + approved business processes (+ roll-forward for later periods). */
   ds: Dataset;
+  /** The CSV package only. */
+  base: Dataset;
+  /** Base package + every approved business process, as of today (for HR screens). */
+  dsNow: Dataset;
   issues: LoadIssue[];
   result: PeriodResult;
+  view: PeriodView;
   texts: Record<string, string>;
   source: "bundled" | "uploaded";
   ms: number;
@@ -31,42 +41,51 @@ async function fetchBundled(): Promise<Record<string, string>> {
   return Object.fromEntries(entries);
 }
 
-function compute(texts: Record<string, string>, source: AppData["source"]): AppData {
-  const t0 = performance.now();
-  const { ds, issues } = loadDataset(texts);
-  const result = runPeriod(ds);
-  return { ds, issues, result, texts, source, ms: Math.round(performance.now() - t0) };
-}
-
 export function DataProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<AppData | null>(null);
+  const { erp, periodId } = useErp();
+  const [texts, setTexts] = useState<Record<string, string> | null>(null);
   const [bundled, setBundled] = useState<Record<string, string> | null>(null);
+  const [source, setSource] = useState<AppData["source"]>("bundled");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchBundled()
-      .then((texts) => {
-        setBundled(texts);
-        setData(compute(texts, "bundled"));
+      .then((t) => {
+        setBundled(t);
+        setTexts(t);
       })
       .catch((e) => setError(`Could not load the data package: ${e instanceof Error ? e.message : String(e)}`));
   }, []);
 
+  const loaded = useMemo(() => (texts ? loadDataset(texts) : null), [texts]);
+
+  const data = useMemo<AppData | null>(() => {
+    if (!loaded || !texts) return null;
+    try {
+      const t0 = performance.now();
+      const view = computePeriod(loaded.ds, erp, periodId);
+      const dsNow = assignGoLivePayGroups(applyBps(loaded.ds, erp.bps), US_PERIOD_2);
+      return { ds: view.ds, base: loaded.ds, dsNow, issues: loaded.issues, result: view.result, view, texts, source, ms: Math.round(performance.now() - t0) };
+    } catch (e) {
+      setTimeout(() => setError(`Calculation failed: ${e instanceof Error ? e.message : String(e)}`));
+      return null;
+    }
+  }, [loaded, texts, erp, periodId, source]);
+
   const replaceFiles = useCallback(
     (files: Record<string, string>) => {
-      try {
-        const merged = { ...(data?.texts ?? bundled ?? {}), ...files };
-        setData(compute(merged, "uploaded"));
-        setError(null);
-      } catch (e) {
-        setError(`Calculation failed on the uploaded files: ${e instanceof Error ? e.message : String(e)}`);
-      }
+      setTexts((t) => ({ ...(t ?? bundled ?? {}), ...files }));
+      setSource("uploaded");
+      setError(null);
     },
-    [data, bundled],
+    [bundled],
   );
 
   const reset = useCallback(() => {
-    if (bundled) setData(compute(bundled, "bundled"));
+    if (bundled) {
+      setTexts(bundled);
+      setSource("bundled");
+    }
   }, [bundled]);
 
   return <DataContext.Provider value={{ data, error, replaceFiles, reset }}>{children}</DataContext.Provider>;

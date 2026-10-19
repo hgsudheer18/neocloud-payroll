@@ -61,6 +61,7 @@ export type ExceptionCode =
   | "DUPLICATE_PUNCH"
   | "OVERLAPPING_BLOCKS"
   | "RETRO_CORRECTION"
+  | "LATE_ENTRY"
   | "IN_PERIOD_CORRECTION"
   | "MISSED_MEAL"
   | "LATE_MEAL"
@@ -139,6 +140,7 @@ export function cleanRows(rows: TimeRow[], periodStart: ISODate, dedupe = true) 
   for (const c of corrections) {
     const orig = kept.find((k) => k.rowId === c.correctsRowId);
     const prior = c.workDate < periodStart;
+    if (prior && c.enteredOn < periodStart) continue; // corrected and paid in an earlier period
     exceptions.push({
       employeeId: c.employeeId,
       rowId: c.rowId,
@@ -153,7 +155,21 @@ export function cleanRows(rows: TimeRow[], periodStart: ISODate, dedupe = true) 
   }
 
   const effective = kept.filter((r) => !replaced.has(r.rowId)).concat(corrections);
-  return { effective, asPaid: kept, exceptions };
+  // What was paid for days before this period: rows (and corrections) entered
+  // before the period started. Anything entered later is paid now as retro.
+  const paidCorrections = corrections.filter((c) => c.enteredOn < periodStart);
+  const paidReplaced = new Set(paidCorrections.map((c) => c.correctsRowId));
+  const asPaid = kept.filter((r) => r.enteredOn < periodStart && !paidReplaced.has(r.rowId)).concat(paidCorrections);
+  for (const r of kept) {
+    if (r.workDate < periodStart && r.enteredOn >= periodStart) {
+      exceptions.push({
+        employeeId: r.employeeId, rowId: r.rowId, date: r.workDate, code: "LATE_ENTRY", severity: "Warning",
+        message: `${r.rowId} for a prior-period day was entered ${r.enteredOn}, after that period was paid.`,
+        treatment: "Paid in this period as RETRO.",
+      });
+    }
+  }
+  return { effective, asPaid, exceptions };
 }
 
 // ---------------------------------------------------------------- shifts
@@ -330,7 +346,10 @@ export function calcWorkerTime(
   const weeks: WeekCalc[] = [];
   const effWeeks = weeksOf(effDays);
   const paidWeeks = weeksOf(paidDays);
+  // Only workweeks that touch this period, or that received entries after the prior period was paid.
+  const lateWeeks = new Set(cleaned.effective.filter((r) => r.enteredOn >= periodStart && r.workDate < periodStart).map((r) => workweekStart(r.workDate)));
   for (const [ws, wdays] of effWeeks) {
+    if (addDays(ws, 6) < periodStart && !lateWeeks.has(ws)) continue;
     const inPeriod = wdays.filter((d) => d.date >= periodStart);
     const prior = wdays.filter((d) => d.date < periodStart);
     const rr = regularRate(wdays, baseRate);
