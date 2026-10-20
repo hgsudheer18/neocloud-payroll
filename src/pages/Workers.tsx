@@ -148,7 +148,7 @@ function Hire({ position }: { position: string }) {
   return (
     <>
       <PageHead title={req ? `Hire into ${req.id}: ${req.title}` : "Hire a worker"}>Creates a Hire business process. Once approved, the worker is effective from the hire date: placed in the pay group for their country, with cost center and supervisory org from the position, and paid from the hire date.</PageHead>
-      <p><a href="#/workers">All workers</a> · <a href="#/positions">Open positions</a></p>
+      <p><a href="#/workers">All workers</a> · <a href="#/positions">Staffing</a></p>
       {req && <div className="callout info">{req.id}: {req.payType === "Hourly" ? `hourly, $${req.pay.toFixed(2)}/hr, ${req.shift.toLowerCase()} shift, paid biweekly` : `salaried, $${req.pay.toLocaleString("en-US")} a year, paid semi-monthly`}; start on or after {pretty(req.startFrom)}. A hire part-way through a pay period is paid from the hire date: salaried by working days, hourly by time worked.</div>}
       <CanInitiate type="Hire">
         <div className="sheet">

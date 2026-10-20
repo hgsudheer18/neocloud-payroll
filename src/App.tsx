@@ -25,6 +25,7 @@ import DataErrors from "./pages/DataErrors.tsx";
 import Positions from "./pages/Positions.tsx";
 import Reports from "./pages/Reports.tsx";
 import PayrollInputs from "./pages/PayrollInputs.tsx";
+import PayCalendars from "./pages/PayCalendars.tsx";
 import { Bell } from "./notifications.tsx";
 import { DemoClock, ScheduledAlerts } from "./alerts.tsx";
 import { adminUnlocked, lockAdmin, unlockAdmin } from "./adminGate.ts";
@@ -39,8 +40,8 @@ import { accessFor, NoAccess, useAccess } from "./access.tsx";
 const PERIOD_PAGES = ["payslip", "benefits", "payruns", "overview", "", "register", "time", "time-off", "absence", "reconciliation", "gl", "controls"];
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["positions", "Open positions"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["inputs", "Payroll inputs"], ["reports", "Reports"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
+  { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["positions", "Staffing"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["calendars", "Pay calendars"], ["inputs", "Payroll inputs"], ["reports", "Reports"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
   { group: "Tie it out", items: [["data-errors", "Data errors (Oct 1–15)"], ["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -101,6 +102,7 @@ export default function App() {
       case "positions": return <Positions />;
       case "reports": return <Reports query={query} />;
       case "inputs": return <PayrollInputs />;
+      case "calendars": return <PayCalendars />;
       default: return <Home />;
     }
   };

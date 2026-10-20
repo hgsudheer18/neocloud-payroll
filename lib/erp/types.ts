@@ -125,7 +125,8 @@ export const BP_RULES: Record<BPType, { initiators: Role[]; approvers: Role[] | 
   "Change Personal Information": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["HR Partner", "Payroll Specialist"], label: "Personal data" },
   "Change Payment Election": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
   "Change Tax Withholding": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
-  "Payroll Input": { initiators: ["Payroll Specialist"], approvers: ["Payroll Approver"], label: "Payroll" },
+  // Either payroll role enters an input; the other one approves it (segregation of duties).
+  "Payroll Input": { initiators: ["Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
   "Create Company": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Location": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Cost Center": { initiators: ["HR Partner", "Payroll Specialist"], approvers: "auto", label: "Setup" },

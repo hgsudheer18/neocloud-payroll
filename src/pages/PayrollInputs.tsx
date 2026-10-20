@@ -62,7 +62,7 @@ export default function PayrollInputs() {
     const when = kind === "one-time" ? `${PERIOD_LABEL[pid]}${completed(pid) ? " (completed: paid as retro in the next pay run)" : ""}` : `every pay period from ${pretty(start)}${end ? ` to ${pretty(end)}` : ""}`;
     const bp = submit({ type: "Payroll Input", subjectId: w.id, subjectName: w.name, effectiveDate: kind === "one-time" ? US_PERIODS.find((p) => p.id === pid)!.start : start, summary: `${k.label.split(" (")[0]}: ${value < 0 ? "−" : ""}$${Math.abs(value).toLocaleString("en-US", { minimumFractionDigits: 2 })}${byHours ? ` (${hours} hrs × $${w.hourlyRate.toFixed(2)})` : ""}, ${when}. ${reason.trim()}`, payload: { input } });
     setLastBp(bp.id);
-    setMsg(`${bp.id} submitted for approval by a Payroll Approver.`);
+    setMsg(`${bp.id} submitted. The other payroll person approves it, and is alerted that you entered it.`);
     setAmount(""); setHours(""); setReason("");
   };
   const endEarly = () => {
@@ -77,7 +77,7 @@ export default function PayrollInputs() {
   const inputs = erp.bps.filter((b) => b.type === "Payroll Input").reverse();
   return (
     <>
-      <PageHead title="Payroll inputs">Enter missed earnings, bonuses, commissions and deduction adjustments. One-time inputs apply to one pay period; an input for a completed period is paid as retro in the next pay run. Ongoing inputs are paid every pay period between a start and end date. A Payroll Approver approves each input before it is paid.</PageHead>
+      <PageHead title="Payroll inputs">Enter missed earnings, bonuses, commissions and deduction adjustments. One-time inputs apply to one pay period; an input for a completed period is paid as retro in the next pay run. Ongoing inputs are paid every pay period between a start and end date. Either payroll role can enter an input; the other approves it before it is paid, and is alerted when it is entered (SOX: no one pays an input they entered).</PageHead>
       <Toast text={msg} tone="info" />
       {msg && <ApproverJump bp={erp.bps.find((b) => b.id === lastBp)} />}
       {errors.map((e) => <div key={e} className="callout bad">{e}</div>)}

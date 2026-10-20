@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { useData } from "./state.tsx";
 import { useErp } from "./erp.tsx";
 import { useAccess } from "./access.tsx";
+import { persona } from "../lib/erp/types.ts";
 import { addDays, dayOfWeek, eachDay, isWeekday, pretty, workweekStart } from "../lib/util/dates.ts";
 import type { TimeRow } from "../lib/data/types.ts";
 
@@ -126,6 +127,13 @@ export function ScheduledAlerts() {
     }
   }
 
+  // SOX: payroll is told about every payroll input someone else entered, before other reminders.
+  if (access.payResults) {
+    for (const b of erp.bps.filter((x) => x.type === "Payroll Input" && x.initiatedBy !== me.id)) {
+      const by = persona(b.initiatedBy);
+      alerts.unshift({ id: `sox:${b.id}`, title: "SOX alert: payroll input entered", body: `${by.name} (${by.role}) entered a payroll input for ${b.subjectName} (${b.subjectId}) on ${new Date(b.initiatedAt).toLocaleString()}: ${b.summary} Status: ${b.status.toLowerCase()}.`, action: b.status === "Awaiting Approval" ? "Review and approve" : "View payroll inputs", href: b.status === "Awaiting Approval" ? `/inbox?bp=${b.id}` : "/inputs" });
+    }
+  }
   const seen = new Set(erp.seen?.[me.id] ?? []);
   // No pop-up on the page the reminder points to: the person is already doing it.
   const page = window.location.hash.replace(/^#\/?/, "").split(/[/?]/)[0];
@@ -142,7 +150,7 @@ export function ScheduledAlerts() {
   return (
     <div className="alert-backdrop" role="dialog" aria-modal="true" aria-labelledby="alert-title">
       <div className="alert-box">
-        <p className="small muted" style={{ margin: 0 }}>Reminder</p>
+        <p className="small muted" style={{ margin: 0 }}>{show.id.startsWith("sox:") ? "Audit alert" : "Reminder"}</p>
         <h2 id="alert-title">{show.title}</h2>
         <p>{show.body}</p>
         <div className="row">

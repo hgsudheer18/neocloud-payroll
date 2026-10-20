@@ -44,7 +44,7 @@ export default function Positions() {
   );
   return (
     <>
-      <PageHead title="Open positions">Positions to fill from Oct 19, 2026. Hiring into one pre-fills the hire. Someone hired part-way through a pay period is paid from their hire date: salaried staff by working days in the period, hourly staff for the time they work.</PageHead>
+      <PageHead title="Staffing">Open positions to fill from Oct 19, 2026. Hiring into one pre-fills the hire. Someone hired part-way through a pay period is paid from their hire date: salaried staff by working days in the period, hourly staff for the time they work.</PageHead>
       <Section title="Hourly: paid biweekly" lede="Non-exempt data center technicians. Overtime, meal breaks and night differential follow the work location's rules.">{table(group("Hourly"))}</Section>
       <Section title="Salaried: paid semi-monthly" lede="Exempt roles, paid twice a month (1st–15th and 16th–month end).">{table(group("Salary"))}</Section>
       <Section title="Leadership positions in the organisation" lede="Shown in the organisation chart; not open for hire in this demo.">

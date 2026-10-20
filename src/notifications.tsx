@@ -64,6 +64,12 @@ export function useNotifications(): { notes: Note[]; unread: Note[] } {
       }
     }
   }
+  // SOX: every payroll input entered by someone else (same id as the pop-up, so reading one reads both).
+  if (access.payResults) {
+    for (const b of erp.bps.filter((x) => x.type === "Payroll Input" && x.initiatedBy !== me.id)) {
+      notes.push({ id: `sox:${b.id}`, text: `SOX alert: ${persona(b.initiatedBy).name} entered a payroll input for ${b.subjectName}: ${b.summary}`, href: b.status === "Awaiting Approval" ? `/inbox?bp=${b.id}` : "/inputs", at: b.initiatedAt });
+    }
+  }
   // Payroll: completed pay runs not yet posted to NetSuite.
   if (access.payResults) {
     for (const p of US_PERIODS) {
