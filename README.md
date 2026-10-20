@@ -85,7 +85,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Time calculation | 3 | Hours by category per technician, daily detail with meal checks and workweeks, exceptions, category-to-component mapping |
 | Absence › Absence Balances | 4 | Tab of Absence for managers (their team) and payroll: sample-worker ending balances, payout to payroll, plan configuration, all balances |
 | Reconciliation | 2 | Headcount reconciliation, employee-level legacy reconciliation with root cause, classification and action, Controller commentary |
-| General ledger | 2, 6 | Journals by subsidiary, validation, NetSuite CSV and JSON export, account and segment mapping  Posting is manual for now: enabled only after the pay run is completed, recorded with who and when, and blocked from posting twice; a posted run cannot be reopened until the reversal is recorded.
+| General ledger | 2, 6 | Journals by subsidiary, validation, NetSuite CSV and JSON export, account and segment mapping. Posting is manual for now: enabled only after the pay run is completed, recorded with who and when, and blocked from posting twice; a posted run cannot be reopened until the reversal is recorded. |
 | International | 5 | Employer cost by country in local currency and USD, outbound change file, provider reconciliation, local and USD postings, intercompany |
 | Controls and audit | 7 | Pre-payroll audit findings, control matrix, security groups |
 | Data and demo | 8 | Demo data download, load and reset; CSV upload and validation |
