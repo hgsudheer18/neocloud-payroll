@@ -62,7 +62,7 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead title="Request time off">Requests go to the manager. Approved hourly time off is paid from the balance and is not hours worked, so it never creates overtime. Exempt Flexible PTO has no balance and no pay impact.</PageHead>
+      <PageHead title="Absence">Requests go to the manager. Approved hourly time off is paid from the balance and is not hours worked, so it never creates overtime. Exempt Flexible PTO has no balance and no pay impact.</PageHead>
       <div className="filters">
         {me.role === "Employee" ? <div><strong>{w.id} {w.name}</strong><div className="small muted">Your time off</div></div> : (
           <Select label="Worker" value={workerId} onChange={(v) => setQuery("/time-off", { worker: v })} options={employees.map((e) => [e.id, `${e.id} ${e.name}`])} all={null} />

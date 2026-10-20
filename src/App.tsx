@@ -24,7 +24,7 @@ import MyPayslip from "./pages/MyPayslip.tsx";
 import { NoAccess, useAccess } from "./access.tsx";
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Time off"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
+  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Absence"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
   { group: "Payroll", items: [["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
