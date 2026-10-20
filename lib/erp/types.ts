@@ -8,7 +8,7 @@
 
 import type { ISODate } from "../util/dates.ts";
 
-export type Role = "Employee" | "Manager" | "HR Partner" | "Payroll Specialist" | "Payroll Approver";
+export type Role = "Employee" | "Manager" | "HR Partner" | "Payroll Specialist" | "Payroll Approver" | "Administrator";
 
 export interface Persona {
   id: string;
@@ -26,6 +26,7 @@ export const PERSONAS: Persona[] = [
   { id: "hr", name: "Chloe Novak", role: "HR Partner", title: "HR Partner, People (E0261)", workerId: "E0261" },
   { id: "ps", name: "Diego Okafor", role: "Payroll Specialist", title: "Payroll Specialist and Time Administrator (E0254)", workerId: "E0254" },
   { id: "pa", name: "Aisha Nguyen", role: "Payroll Approver", title: "Payroll Manager, approver (E0257)", workerId: "E0257" },
+  { id: "admin", name: "Demo Administrator", role: "Administrator", title: "All access, for demos" },
 ];
 
 export type BPType =
@@ -42,6 +43,7 @@ export type BPType =
   | "Change Personal Information"
   | "Change Payment Election"
   | "Change Tax Withholding"
+  | "Payroll Input"
   | "Create Company"
   | "Create Location"
   | "Create Cost Center"
@@ -123,6 +125,7 @@ export const BP_RULES: Record<BPType, { initiators: Role[]; approvers: Role[] | 
   "Change Personal Information": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["HR Partner", "Payroll Specialist"], label: "Personal data" },
   "Change Payment Election": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
   "Change Tax Withholding": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
+  "Payroll Input": { initiators: ["Payroll Specialist"], approvers: ["Payroll Approver"], label: "Payroll" },
   "Create Company": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Location": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Cost Center": { initiators: ["HR Partner", "Payroll Specialist"], approvers: "auto", label: "Setup" },
@@ -135,5 +138,12 @@ export const PAYRUN_RULES = {
   complete: ["Payroll Specialist", "Payroll Approver"] as Role[],
   reopen: ["Payroll Approver"] as Role[],
 };
+
+// The Administrator security group (demo) may start and approve every process and pay run step.
+for (const r of Object.values(BP_RULES)) {
+  r.initiators.push("Administrator");
+  if (r.approvers !== "auto") r.approvers.push("Administrator");
+}
+for (const roles of Object.values(PAYRUN_RULES)) roles.push("Administrator");
 
 export const persona = (id: string) => PERSONAS.find((p) => p.id === id) ?? PERSONAS[0];

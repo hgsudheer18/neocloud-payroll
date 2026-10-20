@@ -99,10 +99,12 @@ export function ErpProvider({ children }: { children: ReactNode }) {
       const bp = erp.bps.find((b) => b.id === id);
       if (!bp || bp.status !== "Awaiting Approval") return "This business process is no longer awaiting approval.";
       const rule = BP_RULES[bp.type];
-      if (bp.initiatedBy === me.id) return "Segregation of duties: you initiated this, so someone else must approve it.";
+      // Segregation of duties, except the demo Administrator, whose own approvals are recorded as an override.
+      const override = bp.initiatedBy === me.id && me.role === "Administrator";
+      if (bp.initiatedBy === me.id && !override) return "Segregation of duties: you initiated this, so someone else must approve it.";
       if (rule.approvers !== "auto" && !rule.approvers.includes(me.role)) return `Only ${rule.approvers.join(" or ")} can approve ${bp.type}.`;
       const now = new Date().toISOString();
-      setErp((s) => ({ ...s, bps: s.bps.map((b) => (b.id === id ? { ...b, status: approve ? "Approved" : "Denied", decidedBy: me.id, decidedAt: now, comment } : b)) }));
+      setErp((s) => ({ ...s, bps: s.bps.map((b) => (b.id === id ? { ...b, status: approve ? "Approved" : "Denied", decidedBy: me.id, decidedAt: now, comment: override ? `Administrator override (demo): approved by the person who started it${comment ? `. ${comment}` : ""}` : comment } : b)) }));
       return null;
     },
     [erp.bps, me],

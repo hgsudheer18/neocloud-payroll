@@ -4,7 +4,7 @@
 // legacy Rippling register column it reconciles to.
 
 export type ComponentType = "Earning" | "Pre-Tax Deduction" | "Post-Tax Deduction" | "Employee Tax" | "Employer Tax" | "Employer Benefit";
-export type Feed = "Compensation" | "Time Tracking" | "Absence" | "One-Time Payment" | "Benefits" | "Manual / Court Order" | "Calculated";
+export type Feed = "Compensation" | "Time Tracking" | "Absence" | "One-Time Payment" | "Benefits" | "Manual / Court Order" | "Calculated" | "Payroll Input";
 
 export interface Taxability {
   fit: boolean;
@@ -46,6 +46,8 @@ export const PAY_COMPONENTS: PayComponent[] = [
   { code: "LEAVE_PAID", name: "Other Paid Leave (Hourly)", type: "Earning", feed: "Absence", basis: "Approved bereavement or jury duty hours × base rate (not hours worked: no OT, no accrual)", taxability: ALL_TAXES, k401Eligible: true, glAccount: "6100", legacyColumn: "otherPay", inScopeThisPeriod: true },
   { code: "PTO_PAYOUT", name: "Vacation Payout on Termination", type: "Earning", feed: "Absence", basis: "Ending vacation balance (after final accrual) × final hourly rate (salary ÷ 2080)", taxability: ALL_TAXES, k401Eligible: false, glAccount: "2150", legacyColumn: "otherPay", inScopeThisPeriod: true },
   { code: "BONUS", name: "Bonus", type: "Earning", feed: "One-Time Payment", basis: "One-time payment amount; supplemental wages (22% optional flat federal rate)", taxability: ALL_TAXES, k401Eligible: true, glAccount: "6130", legacyColumn: "otherPay", inScopeThisPeriod: false },
+  { code: "COMMISSION", name: "Commission", type: "Earning", feed: "One-Time Payment", basis: "Commission amount entered by payroll; supplemental wages", taxability: ALL_TAXES, k401Eligible: true, glAccount: "6130", legacyColumn: "otherPay", inScopeThisPeriod: true },
+  { code: "ADJ_EARN", name: "Earnings Adjustment", type: "Earning", feed: "Payroll Input", basis: "Missed or corrected earnings entered by payroll (amount, or hours × rate); negative reduces earnings", taxability: ALL_TAXES, k401Eligible: true, glAccount: "6100", legacyColumn: "otherPay", inScopeThisPeriod: true },
 
   // ---------- Deductions ----------
   { code: "K401", name: "401(k) Pre-Tax", type: "Pre-Tax Deduction", feed: "Benefits", basis: "Election % × 401(k)-eligible earnings", reduces: { fit: true, fica: false, futaSui: false, state: true }, glAccount: "2120", legacyColumn: "preTaxDeductions", inScopeThisPeriod: true },

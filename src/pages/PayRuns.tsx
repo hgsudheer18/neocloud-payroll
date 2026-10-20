@@ -41,7 +41,7 @@ export default function PayRuns() {
     setMsg(negatives.length ? { text: `Calculated with errors: ${negatives.length} worker(s) have negative net pay. Fix before approval.`, tone: "bad" } : { text: `Calculated ${r.us.length} workers. Review the audit, then a Payroll Approver approves.`, tone: "ok" });
   };
   const approve = () => {
-    if (run.calculatedBy === me.id) return setMsg({ text: "Segregation of duties: you calculated this pay run, so someone else must approve it.", tone: "bad" });
+    if (run.calculatedBy === me.id && me.role !== "Administrator") return setMsg({ text: "Segregation of duties: you calculated this pay run, so someone else must approve it.", tone: "bad" });
     if (stale) return setMsg({ text: "Inputs changed after the calculation. Recalculate before approving.", tone: "bad" });
     if (negatives.length) return setMsg({ text: `${negatives.length} worker(s) have negative net pay. Net pay must be at least zero before the pay run can be approved.`, tone: "bad" });
     if (!tiesOk) return setMsg({ text: "Control totals do not tie. Resolve before approving.", tone: "bad" });

@@ -81,7 +81,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
   const access = useAccess();
   const ds = data!.dsNow;
   // Review mode: managers see their team; payroll sees every hourly worker. Only managers' edits are approved on entry.
-  const approves = manager && me.role === "Manager";
+  const approves = manager && (me.role === "Manager" || me.role === "Administrator");
   const team = manager ? ds.workers.filter((x) => x.payType === "Hourly" && x.country === "USA" && !x.terminationDate && x.id !== me.workerId && access.seesDetails(x.id)) : [];
   const w: Worker | undefined = manager ? team.find((x) => x.id === query.get("worker")) ?? team[0] : ds.workers.find((x) => x.id === me.workerId);
   const now = today();

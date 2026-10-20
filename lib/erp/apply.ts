@@ -1,7 +1,7 @@
 // Apply approved business processes on top of the base data package.
 // Pure: returns a new Dataset, never mutates the input.
 
-import type { AbsenceTaken, CostCenter, Company, Dataset, Location, TimeRow, Worker, WorkerEvent } from "../data/types.ts";
+import type { AbsenceTaken, CostCenter, Company, Dataset, Location, PayInput, TimeRow, Worker, WorkerEvent } from "../data/types.ts";
 import type { BusinessProcess, JobProfile } from "./types.ts";
 import type { ISODate } from "../util/dates.ts";
 
@@ -27,6 +27,7 @@ export function applyBps(base: Dataset, bps: BusinessProcess[], opts: ApplyOptio
     events: [...base.events],
     time: [...base.time],
     absences: [...base.absences],
+    payInputs: [...(base.payInputs ?? [])],
   };
   const ordered = [...bps].sort((a, b) => ((a.decidedAt ?? a.initiatedAt) < (b.decidedAt ?? b.initiatedAt) ? -1 : 1));
   for (const bp of ordered) {
@@ -134,6 +135,16 @@ export function applyBps(base: Dataset, bps: BusinessProcess[], opts: ApplyOptio
           ds.absences.push(a);
         }
         break;
+      case "Payroll Input": {
+        // A new input, or the end date of an ongoing one moved earlier.
+        if (p.endsInput) {
+          const x = ds.payInputs!.find((i) => i.id === p.endsInput);
+          if (x) ds.payInputs = ds.payInputs!.map((i) => (i.id === p.endsInput ? { ...i, end: String(p.end) } : i));
+        } else {
+          ds.payInputs!.push({ ...(p.input as PayInput), id: bp.id, workerId: bp.subjectId });
+        }
+        break;
+      }
       case "Change Tax Withholding": {
         // Federal filing status from the W-4, used by the next pay run calculated.
         const w = ds.workers.find((x) => x.id === bp.subjectId);

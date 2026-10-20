@@ -42,7 +42,8 @@ const PAGES: Record<string, Role[]> = {
   absence: ["Manager", ...PAYROLL],
 };
 
-export const canOpenPage = (role: Role, page: string) => (PAGES[page] ?? PAYROLL).includes(role);
+// The Administrator security group (demo) opens every page.
+export const canOpenPage = (role: Role, page: string) => role === "Administrator" || (PAGES[page] ?? PAYROLL).includes(role);
 
 /** Business processes that carry a worker's compensation, time or time off. */
 const DETAIL_BPS: BPType[] = ["Change Compensation", "Enter Time", "Request Time Off", "Correct Time Off"];
@@ -51,6 +52,7 @@ const PRIVATE_BPS: Partial<Record<BPType, Role[]>> = {
   "Change Personal Information": ["HR Partner", "Payroll Specialist", "Payroll Approver"],
   "Change Payment Election": ["Payroll Specialist", "Payroll Approver"],
   "Change Tax Withholding": ["Payroll Specialist", "Payroll Approver"],
+  "Payroll Input": ["Payroll Specialist", "Payroll Approver"],
 };
 
 /** Worker ids in a manager's reporting line, direct and indirect, including the manager (and any open positions in it). */
@@ -84,7 +86,8 @@ export interface Access {
 }
 
 export function accessFor(me: Persona, ds: Dataset): Access {
-  const payroll = PAYROLL.includes(me.role);
+  const admin = me.role === "Administrator";
+  const payroll = admin || PAYROLL.includes(me.role);
   const all = payroll || me.role === "HR Partner";
   const line = me.role === "Manager" && me.workerId ? reportingLine(ds, me.workerId) : new Set(me.workerId ? [me.workerId] : []);
   const seesWorker = (id: string) => all || line.has(id);
@@ -98,7 +101,7 @@ export function accessFor(me: Persona, ds: Dataset): Access {
     seesWorker,
     seesDetails,
     seesBp: (bp) => {
-      if (bp.initiatedBy === me.id) return true;
+      if (admin || bp.initiatedBy === me.id) return true;
       const privateTo = PRIVATE_BPS[bp.type];
       if (privateTo) return bp.subjectId === me.workerId || privateTo.includes(me.role);
       const subject = bp.type === "Hire" ? String(bp.payload.managerId ?? "") : bp.subjectId;

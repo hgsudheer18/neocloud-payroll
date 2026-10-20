@@ -24,8 +24,11 @@ import Documents from "./pages/Documents.tsx";
 import DataErrors from "./pages/DataErrors.tsx";
 import Positions from "./pages/Positions.tsx";
 import Reports from "./pages/Reports.tsx";
+import PayrollInputs from "./pages/PayrollInputs.tsx";
 import { Bell } from "./notifications.tsx";
 import { DemoClock, ScheduledAlerts } from "./alerts.tsx";
+import { adminUnlocked, lockAdmin, unlockAdmin } from "./adminGate.ts";
+import { useState } from "react";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
@@ -37,7 +40,7 @@ const PERIOD_PAGES = ["payslip", "benefits", "payruns", "overview", "", "registe
 
 const NAV: { group: string; items: [string, string][] }[] = [
   { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["positions", "Open positions"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["reports", "Reports"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["inputs", "Payroll inputs"], ["reports", "Reports"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
   { group: "Tie it out", items: [["data-errors", "Data errors (Oct 1–15)"], ["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -49,6 +52,14 @@ export default function App() {
   const access = useAccess();
   // Switching user starts fresh: same page if the new role may open it (without a previous
   // selection such as another worker), otherwise their inbox.
+  // The Administrator persona is listed only in a browser unlocked with the passphrase.
+  const [admin, setAdmin] = useState(adminUnlocked);
+  const askAdmin = async () => {
+    const pass = window.prompt("Administrator passphrase");
+    if (!pass) return;
+    if (await unlockAdmin(pass)) { setAdmin(true); switchUser("admin"); }
+    else window.alert("That passphrase is not right.");
+  };
   const switchUser = (id: string) => {
     setPersona(id);
     const next = data ? accessFor(personaById(id), data.dsNow) : null;
@@ -89,6 +100,7 @@ export default function App() {
       case "data-errors": return <DataErrors />;
       case "positions": return <Positions />;
       case "reports": return <Reports query={query} />;
+      case "inputs": return <PayrollInputs />;
       default: return <Home />;
     }
   };
@@ -105,7 +117,7 @@ export default function App() {
         <label className="side-select">
           <span>Signed in as</span>
           <select value={me.id} onChange={(e) => switchUser(e.target.value)}>
-            {PERSONAS.map((p) => <option key={p.id} value={p.id}>{p.name}, {p.role}</option>)}
+            {PERSONAS.filter((p) => p.role !== "Administrator" || admin).map((p) => <option key={p.id} value={p.id}>{p.name}, {p.role}</option>)}
           </select>
         </label>
         <nav className="nav" aria-label="Main">
@@ -126,6 +138,7 @@ export default function App() {
         <div className="side-foot">
           {data && <>Calculated in {data.ms} ms in your browser. Data you enter is saved in this browser only.</>}
           <DemoClock />
+          {admin ? <button className="close" style={{ marginLeft: 0, marginTop: 8 }} onClick={() => { lockAdmin(); setAdmin(false); if (me.role === "Administrator") switchUser("hr"); }}>Lock administrator access</button> : <button className="close" style={{ marginLeft: 0, marginTop: 8 }} onClick={askAdmin}>Administrator access</button>}
         </div>
       </aside>
       <main className="main" key={me.id}>

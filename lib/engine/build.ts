@@ -104,6 +104,12 @@ export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Vari
     ytd: ds.ytd.find((y) => y.employeeId === w.id),
     garnishment: v.noGarnishment ? undefined : ds.garnishments.find((g) => g.employeeId === w.id),
     priorPeriodRetro: v.excludeErpEntries ? undefined : retro,
+    // Payroll inputs: one-time for this pay period, or ongoing over dates that overlap it.
+    payInputs: v.excludeErpEntries
+      ? undefined
+      : (ds.payInputs ?? [])
+          .filter((x) => x.workerId === w.id && (x.kind === "one-time" ? x.periodId === period.id : (x.start ?? "") <= period.end && (!x.end || x.end >= period.start)))
+          .map((x) => ({ code: x.code, amount: Math.round(x.amount * 100), hours: x.hours, explain: `${x.reason} (${x.kind === "one-time" ? "one-time" : `ongoing from ${x.start}${x.end ? ` to ${x.end}` : ""}`}, ${x.id})` })),
   };
   const pay = calcUSWorker(input, period, v.ssBaseActual ? { ssWageBase: ACTUAL_2026_SS_WAGE_BASE } : {});
   return { worker: w, input, time, absence, pay, hoursWorkedBasis };

@@ -22,7 +22,7 @@ export default function Inbox({ query }: { query: URLSearchParams }) {
   const awaiting = bps.filter((b) => b.status === "Awaiting Approval");
   const canApprove = (b: BusinessProcess) => {
     const r = BP_RULES[b.type].approvers;
-    return r !== "auto" && r.includes(me.role) && b.initiatedBy !== me.id;
+    return r !== "auto" && r.includes(me.role) && (b.initiatedBy !== me.id || me.role === "Administrator");
   };
   const mine = awaiting.filter(canApprove);
   const list = tab === "mine" ? mine : tab === "all" ? awaiting : [...bps].reverse();

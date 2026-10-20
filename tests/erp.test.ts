@@ -263,3 +263,27 @@ test("Mid-period hire and termination are prorated; hourly vacation is paid out 
   assert.equal(vac.ending, 0);
   assert.equal(payout!.amount, Math.round(vac.payoutQty * 38.25 * 100));
 });
+
+test("Payroll inputs: one-time for a pay period, retro for a completed one, ongoing between dates, deduction adjustments", () => {
+  const input = (id: string, payload: Record<string, unknown>, at = "2026-10-21T10:00:00Z") => ({ ...bp("Payroll Input", "E0001", "2026-10-21", { input: payload }, at), id });
+  const done = { [SM1]: "2026-10-20T09:00:00Z" };
+  const lineOf = (v: ReturnType<typeof computePeriod>, id: string, code: string) => v.result.us.find((c) => c.worker.id === id)!.pay.lines.filter((l) => l.code === code);
+  // One-time bonus in Oct 16–31.
+  const bonus = input("BP-PI1", { code: "BONUS", amount: 2500, kind: "one-time", periodId: SM2, reason: "Spot bonus" });
+  assert.equal(lineOf(computePeriod(base, erp([bonus], done), SM2), "E0001", "BONUS")[0].amount, 250000);
+  // Missed earnings for the completed Oct 1–15: paid as retro in Oct 16–31; Oct 1–15 stays as paid.
+  const missed = input("BP-PI2", { code: "ADJ_EARN", amount: 400, kind: "one-time", periodId: SM1, reason: "Missed on-call pay" });
+  const state = erp([missed], done);
+  assert.equal(lineOf(computePeriod(base, state, SM1), "E0001", "ADJ_EARN").length, 0);
+  assert.equal(lineOf(computePeriod(base, state, SM2), "E0001", "RETRO").reduce((s, l) => s + l.amount, 0), 40000);
+  // Ongoing $100 per period from Oct 16 to Oct 31: in Oct 16–31 only.
+  const ongoing = input("BP-PI3", { code: "ADJ_EARN", amount: 100, kind: "ongoing", start: "2026-10-16", end: "2026-10-31", reason: "Phone stipend" });
+  assert.equal(lineOf(computePeriod(base, erp([ongoing], done), SM2), "E0001", "ADJ_EARN")[0].amount, 10000);
+  assert.equal(lineOf(computePeriod(base, erp([ongoing], done), SM1), "E0001", "ADJ_EARN").length, 0);
+  // 401(k) catch-up of $150 adds to the deduction and lowers federal taxable wages.
+  const k = input("BP-PI4", { code: "K401", amount: 150, kind: "one-time", periodId: SM2, reason: "Missed 401(k) deferral" });
+  const before = computePeriod(base, erp([], done), SM2).result.us.find((c) => c.worker.id === "E0001")!.pay;
+  const after = computePeriod(base, erp([k], done), SM2).result.us.find((c) => c.worker.id === "E0001")!.pay;
+  assert.equal(after.totals.preTax - before.totals.preTax, 15000);
+  assert.equal(before.taxable.fit - after.taxable.fit, 15000);
+});

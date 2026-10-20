@@ -80,6 +80,8 @@ export interface WorkerPayInput {
   garnishment?: Garnishment;
   /** Difference from recalculating a completed period after later changes (Workday retro). */
   priorPeriodRetro?: PriorPeriodRetro;
+  /** Payroll inputs for this pay period (cents): earnings, or 401(k) and medical deduction adjustments. */
+  payInputs?: { code: string; amount: Cents; hours?: number; explain: string }[];
 }
 
 /** One day of time off that changed in a completed period, itemized on the retro. */
@@ -316,7 +318,9 @@ export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: Pay
   const flags: string[] = [];
   const sal = w.payType === "Salary" ? salaryLines(input, period) : [];
   const timeOff = salariedTimeOff(input, period, sal);
-  const earnings = [...sal, ...timeOff, ...timeLines(input), ...absenceLines(input, period), ...retroLines(input)];
+  const last0 = input.timeline[input.timeline.length - 1];
+  const inputLines = (input.payInputs ?? []).filter((x) => COMPONENT[x.code]?.type === "Earning").map((x) => line(x.code, x.amount, x.explain, { hours: x.hours, state: last0.workState, costCenterId: last0.costCenterId }));
+  const earnings = [...sal, ...timeOff, ...timeLines(input), ...absenceLines(input, period), ...retroLines(input), ...inputLines];
   // Overpayment recovery larger than this pay run: when payroll allows it, hold gross (and so net) at
   // zero and carry the rest of the recovery to the next pay run.
   const owed = earnings.reduce((s, l) => s + l.amount, 0);
@@ -330,10 +334,17 @@ export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: Pay
   const k401Base = earnings.filter((l) => COMPONENT[l.code].k401Eligible).reduce((s, l) => s + l.amount, 0);
 
   const lines: PayLine[] = [...earnings];
-  const k401 = pct(k401Base, w.k401Pct);
-  if (k401) lines.push(line("K401", k401, `${(w.k401Pct * 100).toFixed(1)}% × 401(k)-eligible earnings ${fmt(k401Base)}${k401Base !== gross ? " (PTO payout excluded per plan document)" : ""}`));
-  const med = gross > 0 ? roundCents(w.medicalPerPeriod * 100) : 0;
-  if (med) lines.push(line("MED", med, `Medical election ${fmt(med)} per period (Sec. 125)`));
+  // Deduction adjustments entered by payroll add to (or refund) the calculated deduction.
+  const adj = (code: string) => (input.payInputs ?? []).filter((x) => x.code === code);
+  const k401Calc = pct(k401Base, w.k401Pct);
+  const k401 = k401Calc + adj("K401").reduce((s, x) => s + x.amount, 0);
+  const k401Line = k401Calc;
+  if (k401Line) lines.push(line("K401", k401Line, `${(w.k401Pct * 100).toFixed(1)}% × 401(k)-eligible earnings ${fmt(k401Base)}${k401Base !== gross ? " (PTO payout excluded per plan document)" : ""}`));
+  for (const x of adj("K401")) lines.push(line("K401", x.amount, x.explain));
+  const medCalc = gross > 0 ? roundCents(w.medicalPerPeriod * 100) : 0;
+  const med = medCalc + adj("MED").reduce((s, x) => s + x.amount, 0);
+  if (medCalc) lines.push(line("MED", medCalc, `Medical election ${fmt(medCalc)} per period (Sec. 125)`));
+  for (const x of adj("MED")) lines.push(line("MED", x.amount, x.explain));
 
   // ---- taxable wages, each defined by the components' taxability
   const fitWages = gross - k401 - med;

@@ -70,6 +70,21 @@ export interface Worker {
   source?: "erp";
 }
 
+/** A payroll input: a one-time or ongoing earning or deduction adjustment entered by payroll. */
+export interface PayInput {
+  id: string;
+  workerId: string;
+  code: string;
+  /** Major units per pay period; negative reduces (an earning) or refunds (a deduction). */
+  amount: number;
+  hours?: number;
+  kind: "one-time" | "ongoing";
+  periodId?: string;
+  start?: string;
+  end?: string;
+  reason: string;
+}
+
 /** Effective-dated change to one worker attribute. */
 export interface WorkerEvent {
   employeeId: string;
@@ -198,6 +213,8 @@ export interface Dataset {
   absences: AbsenceTaken[];
   ytd: Ytd[];
   garnishments: Garnishment[];
+  /** Payroll inputs entered by payroll: one-time (for a pay period) or ongoing (start and end dates). */
+  payInputs?: PayInput[];
   legacy: LegacyRow[];
   provider: ProviderResult[];
   glMapping: GlMapping[];
