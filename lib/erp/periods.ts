@@ -13,19 +13,20 @@
 import type { AbsenceBalance, Dataset, Ytd } from "../data/types.ts";
 import { PRIOR_PERIOD, US_PERIOD, US_PERIODS, type PayPeriod } from "../config/period.ts";
 import { runPeriod, type PeriodResult } from "../engine/run.ts";
+import type { PriorPeriodRetro, RetroTimeOff } from "../engine/payroll.ts";
 import { applyBps } from "./apply.ts";
 import type { BusinessProcess, ErpState } from "./types.ts";
 import { fmt, type Cents } from "../util/money.ts";
 import { pretty } from "../util/dates.ts";
 
-const NON_TIME_EARNINGS = ["SAL", "VAC", "SICK", "PTO_PAYOUT", "BONUS"];
+const NON_TIME_EARNINGS = ["SAL", "PTO_TAKEN", "VAC", "SICK", "PTO_PAYOUT", "BONUS"];
 const FAR_FUTURE = "9999-12-31T00:00:00.000Z";
 
 export interface PeriodView {
   period: PayPeriod;
   ds: Dataset;
   result: PeriodResult;
-  retro: Map<string, { amount: Cents; explain: string }>;
+  retro: Map<string, PriorPeriodRetro>;
   priorId?: string;
   priorCompleted: boolean;
 }
@@ -95,7 +96,8 @@ function resultAsOfUncached(base: Dataset, bps: BusinessProcess[], erp: ErpState
   }
   // The prior period as it was completed (or provisionally, as of now).
   const priorAt = completedAt(erp, prior);
-  const priorRes = resultAsOf(base, bps, erp, prior, priorAt, cache).result;
+  const priorAsPaid = resultAsOf(base, bps, erp, prior, priorAt, cache);
+  const priorRes = priorAsPaid.result;
   // Data for this period: BPs up to asOf; time approved before the prior completed counts as already paid.
   let ds = applyBps(base, bps, { asOf, knownBy: { at: priorAt ?? FAR_FUTURE, asDate: periodById(prior).end } });
   for (const a of chain(id)) {
@@ -103,12 +105,14 @@ function resultAsOfUncached(base: Dataset, bps: BusinessProcess[], erp: ErpState
     ds = rollForward(assignGoLivePayGroups(ds, periodById(id)), r);
   }
   ds = assignGoLivePayGroups(ds, period);
-  const retro = priorAt ? retroFor(base, bps, erp, prior, priorRes, cache) : new Map();
+  const retro = priorAt ? retroFor(base, bps, erp, prior, priorAsPaid, cache) : new Map();
   return { ds, result: runPeriod(ds, period, undefined, { retro, reconcileLegacy: false }) };
 }
 
-function retroFor(base: Dataset, bps: BusinessProcess[], erp: ErpState, priorId: string, asCompleted: PeriodResult, cache: Cache) {
-  const now = resultAsOf(base, bps, erp, priorId, undefined, cache).result;
+function retroFor(base: Dataset, bps: BusinessProcess[], erp: ErpState, priorId: string, asPaid: { ds: Dataset; result: PeriodResult }, cache: Cache) {
+  const asCompleted = asPaid.result;
+  const nowView = resultAsOf(base, bps, erp, priorId, undefined, cache);
+  const now = nowView.result;
   const earn = (r: PeriodResult) => {
     const m = new Map<string, Map<string, Cents>>();
     for (const c of r.us) {
@@ -120,9 +124,10 @@ function retroFor(base: Dataset, bps: BusinessProcess[], erp: ErpState, priorId:
   };
   const was = earn(asCompleted);
   const is = earn(now);
-  const retro = new Map<string, { amount: Cents; explain: string }>();
+  const retro = new Map<string, PriorPeriodRetro>();
   const p = periodById(priorId);
-  for (const id of new Set([...was.keys(), ...is.keys()])) {
+  const timeOff = timeOffChanges(asPaid.ds, nowView.ds, p);
+  for (const id of new Set([...was.keys(), ...is.keys(), ...timeOff.keys()])) {
     let total = 0;
     const parts: string[] = [];
     for (const code of new Set([...(was.get(id)?.keys() ?? []), ...(is.get(id)?.keys() ?? [])])) {
@@ -133,9 +138,38 @@ function retroFor(base: Dataset, bps: BusinessProcess[], erp: ErpState, priorId:
         parts.push(`${code} ${fmt(before)} → ${fmt(after)}`);
       }
     }
-    if (total) retro.set(id, { amount: total, explain: `${pretty(p.start)}–${pretty(p.end)} recalculated after changes entered since it was completed: ${parts.join("; ")}` });
+    const items = timeOff.get(id);
+    if (total || items) retro.set(id, { amount: total, explain: `${pretty(p.start)}–${pretty(p.end)} recalculated after changes entered since it was completed: ${parts.join("; ") || "no pay change"}`, timeOff: items });
   }
   return retro;
+}
+
+/** Approved time off in a period, as paid versus as known now: the days whose hours changed, by worker. */
+function timeOffChanges(paid: Dataset, now: Dataset, p: PayPeriod): Map<string, RetroTimeOff[]> {
+  const sum = (ds: Dataset) => {
+    const m = new Map<string, { employeeId: string; plan: string; date: string; unit: string; qty: number }>();
+    for (const a of ds.absences) {
+      if (a.status !== "Approved" || a.date < p.start || a.date > p.end) continue;
+      const k = `${a.employeeId}|${a.plan}|${a.date}`;
+      const e = m.get(k) ?? { employeeId: a.employeeId, plan: a.plan, date: a.date, unit: a.unit, qty: 0 };
+      e.qty += a.quantity;
+      m.set(k, e);
+    }
+    return m;
+  };
+  const before = sum(paid);
+  const after = sum(now);
+  const out = new Map<string, RetroTimeOff[]>();
+  for (const k of new Set([...before.keys(), ...after.keys()])) {
+    const b = before.get(k);
+    const a = after.get(k);
+    if ((b?.qty ?? 0) === (a?.qty ?? 0)) continue;
+    const e = (a ?? b)!;
+    if (!out.has(e.employeeId)) out.set(e.employeeId, []);
+    out.get(e.employeeId)!.push({ date: e.date, plan: e.plan, unit: e.unit, before: b?.qty ?? 0, after: a?.qty ?? 0 });
+  }
+  for (const items of out.values()) items.sort((x, y) => (x.date < y.date ? -1 : 1));
+  return out;
 }
 
 export function computePeriod(base: Dataset, erp: ErpState, periodId: string): PeriodView {
@@ -143,10 +177,10 @@ export function computePeriod(base: Dataset, erp: ErpState, periodId: string): P
   const priorId = PRIOR_PERIOD[period.id];
   // A completed period is shown exactly as completed; an open one as of now.
   const { ds, result } = resultAsOf(base, erp.bps, erp, period.id, completedAt(erp, period.id), new Map(), true);
-  const retro = new Map<string, { amount: Cents; explain: string }>();
+  const retro = new Map<string, PriorPeriodRetro>();
   for (const c of result.us) {
-    const l = c.pay.lines.find((x) => x.code === "RETRO" && x.explain.includes("recalculated after changes"));
-    if (l) retro.set(c.worker.id, { amount: l.amount, explain: l.explain });
+    const ls = c.pay.lines.filter((x) => x.code === "RETRO" && (x.explain.includes("recalculated after changes") || x.explain.startsWith("Retro time off")));
+    if (ls.length) retro.set(c.worker.id, { amount: ls.reduce((s, l) => s + l.amount, 0), explain: ls.map((l) => l.explain).join("; ") });
   }
   return { period, ds, result, retro, priorId, priorCompleted: priorId ? !!completedAt(erp, priorId) : true };
 }

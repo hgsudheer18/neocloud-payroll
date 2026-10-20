@@ -19,8 +19,11 @@ test("Period has 11 working days (Oct 1–15, 2026)", () => {
   assert.equal(pay("E0001").input.timeline.filter((d) => d.workingDay).length, 11);
 });
 
-test("Full period salary = annual ÷ 24", () => {
-  assert.equal(line("E0001", "SAL"), 1_187_500); // 285,000 / 24
+test("Full period salary = annual ÷ 24, with time off reclassified out of regular salary", () => {
+  // E0001 took 8 hrs of Flexible PTO on Oct 13: 8 × (285,000 ÷ 2080 = $137.0192) moves to Time Off Taken.
+  assert.equal(line("E0001", "SAL") + line("E0001", "PTO_TAKEN"), 1_187_500); // 285,000 / 24
+  assert.equal(line("E0001", "PTO_TAKEN"), 109_615);
+  assert.equal(pay("E0001").pay.lines.find((l) => l.code === "PTO_TAKEN")!.hours, 8);
 });
 
 test("New hire proration: E0203 starts Mon Oct 12 → 4 of 11 working days", () => {

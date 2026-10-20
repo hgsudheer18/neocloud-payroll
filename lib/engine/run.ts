@@ -9,6 +9,7 @@ import { reconcileEmployee, summarize, type ReconSummary } from "./reconcile.ts"
 import { headcountRecon, type HeadcountStep } from "./headcount.ts";
 import { intlJournals, totalsByJournal, usJournal, validateAndMap, type JournalIssue, type JournalLine, type MappedLine } from "./gl.ts";
 import { prepayrollAudit, type AuditFinding } from "./audit.ts";
+import type { PriorPeriodRetro } from "./payroll.ts";
 import { roundCents, type Cents } from "../util/money.ts";
 
 export interface Rollup {
@@ -49,7 +50,7 @@ export interface RunOptions {
   /** Reconcile to the legacy register (parallel-run periods only). Default: when legacy rows exist and the period is the parallel period. */
   reconcileLegacy?: boolean;
   /** Retro from recalculating a completed prior period, by worker. */
-  retro?: Map<string, { amount: Cents; explain: string }>;
+  retro?: Map<string, PriorPeriodRetro>;
 }
 
 export function runPeriod(ds: Dataset, period: PayPeriod = US_PERIOD, intlPeriod: MonthlyPeriod = INTL_PERIOD, opts: RunOptions = {}): PeriodResult {

@@ -17,6 +17,7 @@ import { allocate, fmt, pct, roundCents, type Cents } from "../util/money.ts";
 import { pretty } from "../util/dates.ts";
 import { COMPONENT, US_BENEFITS_LOAD, type ComponentType } from "../config/payComponents.ts";
 import { STANDARD_ANNUAL_HOURS, type PayPeriod } from "../config/period.ts";
+import { PLAN } from "../config/absencePlans.ts";
 import { annualizedWithholding, asOf, CALIFORNIA, FEDERAL, FICA, STATES, UNEMPLOYMENT } from "../config/usTax.ts";
 
 export interface PayLine {
@@ -78,7 +79,23 @@ export interface WorkerPayInput {
   ytd?: Ytd;
   garnishment?: Garnishment;
   /** Difference from recalculating a completed period after later changes (Workday retro). */
-  priorPeriodRetro?: { amount: Cents; explain: string };
+  priorPeriodRetro?: PriorPeriodRetro;
+}
+
+/** One day of time off that changed in a completed period, itemized on the retro. */
+export interface RetroTimeOff {
+  date: string;
+  plan: string;
+  unit: string;
+  before: number;
+  after: number;
+}
+
+export interface PriorPeriodRetro {
+  amount: Cents;
+  explain: string;
+  /** Time off days that changed; shown with date and hours, priced as the period was recalculated. */
+  timeOff?: RetroTimeOff[];
 }
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -219,6 +236,57 @@ function absenceLines(input: WorkerPayInput, period: PayPeriod): PayLine[] {
   return out;
 }
 
+/**
+ * Salaried time off: approved hours × hourly equivalent, shown as Time Off Taken
+ * and taken out of regular salary, so gross is unchanged (Workday reclass).
+ * Reduces the SAL lines in place.
+ */
+function salariedTimeOff(input: WorkerPayInput, period: PayPeriod, sal: PayLine[]): PayLine[] {
+  if (input.worker.payType !== "Salary" || !sal.length) return [];
+  const paidDays = new Map(input.timeline.filter((d) => d.workingDay && d.paid).map((d) => [d.date, d]));
+  const taken = input.absencesTaken.filter((a) => a.status === "Approved" && a.unit === "hours" && a.date >= period.start && a.date <= period.end && paidDays.has(a.date));
+  const out: PayLine[] = [];
+  for (const plan of [...new Set(taken.map((a) => a.plan))]) {
+    const days = taken.filter((a) => a.plan === plan).sort((a, b) => (a.date < b.date ? -1 : 1));
+    let exact = 0;
+    const parts: string[] = [];
+    for (const a of days) {
+      const rate = hourlyEquivalent(paidDays.get(a.date)!.annualSalary);
+      exact += a.quantity * rate;
+      parts.push(`${pretty(a.date)} ${h2(a.quantity)} hrs × ${money(rate)}`);
+    }
+    const hours = days.reduce((s, a) => s + a.quantity, 0);
+    const last = sal[sal.length - 1];
+    const amount = Math.min(roundCents(exact * 100), last.amount);
+    if (amount <= 0) continue;
+    last.amount -= amount;
+    last.explain += `; less ${fmt(amount)} paid as ${PLAN[plan]?.name ?? plan} (${h2(hours)} hrs)`;
+    out.push(line("PTO_TAKEN", amount, `${PLAN[plan]?.name ?? plan}: ${parts.join("; ")} (hourly equivalent = salary ÷ ${STANDARD_ANNUAL_HOURS})`, { hours, state: last.state, costCenterId: last.costCenterId }));
+  }
+  return out;
+}
+
+/** Retro from a recalculated completed period: one line per changed time off day, then the rest. */
+function retroLines(input: WorkerPayInput): PayLine[] {
+  const r = input.priorPeriodRetro;
+  if (!r) return [];
+  const w = input.worker;
+  const last = input.timeline[input.timeline.length - 1];
+  const at = { state: last.workState, costCenterId: last.costCenterId };
+  const out: PayLine[] = [];
+  let itemized = 0;
+  for (const t of r.timeOff ?? []) {
+    const delta = t.after - t.before;
+    const hourly = w.payType === "Hourly";
+    const amount = hourly ? roundCents(delta * last.hourlyRate * 100) : 0;
+    itemized += amount;
+    const change = `${h2(t.before)} → ${h2(t.after)} ${t.unit} (${delta > 0 ? "+" : ""}${h2(delta)} ${t.unit}`;
+    out.push(line("RETRO", amount, `Retro time off: ${PLAN[t.plan]?.name ?? t.plan}, ${pretty(t.date)}: ${change}${hourly ? ` × ${money(last.hourlyRate)})` : "), reclassified within regular salary: no pay change"}`, { hours: delta, ...at }));
+  }
+  if (r.amount - itemized !== 0) out.push(line("RETRO", r.amount - itemized, r.explain, at));
+  return out;
+}
+
 function lastSalary(tl: DayState[]): number {
   const employed = tl.filter((d) => d.employed);
   return (employed[employed.length - 1] ?? tl[tl.length - 1]).annualSalary;
@@ -234,14 +302,9 @@ function addDaysLocal(d: string, n: number): string {
 export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: PayrollOptions = {}): PayResult {
   const w = input.worker;
   const flags: string[] = [];
-  const earnings = [
-    ...(w.payType === "Salary" ? salaryLines(input, period) : []),
-    ...timeLines(input),
-    ...absenceLines(input, period),
-    ...(input.priorPeriodRetro && input.priorPeriodRetro.amount !== 0
-      ? [line("RETRO", input.priorPeriodRetro.amount, input.priorPeriodRetro.explain, { state: input.timeline[input.timeline.length - 1].workState, costCenterId: input.timeline[input.timeline.length - 1].costCenterId })]
-      : []),
-  ];
+  const sal = w.payType === "Salary" ? salaryLines(input, period) : [];
+  const timeOff = salariedTimeOff(input, period, sal);
+  const earnings = [...sal, ...timeOff, ...timeLines(input), ...absenceLines(input, period), ...retroLines(input)];
   const gross = earnings.reduce((s, l) => s + l.amount, 0);
   const k401Base = earnings.filter((l) => COMPONENT[l.code].k401Eligible).reduce((s, l) => s + l.amount, 0);
 

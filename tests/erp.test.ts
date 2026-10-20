@@ -144,3 +144,21 @@ test("A time off correction in a completed period leaves it as paid and is paid 
   const r = computePeriod(base, state, BWT).retro.get("E0024");
   assert.ok(r && r.amount < 0, "four fewer vacation hours are recovered as negative retro");
 });
+
+test("Retro time off is itemized on the next pay run with the date and hours", () => {
+  const done = { [SM1]: "2026-10-20T09:00:00Z" };
+  // Hourly: 8 → 4 hrs vacation on Oct 9 is recovered at the base rate on the next (biweekly) run.
+  const hourly = bp("Correct Time Off", "E0024", "2026-10-09", { plan: "US_HOURLY_VAC", unit: "hours", date: "2026-10-09", quantity: 4, oldQuantity: 8 }, "2026-10-21T10:00:00Z");
+  const h = computePeriod(base, erp([hourly], done), BWT).result.us.find((c) => c.worker.id === "E0024")!;
+  const hl = h.pay.lines.find((l) => l.code === "RETRO" && l.explain.startsWith("Retro time off"))!;
+  assert.equal(hl.hours, -4);
+  assert.match(hl.explain, /Fri Oct 9: 8\.00 → 4\.00 hours/);
+  assert.equal(hl.amount, -4 * 3825); // 4 hrs × $38.25
+  // Salaried: 8 → 4 hrs Flexible PTO on Oct 13 is shown on the next run, with no pay change.
+  const salaried = bp("Correct Time Off", "E0001", "2026-10-13", { plan: "US_FLEX_PTO", unit: "hours", date: "2026-10-13", quantity: 4, oldQuantity: 8 }, "2026-10-21T10:00:00Z");
+  const s = computePeriod(base, erp([salaried], done), SM2).result.us.find((c) => c.worker.id === "E0001")!;
+  const sl = s.pay.lines.find((l) => l.code === "RETRO" && l.explain.startsWith("Retro time off"))!;
+  assert.equal(sl.hours, -4);
+  assert.equal(sl.amount, 0);
+  assert.match(sl.explain, /Tue Oct 13: 8\.00 → 4\.00 hours/);
+});
