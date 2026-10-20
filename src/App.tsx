@@ -86,10 +86,7 @@ export default function App() {
   return (
     <div className="shell">
       <aside className="side">
-        <div className="brand">
-          NeoCloud People and Payroll
-          <small>Workday-style HCM and payroll</small>
-        </div>
+        <div className="brand">NeoCloud Inc.</div>
         <label className="side-select">
           <span>Signed in as</span>
           <select value={me.id} onChange={(e) => switchUser(e.target.value)}>
