@@ -55,3 +55,16 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 | What about 5,000 employees? | The engine is pure functions with no UI dependency; it moves to a server or background job unchanged, with the same tests. |
 | Can someone approve their own change? | No. Initiator and approver must differ for every business process and for the pay run. |
 | How did you use AI? | It wrote most of the code; I specified the rules and edge cases, checked calculations against hand-worked examples, and the README lists where it was wrong. |
+
+## Hiring and terminating part-way through a pay period
+
+Start with Oct 1–15 completed (Pay runs).
+
+1. **Signed in as Chloe Novak, HR Partner → Workforce → Open positions.** Eight positions: four hourly technicians (paid biweekly) and four salaried roles (paid semi-monthly), starting on or after Oct 19.
+2. **Hire into REQ-S2** (Cloud Solutions IC3, $150,000) with a hire date of **Oct 21**. Then **hire into REQ-H2** (night technician, $41.50/hr) from **Oct 21**. Use the approver shortcut to approve each.
+3. **Terminate Sofia Davis (E0024)** with a last day of **Oct 23**; her manager approves.
+4. **Signed in as Ethan Fischer → Team Timesheets → Jordan Lee, week of Oct 18 → Fill in the schedule → Save changes.** Only Oct 21–23 are filled (from the hire date): 24 hours, 22.5 of them with night differential.
+5. **Signed in as Diego Okafor → Payroll → Reports.**
+   - *By worker, Oct 16–31 semi-monthly:* Riley Chen is paid $4,545.45 = $150,000 ÷ 24 × 8/11 working days ("Hired Oct 21 (prorated)").
+   - *By worker, Oct 16–31 biweekly:* Jordan Lee $1,063.50 (24 hrs × $41.50 + $67.50 night differential); Sofia Davis "Terminated Oct 23; Vacation paid out" with her vacation balance paid at her rate.
+   - *Earnings / Deductions / Taxes:* each pay component by period, with hours and worker counts; *Pay schedule:* every period's dates, check date and totals. Each table downloads as CSV.

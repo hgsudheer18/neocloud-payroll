@@ -111,7 +111,7 @@ export default function Home() {
             <dl className="kv">
               <dt>Active employees</dt><dd>{ds.workers.filter((x) => x.workerType === "Employee" && !x.terminationDate).length}</dd>
               <dt>Contingent workers</dt><dd>{ds.workers.filter((x) => x.workerType === "Contractor").length}</dd>
-              <dt>Open positions</dt><dd>{OPEN_POSITIONS.map((p) => p.title).join(", ")}</dd>
+              <dt>Open positions</dt><dd><a href="#/positions">8 to hire (4 hourly, 4 salaried)</a>; leadership: {OPEN_POSITIONS.map((p) => p.title).join(", ")}</dd>
             </dl>
             <div className="row"><a href="#/workers/new">Hire a worker</a><a href="#/organisation">Organisation</a></div>
           </Section>

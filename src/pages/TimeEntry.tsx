@@ -129,7 +129,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
     setErrors({ ...errors, [d]: [] });
   };
   const fillSchedule = () => {
-    const add = days.filter((d) => isWeekday(d) && !draftFor(d) && !approved(d).length && !pendingRow(d) && !timeOff(d).length);
+    const add = days.filter((d) => isWeekday(d) && d >= w.hireDate && (!w.terminationDate || d <= w.terminationDate) && !draftFor(d) && !approved(d).length && !pendingRow(d) && !timeOff(d).length);
     save([...drafts, ...add.map((d) => ({ workDate: d, rowId: `W${String(nextSeq()).padStart(5, "0")}`, shift: w.shift || "Day", notes: "", ...schedule }) as TimeRow)]);
   };
   const correct = (d: string) => {

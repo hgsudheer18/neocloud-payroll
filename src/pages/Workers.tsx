@@ -13,6 +13,7 @@ import { toCents } from "../../lib/util/money.ts";
 import type { Dataset, Worker } from "../../lib/data/types.ts";
 import { BP_RULES, type BPType } from "../../lib/erp/types.ts";
 import { NoAccess, useAccess } from "../access.tsx";
+import { REQUISITIONS, requisitionStatus } from "../../lib/config/requisitions.ts";
 import { OrgChain } from "./Organisation.tsx";
 
 const SUPPORTED_STATES = Object.keys(asOf(STATES, "2026-10-01"));
@@ -28,7 +29,8 @@ const statusTone = (s: string) => (s === "Active" ? "ok" : s === "Terminated" ? 
 
 export default function Workers({ id, query }: { id?: string; query: URLSearchParams }) {
   const { me } = useErp();
-  if (id === "new") return <Hire />;
+  // Keyed by position so moving from one position to another starts a fresh form.
+  if (id === "new") return <Hire key={query.get("position") ?? ""} position={query.get("position") ?? ""} />;
   if (id) return <Profile id={id} action={query.get("action") ?? ""} />;
   // An employee's directory is just themselves: show their own profile.
   if (me.role === "Employee" && me.workerId) return <Profile id={me.workerId} action={query.get("action") ?? ""} />;
@@ -99,15 +101,20 @@ function Directory({ query }: { query: URLSearchParams }) {
 
 // ------------------------------------------------------------------ hire
 
-function Hire() {
+function Hire({ position }: { position: string }) {
   const { data } = useData();
   const { erp, submit } = useErp();
   const ds = data!.dsNow;
   const jps = jobProfiles(data!.base, erp.bps);
-  const [f, setF] = useState<HireForm & { filingStatus: string; k401Pct: number; medicalPerPeriod: number; shift: string }>({
-    name: "", hireDate: today(), jobProfile: "", flsa: "", payType: "", level: "", costCenterId: "", locationId: "", workState: "",
-    annualSalary: 0, hourlyRate: 0, managerId: "", filingStatus: "Single", k401Pct: 0.05, medicalPerPeriod: 145, shift: "Day",
-  });
+  // Hiring into an open position pre-fills the job, pay, cost center, location and manager.
+  const req = REQUISITIONS.find((r) => r.id === position);
+  const jp = req ? jps.find((j) => j.name === req.jobProfile && (j.flsa === "Exempt" || j.flsa === "Non-Exempt")) ?? jps.find((j) => j.name === req.jobProfile) : undefined;
+  const [f, setF] = useState<HireForm & { filingStatus: string; k401Pct: number; medicalPerPeriod: number; shift: string }>(() => ({
+    name: "", hireDate: req && req.startFrom > today() ? req.startFrom : today(), jobProfile: req?.jobProfile ?? "", flsa: jp?.flsa ?? "", payType: req?.payType ?? jp?.payType ?? "", level: jp?.level ?? "",
+    costCenterId: req?.costCenterId ?? "", locationId: req?.locationId ?? "", workState: ds.locations.find((l) => l.id === req?.locationId)?.state ?? "",
+    annualSalary: req?.payType === "Salary" ? req.pay : 0, hourlyRate: req?.payType === "Hourly" ? req.pay : 0, managerId: req?.managerId ?? "",
+    filingStatus: "Single", k401Pct: req?.k401Pct ?? 0.05, medicalPerPeriod: req?.medicalPerPeriod ?? 145, shift: req?.shift || "Day",
+  }));
   const [check, setCheck] = useState<Check | null>(null);
   const [done, setDone] = useState("");
   const set = (patch: Partial<typeof f>) => setF((x) => ({ ...x, ...patch }));
@@ -124,13 +131,15 @@ function Hire() {
   };
   const doSubmit = () => {
     const c = validateHire(ds, f, SUPPORTED_STATES);
+    if (req && f.hireDate < req.startFrom) c.errors.push(`${req.id} can be filled from ${req.startFrom}.`);
+    if (req && requisitionStatus(req, erp.bps).status !== "Open") c.errors.push(`${req.id} is already ${requisitionStatus(req, erp.bps).status.toLowerCase()}.`);
     setCheck(c);
     if (c.errors.length) return;
     const wid = nextWorkerId(ds, erp.bps);
     const bp = submit({
       type: "Hire", subjectId: wid, subjectName: f.name, effectiveDate: f.hireDate,
       summary: `Hire ${f.name} as ${f.jobProfile}, ${f.payType === "Hourly" ? `$${f.hourlyRate}/hr` : `${f.annualSalary.toLocaleString("en-US")} ${loc?.country === "USA" ? "USD" : ""}`.trim()}, ${loc?.name}, from ${f.hireDate}`,
-      payload: { ...f, annualSalary: f.payType === "Hourly" ? 0 : f.annualSalary, hourlyRate: f.payType === "Hourly" ? f.hourlyRate : 0 },
+      payload: { ...f, annualSalary: f.payType === "Hourly" ? 0 : f.annualSalary, hourlyRate: f.payType === "Hourly" ? f.hourlyRate : 0, ...(req ? { positionId: req.id } : {}) },
       warnings: c.warnings,
     });
     setDone(`${bp.id} submitted: hire ${f.name} (${wid}) is awaiting approval by a Manager or HR Partner (not you). Approve it in the inbox.`);
@@ -138,8 +147,9 @@ function Hire() {
 
   return (
     <>
-      <PageHead title="Hire a worker">Creates a Hire business process. Once approved, the worker is effective from the hire date: placed in the pay group for their country, with cost center and supervisory org from the position, and paid from the hire date.</PageHead>
-      <p><a href="#/workers">All workers</a></p>
+      <PageHead title={req ? `Hire into ${req.id}: ${req.title}` : "Hire a worker"}>Creates a Hire business process. Once approved, the worker is effective from the hire date: placed in the pay group for their country, with cost center and supervisory org from the position, and paid from the hire date.</PageHead>
+      <p><a href="#/workers">All workers</a> · <a href="#/positions">Open positions</a></p>
+      {req && <div className="callout info">{req.id}: {req.payType === "Hourly" ? `hourly, $${req.pay.toFixed(2)}/hr, ${req.shift.toLowerCase()} shift, paid biweekly` : `salaried, $${req.pay.toLocaleString("en-US")} a year, paid semi-monthly`}; start on or after {pretty(req.startFrom)}. A hire part-way through a pay period is paid from the hire date: salaried by working days, hourly by time worked.</div>}
       <CanInitiate type="Hire">
         <div className="sheet">
           <FormGrid>

@@ -236,3 +236,30 @@ test("A submitted timesheet week becomes approved time rows for each day", () =>
   const ds = applyBps(base, [bp("Enter Time", "E0021", "2026-10-19", { rows }, "2026-10-21T10:00:00Z")]);
   assert.deepEqual(ds.time.filter((t) => t.employeeId === "E0021" && t.source === "erp").map((t) => t.workDate), ["2026-10-19", "2026-10-20"]);
 });
+
+test("Mid-period hire and termination are prorated; hourly vacation is paid out on termination", () => {
+  // Salaried hire Wed Oct 21 into Oct 16–31 (11 working days): paid 8 of 11.
+  const sHire = hire("E0410", "2026-10-21", "2026-10-21T09:00:00Z", { annualSalary: 165000 });
+  const sm2 = computePeriod(base, erp([sHire], { [SM1]: "2026-10-20T09:00:00Z" }), SM2).result.us.find((c) => c.worker.id === "E0410")!;
+  const sal = sm2.pay.lines.filter((l) => l.code === "SAL").reduce((s, l) => s + l.amount, 0);
+  assert.equal(sal, Math.round((165000 / 24) * (8 / 11) * 100));
+  // Hourly hire Wed Oct 21: biweekly, paid only for time worked.
+  const hHire = hire("E0411", "2026-10-21", "2026-10-21T09:00:00Z", { jobProfile: "Data Center Technician", flsa: "Non-Exempt", payType: "Hourly", level: "T2", costCenterId: "CC2100", locationId: "SJ", hourlyRate: 40, annualSalary: 0, managerId: "E0005", shift: "Day" });
+  const time = bp("Enter Time", "E0411", "2026-10-21", { rows: [{ rowId: "WH1", workDate: "2026-10-21", timeIn: "08:00", timeOut: "16:30", mealStart: "12:00", mealEnd: "12:30", shift: "Day", notes: "" }] }, "2026-10-22T09:00:00Z");
+  const bw = computePeriod(base, erp([hHire, time], { [SM1]: "2026-10-20T09:00:00Z" }), BWT).result.us.find((c) => c.worker.id === "E0411")!;
+  assert.equal(bw.worker.payGroup, "US Biweekly");
+  assert.equal(bw.pay.lines.find((l) => l.code === "REG")!.amount, 8 * 4000);
+  // Salaried termination Fri Oct 23 in Oct 16–31: paid 6 of 11 working days (Oct 16, 19–23).
+  const sTerm = bp("Terminate", "E0012", "2026-10-23", { reason: "Resignation" }, "2026-10-21T09:00:00Z");
+  const t = computePeriod(base, erp([sTerm], { [SM1]: "2026-10-20T09:00:00Z" }), SM2).result.us.find((c) => c.worker.id === "E0012")!;
+  const annual = base.workers.find((w) => w.id === "E0012")!.annualSalary;
+  assert.equal(t.pay.lines.filter((l) => l.code === "SAL").reduce((s, l) => s + l.amount, 0), Math.round((annual / 24) * (6 / 11) * 100));
+  // Hourly termination Fri Oct 23: vacation balance paid out.
+  const hTerm = bp("Terminate", "E0024", "2026-10-23", { reason: "Resignation" }, "2026-10-21T09:00:00Z");
+  const p = computePeriod(base, erp([hTerm], { [SM1]: "2026-10-20T09:00:00Z" }), BWT).result.us.find((c) => c.worker.id === "E0024")!;
+  const payout = p.pay.lines.find((l) => l.code === "PTO_PAYOUT");
+  assert.ok(payout && payout.amount > 0, "vacation paid out");
+  const vac = p.absence.find((a) => a.plan.code === "US_HOURLY_VAC")!;
+  assert.equal(vac.ending, 0);
+  assert.equal(payout!.amount, Math.round(vac.payoutQty * 38.25 * 100));
+});
