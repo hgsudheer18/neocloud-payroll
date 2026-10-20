@@ -18,6 +18,10 @@ import Setup from "./pages/Setup.tsx";
 import TimeEntry from "./pages/TimeEntry.tsx";
 import AbsenceHub from "./pages/AbsenceHub.tsx";
 import Benefits from "./pages/Benefits.tsx";
+import Home from "./pages/Home.tsx";
+import MyInformation from "./pages/MyInformation.tsx";
+import Documents from "./pages/Documents.tsx";
+import { Bell } from "./notifications.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
@@ -25,11 +29,11 @@ import Organisation from "./pages/Organisation.tsx";
 import { accessFor, NoAccess, useAccess } from "./access.tsx";
 
 // Pages whose figures depend on the selected pay period: they show the pay period picker.
-const PERIOD_PAGES = ["payslip", "benefits", "payruns", "", "register", "time", "time-off", "absence", "reconciliation", "gl", "controls"];
+const PERIOD_PAGES = ["payslip", "benefits", "payruns", "overview", "", "register", "time", "time-off", "absence", "reconciliation", "gl", "controls"];
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-off", "Absence"], ["benefits", "Benefits"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
+  { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -44,14 +48,14 @@ export default function App() {
   const switchUser = (id: string) => {
     setPersona(id);
     const next = data ? accessFor(personaById(id), data.dsNow) : null;
-    window.location.hash = next && next.canOpen(page) ? `/${page}` : "/inbox";
+    window.location.hash = next && next.canOpen(page) ? `/${page}` : "/";
   };
   const page = path[0] ?? "";
 
   const body = () => {
     if (error) return <div className="callout bad">{error}</div>;
     if (!data) return <div className="loading">Loading the data package and calculating the period…</div>;
-    if (!access.canOpen(page)) return page === "" ? <Inbox query={query} /> : <NoAccess />;
+    if (!access.canOpen(page)) return <NoAccess />;
     switch (page) {
       case "inbox": return <Inbox query={query} />;
       case "workers": return <Workers id={path[1]} query={query} />;
@@ -74,7 +78,10 @@ export default function App() {
       case "controls": return <Controls />;
       case "data": return <DataFiles />;
       case "docs": return <Docs slug={path[1]} />;
-      default: return <Dashboard query={query} />;
+      case "overview": return <Dashboard query={query} />;
+      case "my-information": return <MyInformation />;
+      case "documents": return <Documents query={query} />;
+      default: return <Home />;
     }
   };
 
@@ -98,11 +105,11 @@ export default function App() {
             <div key={g.group} style={{ display: "contents" }}>
               <div className="nav-group">{g.group}</div>
               {g.items.map(([href, label]) => (
-                <a key={href} href={`#/${href}`} aria-current={page === href || (page === "" && href === "inbox" && !access.canOpen("")) || (href === "time-off" && ["team-time-off", "upcoming-time-off", "absence"].includes(page)) ? "page" : undefined}>
+                <a key={href} href={`#/${href}`} aria-current={page === href || (href === "time-off" && ["team-time-off", "upcoming-time-off", "absence"].includes(page)) ? "page" : undefined}>
                   {label}
                   {href === "inbox" && toApprove > 0 && <span className="badge">{toApprove}</span>}
                   {href === "reconciliation" && data && data.result.reconciled && <span className="count">{unexplained ? `${unexplained} open` : "tied"}</span>}
-                  {href === "" && data && <span className="count">{tiesOk ? "ties" : "check"}</span>}
+                  {href === "overview" && data && <span className="count">{tiesOk ? "ties" : "check"}</span>}
                 </a>
               ))}
             </div>
@@ -113,8 +120,9 @@ export default function App() {
         </div>
       </aside>
       <main className="main" key={me.id}>
-        {data && PERIOD_PAGES.includes(page) && access.canOpen(page) && (
-          <div className="period-bar">
+        <div className="topbar">
+          {data && PERIOD_PAGES.includes(page) && access.canOpen(page) && (
+            <div className="period-bar">
             <label>
               <span>Pay period</span>
               <select value={periodId} onChange={(e) => setPeriod(e.target.value)}>
@@ -122,8 +130,10 @@ export default function App() {
               </select>
             </label>
             <span className="small muted">Check date {pretty(data.result.period.checkDate)} · Pay run: {run}</span>
-          </div>
-        )}
+            </div>
+          )}
+          {data && <Bell />}
+        </div>
         {body()}
       </main>
     </div>

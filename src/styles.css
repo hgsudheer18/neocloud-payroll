@@ -259,3 +259,37 @@ select, input[type="search"], input[type="text"] {
 .pill-link { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
 .pill-link:hover .pill { outline: 1px solid var(--ink); }
 .pill-link .small { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
+.week-row td { background: var(--band) !important; padding-top: 8px; padding-bottom: 8px; }
+.timesheet th:first-child { text-align: left; white-space: nowrap; }
+.timesheet th.weekend { color: var(--ink-faint); }
+.timesheet td { vertical-align: top; min-width: 96px; }
+.grid-input { width: 72px; padding: 4px 6px; border: 1px solid var(--rule); border-radius: var(--radius-sm); font-variant-numeric: tabular-nums; }
+
+/* ---------- top bar: notifications ---------- */
+.topbar { display: flex; justify-content: flex-end; align-items: center; gap: var(--s4); flex-wrap: wrap; margin: calc(-1 * var(--s3)) 0 var(--s4); }
+.topbar .period-bar { margin: 0; }
+.bell { position: relative; }
+.bell-button { position: relative; background: var(--sheet); border: 1px solid var(--rule); border-radius: 50%; width: 36px; height: 36px; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+.bell-button .badge { position: absolute; top: -6px; right: -8px; }
+.bell-panel { position: absolute; right: 0; top: 44px; width: min(380px, 90vw); max-height: 70vh; overflow: auto; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: var(--s4); z-index: 20; }
+.bell-list { list-style: none; margin: 0; padding: 0; }
+.bell-list li button { display: block; width: 100%; text-align: left; background: none; border: 0; border-top: 1px solid var(--rule); padding: 8px 4px; font: inherit; font-size: 13px; color: var(--ink-soft); cursor: pointer; }
+.bell-list li.unread button { color: var(--ink); font-weight: 600; }
+.bell-list li button:hover { background: var(--band); }
+
+/* ---------- home ---------- */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--s4); margin-bottom: var(--s5); }
+.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s4) var(--s5); }
+.card h3 { margin: 0 0 var(--s2); font-size: 14px; color: var(--ink-soft); font-weight: 600; }
+.card .big { font-size: 26px; font-weight: 600; line-height: 1.2; }
+.card ul { margin: var(--s2) 0 0; padding-left: 18px; font-size: 13px; }
+
+/* ---------- printing documents ---------- */
+@media print {
+  .side, .topbar, .no-print, .tabs { display: none !important; }
+  .shell { display: block; }
+  .main { padding: 0; max-width: none; }
+  body { background: #ffffff; }
+}
+.letter { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--radius); padding: var(--s7); max-width: 760px; line-height: 1.6; }
+.letter h2 { margin-top: 0; }

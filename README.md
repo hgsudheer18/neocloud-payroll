@@ -67,9 +67,12 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Page | Requirement | What it shows |
 |---|---|---|
 | Inbox | ERP | Business processes awaiting your approval; full business-process log |
+| Home | ERP | Landing page for every role: what is waiting on you, next pay date and net pay, time off balances, this week's timesheet; managers: who is off this week and missing timesheets; HR: workforce and open positions; payroll: the pay run status, errors to fix and time not yet approved. A notification bell (top right) lists approvals waiting, decisions on your requests, pay slips available and timesheets due |
 | Workers | ERP | Directory, hire, worker profile with effective-dated history; change pay, cost center or location, leave, return, terminate |
 | Organisation | ERP | Your organisation hierarchy and the company's organisations (CEO; Finance with People Technology; CIO Organisation with Engineering and GPU Cloud in the USA; International; On-Prem), with tabs for compensation, pay group and job profile. Open positions (CIO, Head of International, Head of People Technology) are shown as such. Structure in `lib/config/org.ts` |
-| Enter time | 3, ERP | Hourly workers' own timesheet with validations; payroll auto-fills from work schedules on Pay runs |
+| My Information | ERP | Contact details, emergency contact, bank account for pay (only the last four digits kept) and W-4 filing status. Changes go for approval: personal details to HR, bank and tax to payroll; an approved W-4 is used by the next pay run |
+| Documents | ERP | Pay slips by period, offer letter and W-4 on file, printable or saved as PDF; the 2026 W-2 is issued by Jan 31, 2027 |
+| Enter time | 3, ERP | Weekly timesheet grid (Sunday to Saturday) for hourly workers: saved as a draft while typing, submitted as one week for manager approval; checks overlaps and duplicates; California meal break (30 minutes before the end of the 5th hour) shown per day; payroll auto-fills from work schedules on Pay runs |
 | Absence | 4, ERP | One section with tabs: My Time Off, Team Time Off and Upcoming Time Off (managers), Absence Balances (managers and payroll). Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
 | Benefits | ERP | Your benefit enrolments by type (healthcare: medical; retirement: 401(k)), with this pay period's deduction; payroll can view anyone's. Benefits a worker is not enrolled in are not shown |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |

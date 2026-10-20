@@ -133,6 +133,12 @@ export function applyBps(base: Dataset, bps: BusinessProcess[], opts: ApplyOptio
           ds.absences.push(a);
         }
         break;
+      case "Change Tax Withholding": {
+        // Federal filing status from the W-4, used by the next pay run calculated.
+        const w = ds.workers.find((x) => x.id === bp.subjectId);
+        if (w && (p.filingStatus === "Single" || p.filingStatus === "MFJ")) w.filingStatus = p.filingStatus;
+        break;
+      }
       case "Correct Time Off": {
         // Replace the approved time off for that day and plan; zero cancels it.
         const date = String(p.date);

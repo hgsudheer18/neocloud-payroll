@@ -22,8 +22,11 @@ import { BP_RULES, PERSONAS, type BPType, type BusinessProcess, type Persona, ty
 
 const PAYROLL: Role[] = ["Payroll Specialist", "Payroll Approver"];
 
-/** Page (first path segment) → roles that may open it. "" is the period overview. */
+/** Page (first path segment) → roles that may open it. "" is Home; "overview" the period overview. */
 const PAGES: Record<string, Role[]> = {
+  "": ["Employee", "Manager", "HR Partner", ...PAYROLL],
+  "my-information": ["Employee", "Manager", "HR Partner", ...PAYROLL],
+  documents: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   inbox: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   workers: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   organisation: ["Employee", "Manager", "HR Partner", ...PAYROLL],
@@ -41,6 +44,12 @@ export const canOpenPage = (role: Role, page: string) => (PAGES[page] ?? PAYROLL
 
 /** Business processes that carry a worker's compensation, time or time off. */
 const DETAIL_BPS: BPType[] = ["Change Compensation", "Enter Time", "Request Time Off", "Correct Time Off"];
+/** Private to the worker: personal data goes to HR and payroll, bank and tax details to payroll only. */
+const PRIVATE_BPS: Partial<Record<BPType, Role[]>> = {
+  "Change Personal Information": ["HR Partner", "Payroll Specialist", "Payroll Approver"],
+  "Change Payment Election": ["Payroll Specialist", "Payroll Approver"],
+  "Change Tax Withholding": ["Payroll Specialist", "Payroll Approver"],
+};
 
 /** Worker ids in a manager's reporting line, direct and indirect, including the manager (and any open positions in it). */
 export function reportingLine(ds: Dataset, managerId: string): Set<string> {
@@ -88,6 +97,8 @@ export function accessFor(me: Persona, ds: Dataset): Access {
     seesDetails,
     seesBp: (bp) => {
       if (bp.initiatedBy === me.id) return true;
+      const privateTo = PRIVATE_BPS[bp.type];
+      if (privateTo) return bp.subjectId === me.workerId || privateTo.includes(me.role);
       const subject = bp.type === "Hire" ? String(bp.payload.managerId ?? "") : bp.subjectId;
       if (DETAIL_BPS.includes(bp.type) || bp.type === "Hire") return payroll || (all ? bp.type === "Hire" : false) || line.has(subject);
       return all || line.has(subject);

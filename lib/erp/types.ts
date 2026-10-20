@@ -39,6 +39,9 @@ export type BPType =
   | "Enter Time"
   | "Request Time Off"
   | "Correct Time Off"
+  | "Change Personal Information"
+  | "Change Payment Election"
+  | "Change Tax Withholding"
   | "Create Company"
   | "Create Location"
   | "Create Cost Center"
@@ -97,6 +100,10 @@ export interface ErpState {
   payRuns: Record<string, PayRun>;
   jobProfiles: JobProfile[];
   seq: number;
+  /** Time blocks entered but not yet submitted, by worker: submitted a week at a time. */
+  drafts?: Record<string, Record<string, unknown>[]>;
+  /** Notification ids each persona has read. */
+  seen?: Record<string, string[]>;
 }
 
 /** Who may initiate and approve each process. Approver must always differ from the initiator. */
@@ -111,6 +118,9 @@ export const BP_RULES: Record<BPType, { initiators: Role[]; approvers: Role[] | 
   "Enter Time": { initiators: ["Employee", "Payroll Specialist", "Manager"], approvers: ["Manager"], label: "Time" },
   "Request Time Off": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Manager"], label: "Absence" },
   "Correct Time Off": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Manager"], label: "Absence" },
+  "Change Personal Information": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["HR Partner", "Payroll Specialist"], label: "Personal data" },
+  "Change Payment Election": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
+  "Change Tax Withholding": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Payroll Specialist", "Payroll Approver"], label: "Payroll" },
   "Create Company": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Location": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Cost Center": { initiators: ["HR Partner", "Payroll Specialist"], approvers: "auto", label: "Setup" },

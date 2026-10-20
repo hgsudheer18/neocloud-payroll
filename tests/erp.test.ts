@@ -221,3 +221,18 @@ test("Hourly bereavement is paid at the base rate; the yearly limit is enforced"
   const days = [1, 2, 3, 4, 5].map((d) => ({ date: `2026-11-0${d + 1}`, quantity: 8 }));
   assert.ok(validateTimeOff(ds, [], w, "US_BEREAVEMENT", days, null).errors.some((e) => e.includes("40 hours a year")));
 });
+
+test("An approved W-4 change sets the filing status payroll uses; a pending one does not", () => {
+  const w4 = (status: BusinessProcess["status"]) => bp("Change Tax Withholding", "E0001", "2026-10-20", { filingStatus: "MFJ" }, "2026-10-20T10:00:00Z", status);
+  const before = base.workers.find((w) => w.id === "E0001")!.filingStatus;
+  assert.equal(applyBps(base, [w4("Awaiting Approval")]).workers.find((w) => w.id === "E0001")!.filingStatus, before);
+  assert.equal(applyBps(base, [w4("Approved")]).workers.find((w) => w.id === "E0001")!.filingStatus, "MFJ");
+  const fit = (bps: BusinessProcess[]) => computePeriod(base, erp(bps), SM2).result.us.find((c) => c.worker.id === "E0001")!.pay.lines.find((l) => l.code === "FIT")!.amount;
+  if (before === "Single") assert.ok(fit([w4("Approved")]) < fit([]), "married filing jointly withholds less");
+});
+
+test("A submitted timesheet week becomes approved time rows for each day", () => {
+  const rows = ["2026-10-19", "2026-10-20"].map((d, i) => ({ rowId: `WT${i}`, workDate: d, timeIn: "06:00", timeOut: "14:30", mealStart: "10:30", mealEnd: "11:00", shift: "Day", notes: "" }));
+  const ds = applyBps(base, [bp("Enter Time", "E0021", "2026-10-19", { rows }, "2026-10-21T10:00:00Z")]);
+  assert.deepEqual(ds.time.filter((t) => t.employeeId === "E0021" && t.source === "erp").map((t) => t.workDate), ["2026-10-19", "2026-10-20"]);
+});

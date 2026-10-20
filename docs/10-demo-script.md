@@ -1,6 +1,6 @@
 # Demo script (about 20 minutes)
 
-A hands-on walkthrough for the CFO, Controller and Head of People Technology. Start from a clean state: **Data and demo → Reset demo data**. The role switcher ("Signed in as") and the pay period selector are at the top of the sidebar.
+A hands-on walkthrough for the CFO, Controller and Head of People Technology. Start from a clean state: **Data and demo → Reset demo data**. The role switcher ("Signed in as") is at the top of the sidebar; the pay period selector is at the top right of payroll pages. Each role lands on its **Home** page. Shortcut for a live demo: after submitting a request, click **Sign in as <approver> to approve** (or any "Awaiting Approval with …" status) to jump straight to the approver's inbox item.
 
 ## Part 1. The parallel run ties (4 min)
 
@@ -27,8 +27,8 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 
 ## Part 4. Time and absence (4 min)
 
-13. **Signed in as Emma Kim, Employee → Enter time.** Add a time block for a day in Oct 16–31 with the meal at **11:30**: the app warns that a CA meal premium will be paid. Try to enter the same block again: it's blocked as a duplicate.
-14. **Time off:** request a day of US Hourly Vacation. The available balance is shown and checked.
+13. **Signed in as Emma Kim, Employee → Payroll → Enter time.** Choose the week of Oct 18, click **Fill in my schedule**, then change Tuesday's meal start to **11:45**: the Meal break (CA) row flags it, because California requires the 30-minute meal to start before the end of the 5th hour. **Submit week for approval** sends the whole week as one request.
+14. **Absence → My Time Off:** request a day of US Hourly Vacation. The available balance is shown and checked. Approved time off can be changed or cancelled from **Absence in 2026**; changes go to the manager.
 15. **Signed in as Diego (Payroll Specialist) → Pay runs → Time administration → Dates: Oct 16–31 → Auto-fill scheduled shifts for all technicians.**
 16. **Signed in as Ethan (Manager) → Inbox → Approve all.**
 

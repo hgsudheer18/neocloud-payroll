@@ -46,6 +46,8 @@ interface Ctx {
   submit: (i: SubmitInput) => BusinessProcess;
   decide: (id: string, approve: boolean, comment?: string) => string | null;
   updatePayRun: (periodId: string, patch: Partial<PayRun>) => void;
+  setDrafts: (workerId: string, rows: Record<string, unknown>[]) => void;
+  markSeen: (ids: string[]) => void;
   nextSeq: () => number;
   reset: () => void;
   importState: (s: ErpState) => string | null;
@@ -108,6 +110,15 @@ export function ErpProvider({ children }: { children: ReactNode }) {
     setErp((s) => ({ ...s, payRuns: { ...s.payRuns, [periodId]: { ...(s.payRuns[periodId] ?? { periodId, status: "Not started" }), ...patch } } }));
   }, []);
 
+  const setDrafts = useCallback((workerId: string, rows: Record<string, unknown>[]) => {
+    setErp((s) => ({ ...s, drafts: { ...(s.drafts ?? {}), [workerId]: rows } }));
+  }, []);
+
+  const markSeen = useCallback(
+    (ids: string[]) => setErp((s) => ({ ...s, seen: { ...(s.seen ?? {}), [prefs.persona]: [...new Set([...(s.seen?.[prefs.persona] ?? []), ...ids])] } })),
+    [prefs.persona],
+  );
+
   const reset = useCallback(() => {
     seqRef.current = 0;
     setErp(empty());
@@ -132,6 +143,8 @@ export function ErpProvider({ children }: { children: ReactNode }) {
         submit,
         decide,
         updatePayRun,
+        setDrafts,
+        markSeen,
         nextSeq,
         reset,
         importState,

@@ -14,7 +14,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
   const dept = query.get("dept") ?? "";
   const loc = query.get("loc") ?? "";
   const by = (query.get("by") as "department" | "location" | "costCenter") ?? "department";
-  const set = (k: string, v: string) => setQuery("/", { dept, loc, by, [k]: v });
+  const set = (k: string, v: string) => setQuery("/overview", { dept, loc, by, [k]: v });
 
   const allOk = r.ties.every((t) => t.ok);
   const variances = r.recon.employees.filter((e) => e.status !== "Matched").length;

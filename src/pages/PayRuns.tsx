@@ -133,7 +133,7 @@ export default function PayRuns() {
         </div>
 
         <div className="row" style={{ marginTop: 12 }}>
-          <a href="#/register">Register</a><a href="#/controls">Audit findings</a><a href="#/">Control totals</a><a href="#/gl">Journal</a>{r.reconciled && <a href="#/reconciliation">Legacy reconciliation</a>}
+          <a href="#/register">Register</a><a href="#/controls">Audit findings</a><a href="#/overview">Control totals</a><a href="#/gl">Journal</a>{r.reconciled && <a href="#/reconciliation">Legacy reconciliation</a>}
         </div>
 
         <div className="sheet" style={{ marginTop: 16 }}>
