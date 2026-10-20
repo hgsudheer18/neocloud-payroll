@@ -1,6 +1,6 @@
 # Demo script (about 20 minutes)
 
-A hands-on walkthrough for the CFO, Controller and Head of People Technology. Start from a clean state: **Data and demo → Reset demo data**. The role switcher ("Signed in as") is at the top of the sidebar; the pay period selector is at the top right of payroll pages. Each role lands on its **Home** page. Shortcut for a live demo: after submitting a request, click **Sign in as <approver> to approve** (or any "Awaiting Approval with …" status) to jump straight to the approver's inbox item.
+A hands-on walkthrough for the CFO, Controller and Head of People Technology. Start from a clean state: **Data and demo → Reset demo data**. The role switcher ("Signed in as") is at the top of the sidebar; the pay period selector is at the top right of payroll pages. Each role lands on its **Home** page. To show the timesheet reminders, set the **Demo clock** in the sidebar to Friday 5:05 pm or Monday 6:05 am PT. Shortcut for a live demo: after submitting a request, click **Sign in as <approver> to approve** (or any "Awaiting Approval with …" status) to jump straight to the approver's inbox item.
 
 ## Part 1. The parallel run ties (4 min)
 

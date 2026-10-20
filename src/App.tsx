@@ -22,6 +22,7 @@ import Home from "./pages/Home.tsx";
 import MyInformation from "./pages/MyInformation.tsx";
 import Documents from "./pages/Documents.tsx";
 import { Bell } from "./notifications.tsx";
+import { DemoClock, ScheduledAlerts } from "./alerts.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
@@ -118,9 +119,11 @@ export default function App() {
         </nav>
         <div className="side-foot">
           {data && <>Calculated in {data.ms} ms in your browser. Data you enter is saved in this browser only.</>}
+          <DemoClock />
         </div>
       </aside>
       <main className="main" key={me.id}>
+        <ScheduledAlerts />
         <div className="topbar">
           {data && PERIOD_PAGES.includes(page) && access.canOpen(page) && (
             <div className="period-bar">
