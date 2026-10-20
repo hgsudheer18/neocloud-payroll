@@ -81,6 +81,21 @@ export function validateTimeOff(ds: Dataset, pending: BusinessProcess[], worker:
   return { errors, warnings };
 }
 
+/** A change to approved time off for one day and plan: a new amount, or zero to cancel it. */
+export function validateTimeOffCorrection(ds: Dataset, bps: BusinessProcess[], worker: Worker, plan: string, date: ISODate, quantity: number, availableBalance: number | null): Check {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const p = PLAN[plan];
+  const current = ds.absences.filter((a) => a.employeeId === worker.id && a.plan === plan && a.date === date && a.status === "Approved").reduce((s, a) => s + a.quantity, 0);
+  if (!p) errors.push("Choose a time off plan.");
+  if (!current) errors.push(`${date}: there is no approved time off to change.`);
+  if (!(quantity >= 0)) errors.push("Enter the new amount, or 0 to cancel.");
+  if (quantity === current) errors.push("The new amount is the same as the approved amount.");
+  if (bps.some((b) => b.type === "Correct Time Off" && b.subjectId === worker.id && b.status === "Awaiting Approval" && b.payload.date === date && b.payload.plan === plan)) errors.push(`${date}: a change for this day is already awaiting approval.`);
+  if (p && availableBalance !== null && p.accrualMethod !== "none" && quantity - current > availableBalance) errors.push(`Adds ${(quantity - current).toFixed(2)} ${p.unit} but only ${availableBalance.toFixed(2)} available.`);
+  return { errors, warnings };
+}
+
 export interface HireForm {
   name: string;
   hireDate: ISODate;

@@ -4,7 +4,8 @@ import { useErp } from "../erp.tsx";
 import { setQuery } from "../router.tsx";
 import { PageHead, Section, Select } from "../ui.tsx";
 import { BpStatus, CanInitiate, Checks, Field, FormGrid, Toast, who } from "../erpui.tsx";
-import { validateTimeOff, type Check } from "../../lib/erp/validate.ts";
+import { validateTimeOff, validateTimeOffCorrection, type Check } from "../../lib/erp/validate.ts";
+import { US_PERIODS } from "../../lib/config/period.ts";
 import { plansForWorker } from "../../lib/engine/absence.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
 import { useAccess } from "../access.tsx";
@@ -25,17 +26,27 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
   const [qty, setQty] = useState("");
   const [check, setCheck] = useState<Check | null>(null);
   const [msg, setMsg] = useState("");
+  const [edit, setEdit] = useState<{ plan: string; date: string; current: number; unit: string } | null>(null);
+  const [newQty, setNewQty] = useState("");
+  const [fixCheck, setFixCheck] = useState<Check | null>(null);
+  const [fixMsg, setFixMsg] = useState("");
   if (!w) return <div className="callout info">There are no workers you can request time off for.</div>;
 
   const p = plans.find((x) => x.code === plan) ?? plans[0];
   const perDay = Number(qty) || (p?.unit === "days" ? 1 : 8);
   const days = from && to && from <= to ? eachDay(from, to).filter(isWeekday).map((date) => ({ date, quantity: perDay })) : [];
   // Balance: latest calculated ending for this worker and plan, less pending requests.
-  const line = [...data!.result.us, ...data!.result.intl].find((c) => c.worker.id === w.id)?.absence.find((a) => a.plan.code === p?.code);
-  const opening = ds.balances.find((b) => b.employeeId === w.id && b.plan === p?.code)?.balance ?? null;
-  const pendingQty = erp.bps.filter((b) => b.type === "Request Time Off" && b.subjectId === w.id && b.status === "Awaiting Approval" && b.payload.plan === p?.code).reduce((s, b) => s + (b.payload.days as { quantity: number }[]).reduce((a, d) => a + d.quantity, 0), 0);
-  const base = line ? (line.tracked ? line.ending : null) : opening;
-  const available = base === null ? null : base - pendingQty;
+  const availableFor = (code: string | undefined) => {
+    const l = [...data!.result.us, ...data!.result.intl].find((c) => c.worker.id === w.id)?.absence.find((a) => a.plan.code === code);
+    const open = ds.balances.find((b) => b.employeeId === w.id && b.plan === code)?.balance ?? null;
+    const pend = erp.bps.filter((b) => b.type === "Request Time Off" && b.subjectId === w.id && b.status === "Awaiting Approval" && b.payload.plan === code).reduce((s, b) => s + (b.payload.days as { quantity: number }[]).reduce((a, d) => a + d.quantity, 0), 0);
+    const base = l ? (l.tracked ? l.ending : null) : open;
+    return { line: l, pend, available: base === null ? null : base - pend };
+  };
+  const { line, pend: pendingQty, available } = availableFor(p?.code);
+  // Days in a completed pay period are paid as retro in the next one.
+  const completed = US_PERIODS.filter((x) => erp.payRuns[x.id]?.status === "Completed");
+  const inCompleted = (d: string) => completed.some((x) => x.start <= d && d <= x.end);
 
   const send = () => {
     if (!p) return;
@@ -45,7 +56,20 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
     const bp = submit({ type: "Request Time Off", subjectId: w.id, subjectName: w.name, effectiveDate: days[0].date, summary: `${p.name}: ${days.length} day(s), ${pretty(days[0].date)}–${pretty(days[days.length - 1].date)}, ${days.reduce((s, d) => s + d.quantity, 0)} ${p.unit}`, payload: { plan: p.code, unit: p.unit, days }, warnings: c.warnings });
     setMsg(`${bp.id} submitted to the manager for approval.`);
   };
-  const mine = erp.bps.filter((b) => b.type === "Request Time Off" && b.subjectId === w.id).reverse();
+  const mine = erp.bps.filter((b) => (b.type === "Request Time Off" || b.type === "Correct Time Off") && b.subjectId === w.id).reverse();
+
+  const sendFix = (quantity: number) => {
+    if (!edit) return;
+    const c = validateTimeOffCorrection(ds, erp.bps, w, edit.plan, edit.date, quantity, availableFor(edit.plan).available);
+    setFixCheck(c);
+    if (c.errors.length) return;
+    const what = quantity === 0 ? `Cancel ${planName(edit.plan)} on ${pretty(edit.date)} (${edit.current} ${edit.unit})` : `Change ${planName(edit.plan)} on ${pretty(edit.date)}: ${edit.current} → ${quantity} ${edit.unit}`;
+    const bp = submit({ type: "Correct Time Off", subjectId: w.id, subjectName: w.name, effectiveDate: edit.date, summary: what, payload: { plan: edit.plan, unit: edit.unit, date: edit.date, quantity, oldQuantity: edit.current }, warnings: inCompleted(edit.date) ? ["In a completed pay period: the difference is paid as retro in the next period."] : [] });
+    setFixMsg(`${bp.id} submitted to the manager for approval. The approved time off stays as it is until then.`);
+    setEdit(null);
+    setNewQty("");
+  };
+  const pendingFix = (a: { plan: string; date: string }) => erp.bps.some((b) => b.type === "Correct Time Off" && b.subjectId === w.id && b.status === "Awaiting Approval" && b.payload.date === a.date && b.payload.plan === a.plan);
 
   // This year's absence: balance by plan, and every day of time off on record.
   const year = data!.result.period.start.slice(0, 4);
@@ -75,11 +99,12 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
               <FormGrid>
                 <Field label="Plan"><select value={p?.code ?? ""} onChange={(e) => setPlan(e.target.value)}>{plans.map((x) => <option key={x.code} value={x.code}>{x.name}</option>)}</select></Field>
                 <Field label="Available" hint={line ? `Ending balance for the selected period${pendingQty ? `, less ${pendingQty} pending` : ""}` : "Opening balance"}><input type="text" readOnly value={available === null ? "Not tracked (unlimited)" : `${available.toFixed(2)} ${p?.unit}`} /></Field>
-                <Field label="From"><input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
+                <Field label="From" hint="Past or future dates"><input type="date" value={from} onChange={(e) => setFrom(e.target.value)} /></Field>
                 <Field label="To"><input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></Field>
                 <Field label={`${p?.unit === "days" ? "Days" : "Hours"} per day`}><input type="text" inputMode="decimal" placeholder={p?.unit === "days" ? "1" : "8"} value={qty} onChange={(e) => setQty(e.target.value)} /></Field>
               </FormGrid>
               <p className="small muted">{days.length} weekday(s) selected: {days.reduce((s, d) => s + d.quantity, 0)} {p?.unit}. {p && `${p.name}: ${p.accrualFrequency}.`}</p>
+              {days.some((d) => inCompleted(d.date)) && <div className="callout info">Some days are in a completed pay period. Once approved, the difference is paid as retro in the next period.</div>}
               <Checks check={check} />
               <Toast text={msg} />
               <button className="btn" onClick={send}>Submit request</button>
@@ -109,15 +134,46 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
               </tbody>
             </table>
           </div>
-          {yearRows.length === 0 ? <p className="muted">No time off on record for {year}.</p> : (
-            <div className="table-wrap" style={{ maxHeight: 320 }}>
-              <table className="reg">
-                <thead><tr><th>Date</th><th>Plan</th><th className="n">Amount</th><th>Status</th></tr></thead>
-                <tbody>{yearRows.map((a, i) => <tr key={i}><td>{pretty(a.date)}</td><td>{planName(a.plan)}</td><td className="n">{a.quantity} {a.unit}</td><td>{a.status === "Approved" ? "Approved" : "Awaiting approval"}</td></tr>)}</tbody>
-              </table>
-            </div>
-          )}
+          <div>
+            {yearRows.length === 0 ? <p className="muted">No time off on record for {year}.</p> : (
+              <div className="table-wrap" style={{ maxHeight: 320 }}>
+                <table className="reg">
+                  <thead><tr><th>Date</th><th>Plan</th><th className="n">Amount</th><th>Status</th><th /></tr></thead>
+                  <tbody>
+                    {yearRows.map((a, i) => (
+                      <tr key={i}>
+                        <td>{pretty(a.date)}</td>
+                        <td>{planName(a.plan)}</td>
+                        <td className="n">{a.quantity} {a.unit}</td>
+                        <td>{a.status !== "Approved" ? "Awaiting approval" : pendingFix(a) ? "Change awaiting approval" : "Approved"}</td>
+                        <td>{a.status === "Approved" && !pendingFix(a) && <button className="btn ghost" onClick={() => { setEdit({ plan: a.plan, date: a.date, current: a.quantity, unit: a.unit }); setNewQty(""); setFixCheck(null); setFixMsg(""); }}>Change</button>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            <Toast text={fixMsg} />
+          </div>
         </div>
+        {edit && (
+          <CanInitiate type="Correct Time Off">
+            <div className="sheet" style={{ marginTop: 16 }}>
+              <h3>Change approved time off: {planName(edit.plan)}, {pretty(edit.date)} ({edit.current} {edit.unit})</h3>
+              <FormGrid>
+                <Field label={`New amount (${edit.unit})`} hint="Enter 0 to cancel the day"><input type="text" inputMode="decimal" placeholder={String(edit.current)} value={newQty} onChange={(e) => setNewQty(e.target.value)} /></Field>
+              </FormGrid>
+              {inCompleted(edit.date) && <div className="callout info">This day is in a completed pay period. Once approved, the difference is paid as retro in the next period.</div>}
+              <p className="small muted">The change goes to the manager for approval. Until it is approved, the time off stays as approved.</p>
+              <Checks check={fixCheck} />
+              <div className="row" style={{ marginTop: 12 }}>
+                <button className="btn" onClick={() => sendFix(newQty.trim() === "" ? NaN : Number(newQty))}>Submit change</button>
+                <button className="btn ghost" onClick={() => sendFix(0)}>Cancel this day</button>
+                <button className="btn ghost" onClick={() => setEdit(null)}>Close</button>
+              </div>
+            </div>
+          </CanInitiate>
+        )}
       </Section>
     </>
   );

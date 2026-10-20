@@ -22,6 +22,7 @@ export interface Persona {
 export const PERSONAS: Persona[] = [
   { id: "emp", name: "Emma Kim", role: "Employee", title: "Data Center Technician, San Jose (E0021)", workerId: "E0021" },
   { id: "mgr", name: "Ethan Fischer", role: "Manager", title: "VP, On-Prem (E0005)", workerId: "E0005" },
+  { id: "ceo", name: "Morgan Hale", role: "Manager", title: "Chief Executive Officer (E0000)", workerId: "E0000" },
   { id: "hr", name: "Chloe Novak", role: "HR Partner", title: "HR Partner, People (E0261)", workerId: "E0261" },
   { id: "ps", name: "Diego Okafor", role: "Payroll Specialist", title: "Payroll Specialist and Time Administrator (E0254)", workerId: "E0254" },
   { id: "pa", name: "Aisha Nguyen", role: "Payroll Approver", title: "Payroll Manager, approver (E0257)", workerId: "E0257" },
@@ -37,6 +38,7 @@ export type BPType =
   | "Terminate"
   | "Enter Time"
   | "Request Time Off"
+  | "Correct Time Off"
   | "Create Company"
   | "Create Location"
   | "Create Cost Center"
@@ -106,6 +108,7 @@ export const BP_RULES: Record<BPType, { initiators: Role[]; approvers: Role[] | 
   Terminate: { initiators: ["HR Partner", "Manager"], approvers: ["HR Partner", "Manager"], label: "Staffing" },
   "Enter Time": { initiators: ["Employee", "Payroll Specialist", "Manager"], approvers: ["Manager"], label: "Time" },
   "Request Time Off": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Manager"], label: "Absence" },
+  "Correct Time Off": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Manager"], label: "Absence" },
   "Create Company": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Location": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Cost Center": { initiators: ["HR Partner", "Payroll Specialist"], approvers: "auto", label: "Setup" },

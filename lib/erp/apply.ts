@@ -133,6 +133,14 @@ export function applyBps(base: Dataset, bps: BusinessProcess[], opts: ApplyOptio
           ds.absences.push(a);
         }
         break;
+      case "Correct Time Off": {
+        // Replace the approved time off for that day and plan; zero cancels it.
+        const date = String(p.date);
+        const plan = String(p.plan);
+        ds.absences = ds.absences.filter((a) => !(a.employeeId === bp.subjectId && a.plan === plan && a.date === date && a.status === "Approved"));
+        if (Number(p.quantity) > 0) ds.absences.push({ employeeId: bp.subjectId, plan, date, quantity: Number(p.quantity), unit: p.unit as "hours" | "days", status: "Approved", source: "erp" });
+        break;
+      }
       case "Create Company":
         ds.companies.push(p as unknown as Company);
         break;

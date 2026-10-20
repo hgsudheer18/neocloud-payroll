@@ -26,7 +26,7 @@ export default function PayRuns() {
   const tiesOk = r.ties.every((t) => t.ok);
   const glOk = r.journal.issues.filter((i) => i.severity === "Error").length === 0;
   const stale = (run.status === "Calculated" || run.status === "Approved") && run.bpCountAtCalc !== approvedCount(erp.bps);
-  const pendingTime = erp.bps.filter((b) => b.status === "Awaiting Approval" && (b.type === "Enter Time" || b.type === "Request Time Off") && b.effectiveDate <= period.end).length;
+  const pendingTime = erp.bps.filter((b) => b.status === "Awaiting Approval" && (b.type === "Enter Time" || b.type === "Request Time Off" || b.type === "Correct Time Off") && b.effectiveDate <= period.end).length;
   const dependents = US_PERIODS.filter((p) => PRIOR_PERIOD[p.id] === period.id && (erp.payRuns[p.id]?.status ?? "Not started") !== "Not started");
   const has = (roles: string[]) => roles.includes(me.role);
   const now = () => new Date().toISOString();

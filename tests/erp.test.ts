@@ -127,3 +127,20 @@ test("Hire validation enforces 2026 California minimum wage and exempt salary th
   assert.match(validateHire(base, ex, ["CA", "TX"]).errors.join(), /70,304/);
   assert.equal(validateHire(base, { ...ex, annualSalary: 90000 }, ["CA", "TX"]).errors.length, 0);
 });
+
+test("Correcting approved time off replaces the day once approved; zero cancels it; a pending change does nothing", () => {
+  const fix = (q: number, status: BusinessProcess["status"] = "Approved") => bp("Correct Time Off", "E0024", "2026-10-09", { plan: "US_HOURLY_VAC", unit: "hours", date: "2026-10-09", quantity: q, oldQuantity: 8 }, "2026-10-20T10:00:00Z", status);
+  const day = (ds: ReturnType<typeof applyBps>) => ds.absences.filter((a) => a.employeeId === "E0024" && a.date === "2026-10-09" && a.plan === "US_HOURLY_VAC" && a.status === "Approved");
+  assert.deepEqual(day(applyBps(base, [fix(4)])).map((a) => a.quantity), [4]);
+  assert.equal(day(applyBps(base, [fix(0)])).length, 0);
+  assert.deepEqual(day(applyBps(base, [fix(4, "Awaiting Approval")])).map((a) => a.quantity), [8]);
+});
+
+test("A time off correction in a completed period leaves it as paid and is paid as retro next period", () => {
+  const fix = bp("Correct Time Off", "E0024", "2026-10-09", { plan: "US_HOURLY_VAC", unit: "hours", date: "2026-10-09", quantity: 4, oldQuantity: 8 }, "2026-10-21T10:00:00Z");
+  const state = erp([fix], { [SM1]: "2026-10-20T09:00:00Z" });
+  const before = computePeriod(base, erp([], { [SM1]: "2026-10-20T09:00:00Z" }), SM1).result.totals.gross;
+  assert.equal(computePeriod(base, state, SM1).result.totals.gross, before);
+  const r = computePeriod(base, state, BWT).retro.get("E0024");
+  assert.ok(r && r.amount < 0, "four fewer vacation hours are recovered as negative retro");
+});

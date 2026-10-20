@@ -69,7 +69,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Inbox | ERP | Business processes awaiting your approval; full business-process log |
 | Workers | ERP | Directory, hire, worker profile with effective-dated history; change pay, cost center or location, leave, return, terminate |
 | Enter time | 3, ERP | Hourly workers' own timesheet with validations; payroll auto-fills from work schedules on Pay runs |
-| Absence | 4, ERP | Time off requests with balance and eligibility checks, and the year's absence by plan |
+| Absence | 4, ERP | Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |
 | Period overview | 2 | Control-total tie-out, period totals, burdened cost rollup by department, location or cost center (filterable), variance summary |

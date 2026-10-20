@@ -37,7 +37,7 @@ const PAGES: Record<string, Role[]> = {
 export const canOpenPage = (role: Role, page: string) => (PAGES[page] ?? PAYROLL).includes(role);
 
 /** Business processes that carry a worker's compensation, time or time off. */
-const DETAIL_BPS: BPType[] = ["Change Compensation", "Enter Time", "Request Time Off"];
+const DETAIL_BPS: BPType[] = ["Change Compensation", "Enter Time", "Request Time Off", "Correct Time Off"];
 
 /** Worker ids in a manager's reporting line, direct and indirect, including the manager. */
 export function reportingLine(ds: Dataset, managerId: string): Set<string> {
