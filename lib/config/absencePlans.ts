@@ -29,6 +29,10 @@ export interface AbsencePlan {
   onHire: string;
   onLeave: string;
   onTermination: string;
+  /** Most that can be taken in a calendar year (no-balance plans). */
+  maxPerYear?: number;
+  /** Paid by the employer through payroll (US) or the provider. Unpaid leave is tracked only. */
+  paid?: boolean;
 }
 
 export const ABSENCE_PLANS: AbsencePlan[] = [
@@ -158,6 +162,39 @@ export const ABSENCE_PLANS: AbsencePlan[] = [
     onLeave: "Maternity benefit leave counts as days worked.",
     onTermination: "Encashed in full and settlement within 2 working days of separation.",
   },
+  // ---- Time off types without a balance: tracked, limited per year where policy says so ----
+  ...(
+    [
+      ["US_SICK_EXEMPT", "US Sick Time", "USA", "hours", "US exempt employees", (w: Worker) => w.country === "USA" && w.flsa === "Exempt", "Paid sick time, tracked separately from Flexible PTO (CA paid sick leave law met by the unlimited policy)", undefined, true],
+      ["US_BEREAVEMENT", "US Bereavement Leave", "USA", "hours", "All US employees", (w: Worker) => w.country === "USA", "Up to 40 hours a year (CA: up to 5 days, Gov. Code 12945.7)", 40, true],
+      ["US_JURY_DUTY", "US Jury Duty", "USA", "hours", "All US employees", (w: Worker) => w.country === "USA", "Paid for days on jury service; proof of service required", undefined, true],
+      ["UK_SICK", "UK Sick Leave", "GBR", "days", "All UK employees", (w: Worker) => w.country === "GBR", "Statutory Sick Pay from the fourth qualifying day; provider calculates SSP", undefined, true],
+      ["CAN_ON_SICK", "Ontario Sick Days (ESA)", "CAN", "days", "All Ontario employees", (w: Worker) => w.country === "CAN", "Up to 3 unpaid, job-protected days a year (ESA s. 50.0.1)", 3, false],
+      ["IND_SL", "India Sick and Casual Leave", "IND", "days", "All India employees", (w: Worker) => w.country === "IND", "Up to 12 days a year; not carried over or encashed", 12, true],
+    ] as const
+  ).map(([code, name, country, unit, eligibility, isEligible, accrualFrequency, maxPerYear, paid]): AbsencePlan => ({
+    code,
+    name,
+    country,
+    unit,
+    eligibility,
+    isEligible,
+    accrualMethod: "none",
+    accrualRate: 0,
+    accrualFrequency,
+    waitingPeriodDays: 0,
+    balanceCap: null,
+    carryover: "Not applicable",
+    payoutOnTermination: false,
+    payoutBasis: "None.",
+    accruesDuringUnpaidLeave: false,
+    accruesDuringStatutoryLeave: false,
+    onHire: "Available from day one.",
+    onLeave: "Not used during a leave of absence (leave plan governs).",
+    onTermination: "No payout.",
+    maxPerYear,
+    paid,
+  })),
 ];
 
 export const PLAN = Object.fromEntries(ABSENCE_PLANS.map((p) => [p.code, p])) as Record<string, AbsencePlan>;

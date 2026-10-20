@@ -222,6 +222,13 @@ function absenceLines(input: WorkerPayInput, period: PayPeriod): PayLine[] {
       const hours = taken.reduce((s, a) => s + a.quantity, 0);
       out.push(line(code, roundCents(exact * 100), parts.join("; "), { hours, state: last.workState, costCenterId: last.costCenterId }));
     }
+    // Other paid leave without a balance (bereavement, jury duty): hours × base rate.
+    const other = input.absencesTaken.filter((a) => a.status === "Approved" && a.date >= period.start && a.date <= period.end && PLAN[a.plan]?.paid && PLAN[a.plan]?.country === "USA" && PLAN[a.plan]?.accrualMethod === "none" && PLAN[a.plan]?.isEligible(w));
+    if (other.length) {
+      const parts = other.map((a) => `${PLAN[a.plan].name} ${pretty(a.date)} ${h2(a.quantity)} hrs × ${money(w.hourlyRate)}`);
+      const hours = other.reduce((s, a) => s + a.quantity, 0);
+      out.push(line("LEAVE_PAID", roundCents(hours * w.hourlyRate * 100), parts.join("; "), { hours, state: last.workState, costCenterId: last.costCenterId }));
+    }
   }
   // Termination payout.
   for (const al of input.absenceLines) {

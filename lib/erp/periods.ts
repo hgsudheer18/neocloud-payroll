@@ -19,7 +19,7 @@ import type { BusinessProcess, ErpState } from "./types.ts";
 import { fmt, type Cents } from "../util/money.ts";
 import { pretty } from "../util/dates.ts";
 
-const NON_TIME_EARNINGS = ["SAL", "PTO_TAKEN", "VAC", "SICK", "PTO_PAYOUT", "BONUS"];
+const NON_TIME_EARNINGS = ["SAL", "PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID", "PTO_PAYOUT", "BONUS"];
 const FAR_FUTURE = "9999-12-31T00:00:00.000Z";
 
 export interface PeriodView {

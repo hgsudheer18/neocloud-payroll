@@ -7,7 +7,6 @@ import { PERIOD_LABEL, US_PERIODS } from "../lib/config/period.ts";
 import Dashboard from "./pages/Dashboard.tsx";
 import Register from "./pages/Register.tsx";
 import Time from "./pages/Time.tsx";
-import Absence from "./pages/Absence.tsx";
 import Reconciliation from "./pages/Reconciliation.tsx";
 import Ledger from "./pages/Ledger.tsx";
 import International from "./pages/International.tsx";
@@ -17,20 +16,20 @@ import Docs from "./pages/Docs.tsx";
 import Workers from "./pages/Workers.tsx";
 import Setup from "./pages/Setup.tsx";
 import TimeEntry from "./pages/TimeEntry.tsx";
-import TimeOff from "./pages/TimeOff.tsx";
+import AbsenceHub from "./pages/AbsenceHub.tsx";
+import Benefits from "./pages/Benefits.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
-import TeamTimeOff, { UpcomingTimeOff } from "./pages/TeamTimeOff.tsx";
 import Organisation from "./pages/Organisation.tsx";
 import { accessFor, NoAccess, useAccess } from "./access.tsx";
 
 // Pages whose figures depend on the selected pay period: they show the pay period picker.
-const PERIOD_PAGES = ["payslip", "payruns", "", "register", "time", "absence", "reconciliation", "gl", "controls"];
+const PERIOD_PAGES = ["payslip", "benefits", "payruns", "", "register", "time", "time-off", "absence", "reconciliation", "gl", "controls"];
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-off", "Absence"], ["team-time-off", "Team Time Off"], ["upcoming-time-off", "Upcoming Time Off"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
+  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-off", "Absence"], ["benefits", "Benefits"], ["setup", "Organization setup"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -57,16 +56,18 @@ export default function App() {
       case "inbox": return <Inbox query={query} />;
       case "workers": return <Workers id={path[1]} query={query} />;
       case "time-entry": return <TimeEntry query={query} />;
-      case "time-off": return <TimeOff query={query} />;
+      case "time-off": return <AbsenceHub query={query} />;
+      case "benefits": return <Benefits query={query} />;
       case "payslip": return <MyPayslip />;
       case "organisation": return <Organisation query={query} />;
-      case "team-time-off": return <TeamTimeOff query={query} />;
-      case "upcoming-time-off": return <UpcomingTimeOff />;
+      // Earlier links to the separate absence pages open the matching Absence tab.
+      case "team-time-off": return <AbsenceHub query={query} tab="team" />;
+      case "upcoming-time-off": return <AbsenceHub query={query} tab="upcoming" />;
       case "setup": return <Setup query={query} />;
       case "payruns": return <PayRuns />;
       case "register": return <Register id={path[1]} query={query} />;
       case "time": return <Time id={path[1]} />;
-      case "absence": return <Absence query={query} />;
+      case "absence": return <AbsenceHub query={query} tab="balances" />;
       case "reconciliation": return <Reconciliation id={path[1]} query={query} />;
       case "gl": return <Ledger query={query} />;
       case "international": return <International />;
@@ -100,7 +101,7 @@ export default function App() {
             <div key={g.group} style={{ display: "contents" }}>
               <div className="nav-group">{g.group}</div>
               {g.items.map(([href, label]) => (
-                <a key={href} href={`#/${href}`} aria-current={page === href || (page === "" && href === "inbox" && !access.canOpen("")) ? "page" : undefined}>
+                <a key={href} href={`#/${href}`} aria-current={page === href || (page === "" && href === "inbox" && !access.canOpen("")) || (href === "time-off" && ["team-time-off", "upcoming-time-off", "absence"].includes(page)) ? "page" : undefined}>
                   {label}
                   {href === "inbox" && toApprove > 0 && <span className="badge">{toApprove}</span>}
                   {href === "reconciliation" && data && data.result.reconciled && <span className="count">{unexplained ? `${unexplained} open` : "tied"}</span>}

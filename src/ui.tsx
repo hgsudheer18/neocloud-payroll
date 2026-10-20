@@ -15,6 +15,8 @@ export function Pill({ tone = "", children }: { tone?: "ok" | "warn" | "bad" | "
 }
 
 export function PageHead({ title, children }: { title: string; children?: ReactNode }) {
+  // No title: the page sits inside a section that has its own heading (e.g. a tab of Absence).
+  if (!title) return children ? <p className="muted" style={{ marginTop: 0 }}>{children}</p> : null;
   return (
     <header className="page-head">
       <h1>{title}</h1>

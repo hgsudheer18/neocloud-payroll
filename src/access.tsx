@@ -27,6 +27,7 @@ const PAGES: Record<string, Role[]> = {
   inbox: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   workers: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   organisation: ["Employee", "Manager", "HR Partner", ...PAYROLL],
+  benefits: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "time-off": ["Employee", "Manager", "HR Partner", ...PAYROLL],
   payslip: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "team-time-off": ["Manager"],

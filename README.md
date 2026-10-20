@@ -11,7 +11,7 @@ Parallel-run results (Oct 1–15):
 
 - 280 US workers paid, $1,973,794.91 gross, $2,299,341.55 burdened cost
 - 25 non-exempt technicians under California and FLSA time rules
-- Absence balances for six plans across four countries
+- Absence balances for six accruing plans across four countries, plus sick, bereavement and jury duty time off types without a balance
 - Employee-level reconciliation to the legacy Rippling register: 262 match to the cent, 19 variances explained by re-performance, 0 unexplained
 - Five balanced, fully mapped journals with a validated NetSuite export
 - Every control total ties
@@ -70,13 +70,14 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Workers | ERP | Directory, hire, worker profile with effective-dated history; change pay, cost center or location, leave, return, terminate |
 | Organisation | ERP | Your organisation hierarchy and the company's organisations (CEO; Finance with People Technology; CIO Organisation with Engineering and GPU Cloud in the USA; International; On-Prem), with tabs for compensation, pay group and job profile. Open positions (CIO, Head of International, Head of People Technology) are shown as such. Structure in `lib/config/org.ts` |
 | Enter time | 3, ERP | Hourly workers' own timesheet with validations; payroll auto-fills from work schedules on Pay runs |
-| Absence | 4, ERP | Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
+| Absence | 4, ERP | One section with tabs: My Time Off, Team Time Off and Upcoming Time Off (managers), Absence Balances (managers and payroll). Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
+| Benefits | ERP | Your benefit enrolments by type (healthcare: medical; retirement: 401(k)), with this pay period's deduction; payroll can view anyone's. Benefits a worker is not enrolled in are not shown |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |
 | Period overview | 2 | Control-total tie-out, period totals, burdened cost rollup by department, location or cost center (filterable), variance summary |
 | Payroll register | 2 | Gross to net for every worker; payslip drill-down with the calculation behind every line |
 | Time calculation | 3 | Hours by category per technician, daily detail with meal checks and workweeks, exceptions, category-to-component mapping |
-| Absence balances | 4 | Sample-worker ending balances, payout to payroll, plan configuration, all balances |
+| Absence › Absence Balances | 4 | Tab of Absence for managers (their team) and payroll: sample-worker ending balances, payout to payroll, plan configuration, all balances |
 | Reconciliation | 2 | Headcount reconciliation, employee-level legacy reconciliation with root cause, classification and action, Controller commentary |
 | General ledger | 2, 6 | Journals by subsidiary, validation, NetSuite CSV and JSON export, account and segment mapping |
 | International | 5 | Employer cost by country in local currency and USD, outbound change file, provider reconciliation, local and USD postings, intercompany |

@@ -76,6 +76,11 @@ export function validateTimeOff(ds: Dataset, pending: BusinessProcess[], worker:
     if (worker.payType === "Hourly" && ds.time.some((t) => t.employeeId === worker.id && t.workDate === d.date)) warnings.push(`${d.date}: the worker also has worked time that day.`);
   }
   const total = days.reduce((s, d) => s + d.quantity, 0);
+  if (p.maxPerYear && days.length) {
+    const year = days[0].date.slice(0, 4);
+    const used = ds.absences.filter((a) => a.employeeId === worker.id && a.plan === plan && a.date.startsWith(year)).reduce((s, a) => s + a.quantity, 0);
+    if (used + total > p.maxPerYear) errors.push(`${p.name} allows ${p.maxPerYear} ${p.unit} a year; ${used} already taken or requested in ${year}.`);
+  }
   if (availableBalance !== null && p.accrualMethod !== "none" && total > availableBalance) errors.push(`Requested ${total} ${p.unit} but only ${availableBalance.toFixed(2)} available.`);
   if (p.waitingPeriodDays && days.length && daysInclusive(worker.hireDate, days[0].date) < p.waitingPeriodDays) warnings.push(`Within the ${p.waitingPeriodDays}-day waiting period: the plan does not allow use yet.`);
   return { errors, warnings };

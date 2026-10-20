@@ -10,7 +10,7 @@ import { plansForWorker } from "../../lib/engine/absence.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
 import { useAccess } from "../access.tsx";
 
-export default function TimeOff({ query }: { query: URLSearchParams }) {
+export default function TimeOff({ query, embedded = false }: { query: URLSearchParams; embedded?: boolean }) {
   const { data } = useData();
   const { erp, me, submit } = useErp();
   const access = useAccess();
@@ -86,7 +86,7 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead title="Absence">Requests go to the manager. Approved hourly time off is paid from the balance and is not hours worked, so it never creates overtime. Exempt Flexible PTO has no balance and no pay impact.</PageHead>
+      <PageHead title={embedded ? "" : "Absence"}>Requests go to the manager. Approved hourly time off is paid from the balance and is not hours worked, so it never creates overtime. Exempt Flexible PTO has no balance and no pay impact.</PageHead>
       <div className="filters">
         {me.role === "Employee" ? <div><strong>{w.id} {w.name}</strong><div className="small muted">Your time off</div></div> : (
           <Select label="Worker" value={workerId} onChange={(v) => setQuery("/time-off", { worker: v })} options={employees.map((e) => [e.id, `${e.id} ${e.name}`])} all={null} />

@@ -54,7 +54,7 @@ function AbsenceTable({ rows, name }: { rows: AbsenceTaken[]; name: (id: string)
 }
 
 /** Team Time Off: the manager's team's time off in the selected pay period or its month. */
-export default function TeamTimeOff({ query }: { query: URLSearchParams }) {
+export default function TeamTimeOff({ query, embedded = false }: { query: URLSearchParams; embedded?: boolean }) {
   const period = currentPeriod();
   const range = query.get("range") === "month" ? "month" : "period";
   const month = period.start.slice(0, 7);
@@ -64,11 +64,11 @@ export default function TeamTimeOff({ query }: { query: URLSearchParams }) {
   const label = range === "month" ? monthName(period.start) : `Current pay period: ${PERIOD_LABEL[period.id]}`;
   return (
     <>
-      <PageHead title="Team Time Off">
+      <PageHead title={embedded ? "" : "Team Time Off"}>
         Time off for the {teamSize} people in your reporting line, approved and awaiting your approval, in the current pay period or month.
       </PageHead>
       <div className="filters">
-        <Select label="Show" value={range} onChange={(v) => setQuery("/team-time-off", { range: v })} options={[["period", "This pay period"], ["month", "This month"]]} all={null} />
+        <Select label="Show" value={range} onChange={(v) => setQuery("/time-off", { tab: "team", range: v })} options={[["period", "This pay period"], ["month", "This month"]]} all={null} />
       </div>
       <Section title={label} lede={`${range === "month" ? "The whole month" : `${pretty(from)} to ${pretty(to)}`}. ${people} of ${teamSize} people have time off.`}>
         {rows.length === 0 ? <p className="muted">No time off in your team for these dates.</p> : <AbsenceTable rows={rows} name={name} />}
@@ -78,14 +78,14 @@ export default function TeamTimeOff({ query }: { query: URLSearchParams }) {
 }
 
 /** Upcoming Time Off: the manager's own and their team's time off from today to the end of the selected pay period. */
-export function UpcomingTimeOff() {
+export function UpcomingTimeOff({ embedded = false }: { embedded?: boolean }) {
   const period = currentPeriod();
   const now = today();
   const from = now > period.start ? now : period.start;
   const { rows, name } = useTeamAbsence(true, from, period.end);
   return (
     <>
-      <PageHead title="Upcoming Time Off">
+      <PageHead title={embedded ? "" : "Upcoming Time Off"}>
         Your own and your team's time off from today to the end of the current pay period, approved and awaiting approval.
       </PageHead>
       <Section title={`Current pay period: ${PERIOD_LABEL[period.id]}`} lede={from > period.end ? `This pay period ended on ${pretty(period.end)}.` : `${pretty(from)} to ${pretty(period.end)}.`}>

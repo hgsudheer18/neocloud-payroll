@@ -9,7 +9,8 @@ import { readTexts } from "../lib/data/fs.ts";
 import { loadDataset } from "../lib/data/load.ts";
 import { applyBps } from "../lib/erp/apply.ts";
 import { computePeriod } from "../lib/erp/periods.ts";
-import { validateHire, validateTimeEntry } from "../lib/erp/validate.ts";
+import { validateHire, validateTimeEntry, validateTimeOff } from "../lib/erp/validate.ts";
+import { plansForWorker } from "../lib/engine/absence.ts";
 import type { BusinessProcess, ErpState } from "../lib/erp/types.ts";
 
 const { ds: base } = loadDataset(readTexts(join(import.meta.dirname, "..", "data")));
@@ -200,4 +201,23 @@ test("Organisation structure: CIO and International under the CEO, People Techno
   for (const w of base.workers.filter((x) => ["Engineering", "GPU Cloud"].includes(x.department) && x.workerType === "Employee" && !x.terminationDate)) {
     assert.equal(orgPath(nodes, w.id).includes("CIO Organisation"), w.country === "USA", w.id);
   }
+});
+
+test("Every worker sees each time off type they are eligible for", () => {
+  const codes = (id: string) => plansForWorker(base.workers.find((w) => w.id === id)!, base.balances).filter((p) => p.code !== "US_FLEX_PTO" || p.isEligible(base.workers.find((w) => w.id === id)!)).map((p) => p.code).sort();
+  assert.deepEqual(codes("E0021"), ["CA_SICK", "US_BEREAVEMENT", "US_HOURLY_VAC", "US_JURY_DUTY"]); // CA hourly
+  assert.deepEqual(codes("E0001"), ["US_BEREAVEMENT", "US_FLEX_PTO", "US_JURY_DUTY", "US_SICK_EXEMPT"]); // US exempt
+  assert.deepEqual(codes("E0006"), ["UK_ANNUAL", "UK_SICK"]);
+  assert.deepEqual(codes("E0009"), ["IND_EL", "IND_SL"]);
+});
+
+test("Hourly bereavement is paid at the base rate; the yearly limit is enforced", () => {
+  const ds = applyBps(base, [bp("Request Time Off", "E0021", "2026-10-12", { plan: "US_BEREAVEMENT", unit: "hours", days: [{ date: "2026-10-12", quantity: 8 }] }, "2026-10-12T10:00:00Z")]);
+  const c = computePeriod(base, erp([bp("Request Time Off", "E0021", "2026-10-12", { plan: "US_BEREAVEMENT", unit: "hours", days: [{ date: "2026-10-12", quantity: 8 }] }, "2026-10-12T10:00:00Z")]), SM1).result.us.find((x) => x.worker.id === "E0021")!;
+  const l = c.pay.lines.find((x) => x.code === "LEAVE_PAID")!;
+  assert.equal(l.amount, 8 * 4200);
+  assert.equal(l.hours, 8);
+  const w = ds.workers.find((x) => x.id === "E0021")!;
+  const days = [1, 2, 3, 4, 5].map((d) => ({ date: `2026-11-0${d + 1}`, quantity: 8 }));
+  assert.ok(validateTimeOff(ds, [], w, "US_BEREAVEMENT", days, null).errors.some((e) => e.includes("40 hours a year")));
 });

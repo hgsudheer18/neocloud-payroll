@@ -7,7 +7,7 @@ import { useAccess } from "../access.tsx";
 
 const SAMPLES = ["E0001", "E0021", "E0006", "E0008", "E0009", "E0148"];
 
-export default function Absence({ query }: { query: URLSearchParams }) {
+export default function Absence({ query, embedded = false }: { query: URLSearchParams; embedded?: boolean }) {
   const { data } = useData();
   const access = useAccess();
   const pay = access.payResults;
@@ -24,7 +24,7 @@ export default function Absence({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead title="Absence balances">
+      <PageHead title={embedded ? "" : "Absence balances"}>
         Opening balance, plus the accrual posted at the end of the period, minus approved time off, minus any termination payout, equals the ending balance. US plans run on the semi-monthly period; UK, Ontario and India plans on the October month.
       </PageHead>
 
@@ -78,7 +78,7 @@ export default function Absence({ query }: { query: URLSearchParams }) {
         </div>
       </Section>
 
-      <Section title="All balances" right={<Select label="" value={plan} onChange={(v) => setQuery("/absence", { plan: v })} options={ABSENCE_PLANS.map((p) => [p.code, p.name])} all="All plans" />}>
+      <Section title="All balances" right={<Select label="" value={plan} onChange={(v) => setQuery("/time-off", { tab: "balances", plan: v })} options={ABSENCE_PLANS.map((p) => [p.code, p.name])} all="All plans" />}>
         <div className="table-wrap" style={{ maxHeight: "60vh" }}>
           <table className="reg">
             <thead>
