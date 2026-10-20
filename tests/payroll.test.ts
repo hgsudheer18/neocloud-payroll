@@ -105,3 +105,17 @@ test("GL validation flags unmapped accounts, unmapped cost centers and imbalance
 test("allocate() always sums to the total", () => {
   for (const total of [1, 99, 100_001, -505]) assert.equal(allocate(total, [3, 8, 1]).reduce((a, b) => a + b, 0), total);
 });
+
+test("Daily cost lines add back to the pay run, line by line and in total", async () => {
+  const { dailyLines } = await import("../lib/engine/costReport.ts");
+  const lines = dailyLines(result);
+  const sum = (f: (l: (typeof lines)[0]) => boolean) => lines.filter(f).reduce((s, l) => s + l.amount, 0);
+  assert.equal(sum((l) => l.type === "Earning"), result.totals.gross);
+  assert.equal(sum((l) => l.type === "Employer Tax"), result.totals.erTaxes);
+  // Every line of every worker adds back exactly.
+  for (const c of result.us.slice(0, 40)) for (const l of c.pay.lines) assert.equal(sum((x) => x.workerId === c.worker.id && x.code === l.code), c.pay.lines.filter((y) => y.code === l.code).reduce((s, y) => s + y.amount, 0), `${c.worker.id} ${l.code}`);
+  // Hourly time is on the days worked: E0021 worked Oct 2 (12.75 hrs, 0.75 double time).
+  assert.ok(lines.some((l) => l.workerId === "E0021" && l.date === "2026-10-02" && l.code === "DT" && Math.abs(l.hours - 0.75) < 1e-9));
+  // Everything is inside the pay period.
+  assert.ok(lines.every((l) => l.date >= "2026-10-01" && l.date <= "2026-10-15"));
+});

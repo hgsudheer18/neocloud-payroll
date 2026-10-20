@@ -8,8 +8,9 @@ import { PERIOD_LABEL, US_PERIODS } from "../../lib/config/period.ts";
 import { pretty } from "../../lib/util/dates.ts";
 import { toCsv } from "../../lib/util/csv.ts";
 import type { ComponentType } from "../../lib/config/payComponents.ts";
+import CustomReport from "./CustomReport.tsx";
 
-const TABS: [string, string][] = [["schedule", "Pay schedule"], ["earnings", "Earnings"], ["deductions", "Deductions"], ["taxes", "Taxes"], ["workers", "By worker"]];
+const TABS: [string, string][] = [["custom", "Custom report"], ["schedule", "Pay schedule"], ["earnings", "Earnings"], ["deductions", "Deductions"], ["taxes", "Taxes"], ["workers", "By worker"]];
 const SCHEDULES: [string, string][] = [["", "All pay groups"], ["US Semi-Monthly", "Semi-monthly (salaried)"], ["US Biweekly", "Biweekly (hourly)"]];
 const dollars = (c: number) => (c / 100).toFixed(2);
 
@@ -38,7 +39,7 @@ function byComponent(v: PeriodView, types: ComponentType[]) {
 export default function Reports({ query }: { query: URLSearchParams }) {
   const { data } = useData();
   const { erp } = useErp();
-  const tab = TABS.some(([k]) => k === query.get("tab")) ? query.get("tab")! : "schedule";
+  const tab = TABS.some(([k]) => k === query.get("tab")) ? query.get("tab")! : "custom";
   const schedule = query.get("group") ?? "";
   const set = (k: string, v: string) => setQuery("/reports", { tab, group: schedule, period: query.get("period") ?? "", [k]: v });
   const periods = US_PERIODS.filter((p) => !schedule || p.payGroup === schedule || (schedule === "US Semi-Monthly" && p.id === "2026-10-SM1"));
@@ -82,14 +83,17 @@ export default function Reports({ query }: { query: URLSearchParams }) {
 
   return (
     <>
-      <PageHead title="Payroll reports">Earnings, deductions and taxes for every pay period, by pay group. Completed pay runs show what was paid; open ones are previews that change as time and changes are approved.</PageHead>
-      <div className="filters">
-        <Select label="Pay group" value={schedule} onChange={(x) => set("group", x)} options={SCHEDULES.filter(([k]) => k).map(([k, l]) => [k, l])} all="All pay groups" />
-      </div>
+      <PageHead title="Payroll reports">Build a report for any date range (a week, a day, a pay period) with the earnings, deductions and taxes you choose, grouped the way you need. Standard reports follow. Completed pay runs show what was paid; open ones are previews.</PageHead>
       <div className="tabs" role="tablist">
         {TABS.map(([k, l]) => <button key={k} role="tab" aria-selected={tab === k} onClick={() => set("tab", k)}>{l}</button>)}
       </div>
+      {tab !== "custom" && (
+        <div className="filters">
+          <Select label="Pay group" value={schedule} onChange={(x) => set("group", x)} options={SCHEDULES.filter(([k]) => k).map(([k, l]) => [k, l])} all="All pay groups" />
+        </div>
+      )}
 
+      {tab === "custom" && <CustomReport views={views} />}
       {tab === "schedule" && (
         <Section title="Pay schedule" lede="Each pay period with its dates, check date, status and totals." right={<button className="btn ghost" onClick={() => downloadText("pay-schedule.csv", toCsv(periods.map((p) => { const r = views.get(p.id)!.result; return { period: PERIOD_LABEL[p.id], pay_group: p.payGroup, start: p.start, end: p.end, check_date: p.checkDate, status: status(p.id), workers: r.us.length, gross: dollars(r.totals.gross), employee_taxes: dollars(r.totals.eeTaxes), deductions: dollars(r.totals.preTax + r.totals.postTax), net: dollars(r.totals.net), employer_taxes: dollars(r.totals.erTaxes), burdened_cost: dollars(r.totals.burdened) }; })))}>Download CSV</button>}>
           <div className="table-wrap">
