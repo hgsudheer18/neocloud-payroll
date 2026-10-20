@@ -97,6 +97,10 @@ export interface TimeRow {
   enteredOn: ISODate;
   notes: string;
   source?: "erp";
+  /** A correction that removes the time block it corrects (manager delete). */
+  deleted?: boolean;
+  /** Internal: minutes added because a night shift started after midnight belongs to the previous workday. */
+  dayOffset?: number;
 }
 
 export interface AbsenceBalance {

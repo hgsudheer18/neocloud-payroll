@@ -35,6 +35,8 @@ export interface SubmitInput {
   effectiveDate: string;
   payload: Record<string, unknown>;
   warnings?: string[];
+  /** The initiator is also the approver (a manager editing their team's time): approved on entry, with this note. */
+  approvedAs?: string;
 }
 
 interface Ctx {
@@ -79,12 +81,12 @@ export function ErpProvider({ children }: { children: ReactNode }) {
       const created: BusinessProcess = {
         id: `BP-${String(seq).padStart(5, "0")}`,
         ...i,
-        status: auto ? "Approved" : "Awaiting Approval",
+        status: auto || i.approvedAs ? "Approved" : "Awaiting Approval",
         initiatedBy: me.id,
         initiatedAt: now,
-        decidedBy: auto ? "system" : undefined,
-        decidedAt: auto ? now : undefined,
-        comment: auto ? "Configuration change: no approval step; captured in the change log" : undefined,
+        decidedBy: auto ? "system" : i.approvedAs ? me.id : undefined,
+        decidedAt: auto || i.approvedAs ? now : undefined,
+        comment: auto ? "Configuration change: no approval step; captured in the change log" : i.approvedAs,
       };
       setErp((s) => ({ ...s, bps: [...s.bps, created] }));
       return created;

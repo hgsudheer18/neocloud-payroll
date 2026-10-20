@@ -102,3 +102,53 @@ test("Retro correction to a prior-period day is paid as the difference", () => {
   assert.equal(owed - paid, 220);
   assert.ok(t.exceptions.some((e) => e.code === "RETRO_CORRECTION"));
 });
+
+test("Daily overtime follows the work location: AK and NV over 8, CO over 12, TX weekly only", () => {
+  const ten = (state: string, hrsOut: string) => day(calcWorkerTime("E9", [row("E9", "2026-10-05", "06:00", hrsOut, "10:00", "10:30")], state, 30, P.start, P.end), "2026-10-05").cats;
+  assert.equal(ten("AK", "16:30").OT_DAILY, 120); // 10 hrs worked
+  assert.equal(ten("NV", "16:30").OT_DAILY, 120);
+  assert.equal(ten("CO", "16:30").OT_DAILY, 0);
+  assert.equal(ten("CO", "19:30").OT_DAILY, 60); // 13 hrs worked
+  assert.equal(ten("CO", "19:30").DT_DAILY, 0);
+  assert.equal(ten("TX", "16:30").OT_DAILY, 0);
+  assert.equal(ten("CA", "16:30").OT_DAILY, 120);
+});
+
+test("Night shift day-breaker is 12:00: a night shift starting after midnight belongs to the previous workday", () => {
+  const t = calcWorkerTime("E9", [row("E9", "2026-10-06", "01:00", "09:00", "05:00", "05:30", { shift: "Night" })], "CA", 30, P.start, P.end);
+  assert.ok(t.days.some((d) => d.date === "2026-10-05"), "workday Oct 5");
+  assert.equal(day(t, "2026-10-05").workedMin, 450);
+  assert.equal(day(t, "2026-10-05").nightMin, 270); // 01:00–05:00 and 05:30–06:00
+  // A day shift starting at 06:00 stays on its own date (midnight day-breaker).
+  const d = calcWorkerTime("E9", [row("E9", "2026-10-06", "06:00", "14:30", "10:00", "10:30")], "CA", 30, P.start, P.end);
+  assert.ok(d.days.some((x) => x.date === "2026-10-06"));
+});
+
+test("A shift crossing into the next pay period is paid in the next period", () => {
+  const rows = [row("E9", "2026-10-31", "22:00", "06:30", "02:00", "02:30", { shift: "Night" })];
+  const thisPeriod = calcWorkerTime("E9", rows, "CA", 30, "2026-10-16", "2026-10-31", { deferCrossing: true });
+  assert.equal(thisPeriod.hoursWorkedInPeriod, 0);
+  assert.ok(thisPeriod.exceptions.some((e) => e.code === "CROSSES_PAY_PERIOD"));
+  const next = calcWorkerTime("E9", rows, "CA", 30, "2026-11-01", "2026-11-14", { deferCrossing: true, carryInCrossing: true });
+  assert.equal(next.hoursWorkedInPeriod, 8);
+  assert.equal(next.catsInPeriod.NIGHT, 450); // 22:00–02:00 and 02:30–06:00
+});
+
+test("A deleted block is removed; deleting a paid prior-period block is recovered as retro", () => {
+  const orig = row("E9", "2026-10-05", "06:00", "14:30", "10:00", "10:30", { enteredOn: "2026-10-05" });
+  const del = row("E9", "2026-10-05", "06:00", "14:30", "10:00", "10:30", { entryType: "Correction", correctsRowId: orig.rowId, deleted: true, enteredOn: "2026-10-20" });
+  const now = calcWorkerTime("E9", [orig, del], "CA", 30, P.start, P.end);
+  assert.equal(now.hoursWorkedInPeriod, 0);
+  const later = calcWorkerTime("E9", [orig, del], "CA", 30, "2026-10-16", "2026-10-31");
+  const wk = later.weeks.find((w) => w.weekStart === "2026-10-04")!;
+  assert.equal(wk.priorOwed, null); // nothing owed for the deleted day
+  assert.ok(wk.priorPaid && wk.priorPaid.hours.REG === 8);
+});
+
+test("A correction that is later corrected or deleted no longer counts", () => {
+  const orig = row("E9", "2026-10-05", "06:00", "14:30", "10:00", "10:30");
+  const fix = row("E9", "2026-10-05", "06:00", "17:30", "10:00", "10:30", { entryType: "Correction", correctsRowId: orig.rowId });
+  const del = row("E9", "2026-10-05", "06:00", "17:30", "10:00", "10:30", { entryType: "Correction", correctsRowId: fix.rowId, deleted: true });
+  assert.equal(calcWorkerTime("E9", [orig, fix], "CA", 30, P.start, P.end).hoursWorkedInPeriod, 11);
+  assert.equal(calcWorkerTime("E9", [orig, fix, del], "CA", 30, P.start, P.end).hoursWorkedInPeriod, 0);
+});

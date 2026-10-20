@@ -34,6 +34,7 @@ const PAGES: Record<string, Role[]> = {
   "time-off": ["Employee", "Manager", "HR Partner", ...PAYROLL],
   payslip: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "team-time-off": ["Manager"],
+  "team-time": ["Manager"],
   "upcoming-time-off": ["Manager"],
   setup: ["HR Partner", ...PAYROLL],
   time: ["Manager", ...PAYROLL],

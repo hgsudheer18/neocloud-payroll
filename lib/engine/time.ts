@@ -17,9 +17,12 @@
 import type { TimeRow } from "../data/types.ts";
 import { addDays, dayOfWeek, hhmm, workweekStart, type ISODate } from "../util/dates.ts";
 import { NIGHT_DIFF_PER_HOUR } from "../config/payComponents.ts";
+import { ruleForState, SHIFTS, STATE_TIME_RULES } from "../config/timeRules.ts";
 
-export type TimeRules = "CA" | "FLSA";
-export const rulesForState = (state: string): TimeRules => (state === "CA" ? "CA" : "FLSA");
+/** Code of the state rule set that applies (CA, AK, NV, CO), or FLSA for weekly overtime only. */
+export type TimeRules = string;
+export const rulesForState = (state: string): TimeRules => ruleForState(state).code;
+const ruleOf = (rules: TimeRules) => STATE_TIME_RULES[rules] ?? STATE_TIME_RULES.FLSA;
 
 export interface Cats {
   REG: number;
@@ -71,6 +74,8 @@ export type ExceptionCode =
   | "SEVENTH_DAY"
   | "SEVEN_CONSECUTIVE_NOT_IN_WEEK"
   | "CROSSES_MIDNIGHT"
+  | "CROSSES_PAY_PERIOD"
+  | "DELETED_BLOCK"
   | "OVER_12_HOURS";
 
 export interface TimeException {
@@ -141,6 +146,10 @@ export function cleanRows(rows: TimeRow[], periodStart: ISODate, dedupe = true) 
     const orig = kept.find((k) => k.rowId === c.correctsRowId);
     const prior = c.workDate < periodStart;
     if (prior && c.enteredOn < periodStart) continue; // corrected and paid in an earlier period
+    if (c.deleted) {
+      exceptions.push({ employeeId: c.employeeId, rowId: c.rowId, date: c.workDate, code: "DELETED_BLOCK", severity: prior ? "Warning" : "Info", message: `${c.rowId} deletes ${c.correctsRowId}${orig ? ` (${orig.timeIn}–${orig.timeOut})` : ""}, entered ${c.enteredOn}.`, treatment: prior ? "Prior period recalculated without the block; the difference is recovered as RETRO in this period." : "Block removed before payment." });
+      continue;
+    }
     exceptions.push({
       employeeId: c.employeeId,
       rowId: c.rowId,
@@ -154,12 +163,14 @@ export function cleanRows(rows: TimeRow[], periodStart: ISODate, dedupe = true) 
     });
   }
 
-  const effective = kept.filter((r) => !replaced.has(r.rowId)).concat(corrections);
+  // A deletion replaces the block it corrects and adds no time of its own.
+  // A correction can itself be corrected or deleted later: only the latest in a chain counts.
+  const effective = kept.filter((r) => !replaced.has(r.rowId)).concat(corrections.filter((c) => !c.deleted && !replaced.has(c.rowId)));
   // What was paid for days before this period: rows (and corrections) entered
   // before the period started. Anything entered later is paid now as retro.
   const paidCorrections = corrections.filter((c) => c.enteredOn < periodStart);
   const paidReplaced = new Set(paidCorrections.map((c) => c.correctsRowId));
-  const asPaid = kept.filter((r) => r.enteredOn < periodStart && !paidReplaced.has(r.rowId)).concat(paidCorrections);
+  const asPaid = kept.filter((r) => r.enteredOn < periodStart && !paidReplaced.has(r.rowId)).concat(paidCorrections.filter((c) => !c.deleted && !paidReplaced.has(c.rowId)));
   for (const r of kept) {
     if (r.workDate < periodStart && r.enteredOn >= periodStart) {
       exceptions.push({
@@ -179,13 +190,14 @@ function overlap(a0: number, a1: number, b0: number, b1: number) {
 }
 
 export function buildShift(r: TimeRow): Shift {
-  const start = hhmm(r.timeIn);
-  let end = hhmm(r.timeOut);
+  const off = r.dayOffset ?? 0; // night shift after midnight: minutes after the previous workday's 00:00
+  const start = hhmm(r.timeIn) + off;
+  let end = hhmm(r.timeOut) + off;
   if (end <= start) end += 1440; // crosses midnight
   let ms: number | null = null;
   let me: number | null = null;
   if (r.mealStart && r.mealEnd && r.mealStart !== "—" && r.mealEnd !== "—") {
-    ms = hhmm(r.mealStart);
+    ms = hhmm(r.mealStart) + off;
     if (ms < start) ms += 1440;
     me = hhmm(r.mealEnd);
     while (me < ms) me += 1440;
@@ -195,7 +207,7 @@ export function buildShift(r: TimeRow): Shift {
   let night = 0;
   for (const [a, b] of intervals) {
     worked += b - a;
-    for (let k = -1; k <= 1; k++) night += overlap(a, b, 1320 + 1440 * k, 1800 + 1440 * k); // 22:00–06:00
+    for (let k = -1; k <= 2; k++) night += overlap(a, b, 1320 + 1440 * k, 1800 + 1440 * k); // 22:00–06:00
   }
   return { rowId: r.rowId, start, end, mealStart: ms, mealEnd: me, worked, night, crossesMidnight: end > 1440 };
 }
@@ -212,9 +224,15 @@ function mealCheck(shifts: Shift[], worked: number): { status: MealStatus; secon
   return { status: "ok", secondWarning: worked > 600 };
 }
 
+/** The workday a block belongs to: a night shift starting before the night day-breaker (12:00) belongs to the previous workday. */
+export function toWorkday(r: TimeRow): TimeRow {
+  if (r.shift === "Night" && hhmm(r.timeIn) < hhmm(SHIFTS.Night.dayBreaker)) return { ...r, workDate: addDays(r.workDate, -1), dayOffset: 1440 };
+  return r;
+}
+
 export function buildDays(rows: TimeRow[], rules: TimeRules): DayCalc[] {
   const byDate = new Map<ISODate, TimeRow[]>();
-  for (const r of rows) {
+  for (const r of rows.map(toWorkday)) {
     if (!byDate.has(r.workDate)) byDate.set(r.workDate, []);
     byDate.get(r.workDate)!.push(r);
   }
@@ -224,7 +242,7 @@ export function buildDays(rows: TimeRow[], rules: TimeRules): DayCalc[] {
       const shifts = rs.map(buildShift).sort((a, b) => a.start - b.start);
       const workedMin = shifts.reduce((t, s) => t + s.worked, 0);
       const nightMin = shifts.reduce((t, s) => t + s.night, 0);
-      const meal = rules === "CA" ? mealCheck(shifts, workedMin) : { status: "n/a" as MealStatus, secondWarning: false };
+      const meal = ruleOf(rules).mealPremium ? mealCheck(shifts, workedMin) : { status: "n/a" as MealStatus, secondWarning: false };
       return {
         date,
         weekStart: workweekStart(date),
@@ -244,6 +262,7 @@ export function buildDays(rows: TimeRow[], rules: TimeRules): DayCalc[] {
 
 /** Categorize the days of ONE workweek (sorted ascending). Mutates and returns days. */
 export function categorizeWeek(days: DayCalc[], rules: TimeRules): DayCalc[] {
+  const rule = ruleOf(rules);
   const ws = days[0]?.weekStart;
   const workedDates = new Set(days.filter((d) => d.workedMin > 0).map((d) => d.date));
   let weeklyReg = 0;
@@ -252,7 +271,7 @@ export function categorizeWeek(days: DayCalc[], rules: TimeRules): DayCalc[] {
     const c = zeroCats();
     let reg: number;
     const seventh =
-      rules === "CA" &&
+      rule.seventhDay &&
       dayOfWeek(d.date) === 6 &&
       [0, 1, 2, 3, 4, 5, 6].every((i) => workedDates.has(addDays(ws, i)));
     d.seventhDay = seventh;
@@ -260,10 +279,13 @@ export function categorizeWeek(days: DayCalc[], rules: TimeRules): DayCalc[] {
       c.SEVENTH_OT = Math.min(h, 480);
       c.SEVENTH_DT = Math.max(h - 480, 0);
       reg = 0;
-    } else if (rules === "CA") {
-      reg = Math.min(h, 480);
-      c.OT_DAILY = Math.min(Math.max(h - 480, 0), 240);
-      c.DT_DAILY = Math.max(h - 720, 0);
+    } else if (rule.dailyOtAfter !== null) {
+      // Daily overtime by state: CA 8 hours (double time after 12), AK and NV 8, CO 12.
+      const ot = rule.dailyOtAfter;
+      const dt = rule.dailyDtAfter;
+      reg = Math.min(h, ot);
+      c.OT_DAILY = dt === null ? Math.max(h - ot, 0) : Math.min(Math.max(h - ot, 0), dt - ot);
+      c.DT_DAILY = dt === null ? 0 : Math.max(h - dt, 0);
     } else {
       reg = h;
     }
@@ -321,7 +343,14 @@ export function calcWorkerTime(
   baseRate: number,
   periodStart: ISODate,
   periodEnd: ISODate,
-  opts: { dedupe?: boolean; mealPremiums?: boolean } = {},
+  opts: {
+    dedupe?: boolean;
+    mealPremiums?: boolean;
+    /** A shift crossing from the last day of this period into the next is paid next period. */
+    deferCrossing?: boolean;
+    /** The prior period deferred its crossing shift: pay it in this one. */
+    carryInCrossing?: boolean;
+  } = {},
 ): WorkerTimeResult {
   const rules = rulesForState(workState);
   const mine = rows.filter((r) => r.employeeId === employeeId && r.workDate <= periodEnd);
@@ -329,7 +358,12 @@ export function calcWorkerTime(
   const exceptions = [...cleaned.exceptions];
 
   const effDays = buildDays(cleaned.effective, rules);
-  const paidDays = buildDays(cleaned.asPaid.filter((r) => r.workDate < periodStart), rules);
+  // Pay-period attribution of a shift that crosses midnight on a period boundary.
+  const crosses = (d: DayCalc) => d.shifts.some((s) => s.end > 1440);
+  const deferred = (d: DayCalc) => !!opts.deferCrossing && d.date === periodEnd && crosses(d);
+  const carried = (d: DayCalc) => !!opts.carryInCrossing && d.date === addDays(periodStart, -1) && crosses(d);
+  const paysNow = (d: DayCalc) => (d.date >= periodStart && !deferred(d)) || carried(d);
+  const paidDays = buildDays(cleaned.asPaid.filter((r) => r.workDate < periodStart), rules).filter((d) => !carried(d));
   for (const wk of weeksOf(effDays).values()) categorizeWeek(wk, rules);
   for (const wk of weeksOf(paidDays).values()) categorizeWeek(wk, rules);
   if (opts.mealPremiums === false) for (const d of [...effDays, ...paidDays]) d.mealPenalty = 0;
@@ -347,11 +381,16 @@ export function calcWorkerTime(
   const effWeeks = weeksOf(effDays);
   const paidWeeks = weeksOf(paidDays);
   // Only workweeks that touch this period, or that received entries after the prior period was paid.
-  const lateWeeks = new Set(cleaned.effective.filter((r) => r.enteredOn >= periodStart && r.workDate < periodStart).map((r) => workweekStart(r.workDate)));
-  for (const [ws, wdays] of effWeeks) {
-    if (addDays(ws, 6) < periodStart && !lateWeeks.has(ws)) continue;
-    const inPeriod = wdays.filter((d) => d.date >= periodStart);
-    const prior = wdays.filter((d) => d.date < periodStart);
+  // Late corrections count too, including deletions that leave a paid week with no time at all.
+  const lateWeeks = new Set(
+    [...cleaned.effective, ...mine.filter((r) => r.entryType === "Correction")].filter((r) => r.enteredOn >= periodStart && r.workDate < periodStart).map((r) => workweekStart(r.workDate)),
+  );
+  const weekKeys = [...new Set([...effWeeks.keys(), ...[...paidWeeks.keys()].filter((ws) => lateWeeks.has(ws))])].sort();
+  for (const ws of weekKeys) {
+    const wdays = effWeeks.get(ws) ?? [];
+    if (addDays(ws, 6) < periodStart && !lateWeeks.has(ws) && !wdays.some(carried)) continue;
+    const inPeriod = wdays.filter(paysNow);
+    const prior = wdays.filter((d) => d.date < periodStart && !carried(d));
     const rr = regularRate(wdays, baseRate);
     const paidPrior = paidWeeks.get(ws) ?? [];
     weeks.push({
@@ -365,7 +404,10 @@ export function calcWorkerTime(
   }
 
   // Exceptions that explain the numbers
-  for (const d of effDays.filter((x) => x.date >= periodStart)) {
+  for (const d of effDays.filter((x) => deferred(x) || carried(x))) {
+    exceptions.push({ employeeId, rowId: d.shifts[0]?.rowId ?? "", date: d.date, code: "CROSSES_PAY_PERIOD", severity: "Info", message: "Shift crosses from the last day of a pay period into the next.", treatment: deferred(d) ? "Paid in the next pay period." : "Paid in this pay period (carried from the previous period's last day)." });
+  }
+  for (const d of effDays.filter(paysNow)) {
     const rowId = d.shifts[0]?.rowId ?? "";
     const meal: Record<string, [ExceptionCode, string]> = {
       missed: ["MISSED_MEAL", "No meal period recorded on a shift over 5 hours."],
@@ -407,7 +449,7 @@ export function calcWorkerTime(
     }
   }
 
-  const inP = effDays.filter((d) => d.date >= periodStart);
+  const inP = effDays.filter(paysNow);
   const sumC = (k: keyof Cats) => inP.reduce((t, d) => t + d.cats[k], 0);
   return {
     employeeId,

@@ -123,6 +123,7 @@ export function applyBps(base: Dataset, bps: BusinessProcess[], opts: ApplyOptio
             enteredOn: known ? opts.knownBy!.asDate : entered,
             notes: String(r.notes ?? `Entered via ${bp.id}`),
             source: "erp",
+            ...(r.deleted ? { deleted: true } : {}),
           });
         }
         break;

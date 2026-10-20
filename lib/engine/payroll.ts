@@ -358,7 +358,7 @@ export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: Pay
   // ---- employee taxes
   const fed = asOf(FEDERAL, period.checkDate);
   const fit = roundCents(annualizedWithholding(fitWages, period.periodsPerYear, fed, w.filingStatus));
-  lines.push(line("FIT", fit, `Annualized: (${fmt(fitWages)} × 24 − ${money(fed.standardDeduction[w.filingStatus])} std. deduction) through 2026 ${w.filingStatus} brackets ÷ 24`));
+  lines.push(line("FIT", fit, `Annualized: (${fmt(fitWages)} × ${period.periodsPerYear} − ${money(fed.standardDeduction[w.filingStatus])} std. deduction) through 2026 ${w.filingStatus} brackets ÷ ${period.periodsPerYear}`));
 
   const ssEe = pct(ssTaxable, fica.ssRate);
   const ssNote =

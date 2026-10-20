@@ -5,6 +5,7 @@ import { Hours, Money, PageHead, Pill, Section, Select, sevTone } from "../ui.ts
 import { TIME_CATEGORY_FEEDS } from "../../lib/config/payComponents.ts";
 import { minutesToHHMM, pretty } from "../../lib/util/dates.ts";
 import type { UsWorkerCalc } from "../../lib/engine/build.ts";
+import { ruleForState } from "../../lib/config/timeRules.ts";
 import { useAccess } from "../access.tsx";
 
 const h = (m: number) => m / 60;
@@ -63,7 +64,7 @@ export default function Time({ id }: { id?: string }) {
                       <a href={`#/time/${c.worker.id}`} onClick={(e) => e.preventDefault()}>{c.worker.id}</a> {c.worker.name}
                       <div className="faint small">{c.worker.locationId}, {c.worker.shift || "Day"} shift</div>
                     </td>
-                    <td>{c.time!.rules === "CA" ? "California" : "FLSA"}</td>
+                    <td>{ruleForState(c.worker.workState).label}</td>
                     <td className="n">${c.worker.hourlyRate.toFixed(2)}</td>
                     <td className="n"><Hours h={h(k.REG)} /></td>
                     <td className="n"><Hours h={h(k.OT_DAILY)} /></td>
@@ -151,7 +152,7 @@ function TimeDetail({ c, pay }: { c: UsWorkerCalc; pay: boolean }) {
     <div className="detail">
       <div className="detail-head">
         <h2>{c.worker.id} {c.worker.name}</h2>
-        <span className="muted">{t.rules === "CA" ? "California daily and weekly rules" : "FLSA weekly rule only"}, base ${t.baseRate.toFixed(2)}/hr</span>
+        <span className="muted">{t.rules === "FLSA" ? "FLSA weekly rule only" : `${ruleForState(c.worker.workState).label} daily and weekly rules`}, base ${t.baseRate.toFixed(2)}/hr</span>
         <button className="close" onClick={() => go("/time")}>Close</button>
       </div>
       <div className="table-wrap">

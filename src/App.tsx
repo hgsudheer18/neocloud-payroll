@@ -33,7 +33,7 @@ const PERIOD_PAGES = ["payslip", "benefits", "payruns", "overview", "", "registe
 
 const NAV: { group: string; items: [string, string][] }[] = [
   { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -60,6 +60,7 @@ export default function App() {
       case "inbox": return <Inbox query={query} />;
       case "workers": return <Workers id={path[1]} query={query} />;
       case "time-entry": return <TimeEntry query={query} />;
+      case "team-time": return <TimeEntry query={query} manager />;
       case "time-off": return <AbsenceHub query={query} />;
       case "benefits": return <Benefits query={query} />;
       case "payslip": return <MyPayslip />;

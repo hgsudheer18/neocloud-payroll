@@ -4,6 +4,7 @@
 
 import type { Dataset, TimeRow, Worker } from "../data/types.ts";
 import { buildShift, rulesForState } from "../engine/time.ts";
+import { ruleForState, SHIFTS } from "../config/timeRules.ts";
 import { PLAN } from "../config/absencePlans.ts";
 import { daysInclusive, isWeekday, type ISODate } from "../util/dates.ts";
 import type { BusinessProcess } from "./types.ts";
@@ -40,7 +41,7 @@ export function validateTimeEntry(ds: Dataset, pending: BusinessProcess[], worke
 
   // Overlap / duplicate against approved and pending time for the same workday.
   const others = [
-    ...ds.time.filter((t) => t.employeeId === worker.id && t.workDate === r.workDate && t.rowId !== r.correctsRowId),
+    ...ds.time.filter((t) => t.employeeId === worker.id && t.workDate === r.workDate && t.rowId !== r.correctsRowId && !t.deleted),
     ...pending.filter((b) => b.type === "Enter Time" && b.subjectId === worker.id && b.status === "Awaiting Approval").flatMap((b) => (b.payload.rows as TimeRow[]).filter((x) => x.workDate === r.workDate)),
   ];
   for (const o of others) {
@@ -55,7 +56,19 @@ export function validateTimeEntry(ds: Dataset, pending: BusinessProcess[], worke
     else if (s.mealStart !== null && (s.mealEnd as number) - s.mealStart < 30) warnings.push("Meal shorter than 30 minutes: a CA meal premium will be paid.");
     if (s.worked > 720) warnings.push("Over 12 hours: double time applies and a second meal was required.");
     else if (s.worked > 600) warnings.push("Over 10 hours: second meal required unless a waiver is on file.");
-  } else if (s.worked > 720) warnings.push("Over 12 hours in one day (no daily overtime under FLSA; counts toward the weekly 40).");
+  } else {
+    // Outside California: no meal premium, but a missing meal on a long shift is still flagged.
+    if (s.worked > 300 && s.mealStart === null) warnings.push("No meal recorded on a shift over 5 hours: check it against the meal policy.");
+    const rule = ruleForState(worker.workState);
+    if (rule.dailyOtAfter !== null && s.worked > rule.dailyOtAfter) warnings.push(`Over ${rule.dailyOtAfter / 60} hours: ${rule.label} daily overtime applies.`);
+    else if (s.worked > 720) warnings.push("Over 12 hours in one day (no daily overtime in this state; counts toward the weekly 40).");
+  }
+  // Soft warning: block outside the worker's shift window.
+  const def = SHIFTS[(worker.shift as "Day" | "Night") || "Day"];
+  const start = Number(r.timeIn!.slice(0, 2)) * 60 + Number(r.timeIn!.slice(3));
+  const [w0, w1] = def.window.map((t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3)));
+  const inWindow = w0 < w1 ? start >= w0 && start < w1 : start >= w0 || start < w1;
+  if (!inWindow) warnings.push(`Starts at ${r.timeIn}, outside the ${def.name.toLowerCase()} shift (${def.window[0]}–${def.window[1]}).`);
   return { errors, warnings };
 }
 

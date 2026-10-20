@@ -100,7 +100,7 @@ export default function Home() {
             <a href="#/time-off?tab=team">Team Time Off</a>
           </Section>
           <Section title="Timesheets" lede={`Hourly workers in your team without time for every workday of the week of ${pretty(lastWeek)}.`}>
-            {missingLast.length === 0 ? <p className="small muted">Everyone has submitted.</p> : <ul className="small">{missingLast.slice(0, 12).map((x) => <li key={x.id}><a href={`#/workers/${x.id}`}>{x.name}</a> ({x.id})</li>)}{missingLast.length > 12 && <li>and {missingLast.length - 12} more</li>}</ul>}
+            {missingLast.length === 0 ? <p className="small muted">Everyone has submitted.</p> : <ul className="small">{missingLast.slice(0, 12).map((x) => <li key={x.id}><a href={`#/team-time?worker=${x.id}&week=${lastWeek}`}>{x.name}</a> ({x.id})</li>)}{missingLast.length > 12 && <li>and {missingLast.length - 12} more</li>}</ul>}
           </Section>
         </div>
       )}

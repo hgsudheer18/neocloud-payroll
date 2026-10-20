@@ -11,6 +11,8 @@ import type { PayPeriod } from "../config/period.ts";
 import { ACTUAL_2026_SS_WAGE_BASE } from "../config/usTax.ts";
 import { buildTimeline } from "./timeline.ts";
 import { calcWorkerTime, type WorkerTimeResult } from "./time.ts";
+import { CROSSING_SHIFTS_PAID_NEXT_FROM } from "../config/timeRules.ts";
+import { addDays } from "../util/dates.ts";
 import { calcAbsenceLine, plansForWorker, type AbsenceLine } from "./absence.ts";
 import { calcUSWorker, type PayResult, type WorkerPayInput } from "./payroll.ts";
 import { STANDARD_DAILY_HOURS } from "../config/period.ts";
@@ -70,6 +72,9 @@ export function calcUsWorker(ds: Dataset, w0: Worker, period: PayPeriod, v: Vari
     time = calcWorkerTime(w.id, rows, w.workState, w.hourlyRate, period.start, period.end, {
       dedupe: !v.keepDuplicatePunches,
       mealPremiums: !v.noMealPremium,
+      // From go-live, a shift crossing into the next pay period is paid there.
+      deferCrossing: period.start >= CROSSING_SHIFTS_PAID_NEXT_FROM,
+      carryInCrossing: addDays(period.start, -1) >= CROSSING_SHIFTS_PAID_NEXT_FROM,
     });
   }
 

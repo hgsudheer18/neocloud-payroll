@@ -107,3 +107,23 @@ Pay: 88.00 REG × $42 + 15.00 OT × $63 + 0.75 DT × $84 + 3 meal premiums × $4
 - Approved vacation and sick time create time-off blocks on the timesheet that replace scheduled hours; they are paid (VAC / SICK) but are not hours worked, so they never count toward overtime or accrual.
 - California sick pay is paid at the regular rate of pay for the workweek (which includes the night differential for night workers).
 - Hourly accruals read hours worked from Time Tracking at period end, after approval (see the Absence design).
+
+## Overtime by work location, shifts and pay-period boundaries
+
+Time rules are configuration (`lib/config/timeRules.ts`); the engine reads them and has no state branches of its own. Weekly overtime over 40 hours (FLSA) applies everywhere; states add:
+
+| State | Daily overtime (1.5x) | Daily double time (2x) | 7th consecutive day | Meal premium |
+|---|---|---|---|---|
+| California | over 8 hours | over 12 hours | yes | yes (Labor Code 512 / 226.7) |
+| Alaska | over 8 hours | none | no | no |
+| Nevada | over 8 hours | none | no | no |
+| Colorado | over 12 hours | none | no | no |
+| Texas and other states | none (weekly only) | none | no | no |
+
+**Shifts.** Day shift 08:00–18:00, workday breaks at midnight. Night shift 18:00–08:00, workday breaks at noon: a night shift that starts after midnight (for example 01:00) belongs to the previous workday. Night shift differential: $3.00 an hour for minutes worked between 22:00 and 06:00, on any shift. A block starting outside the worker's shift window is a soft warning.
+
+**Meal breaks.** California: a shift over 5 hours needs a 30-minute meal that starts before the end of the 5th hour; missed, late or short meals earn one hour at the regular rate. Elsewhere, a missing meal on a shift over 5 hours is flagged against company policy (no premium).
+
+**Shifts that cross pay periods.** From go-live (Oct 16, 2026), a shift that starts on the last day of a pay period and ends in the next is paid in the next period; its overtime is still counted in its own workweek. The Oct 1–15 parallel run keeps the legacy treatment (paid in the period it started) so it reproduces the Rippling register.
+
+**Manager edits.** Managers can edit or delete their team's time for current and past periods from Team Timesheets. Their changes are approved on entry and recorded in the business process log; a change to a paid period is paid, or recovered, as retro in the next pay run. Only the latest correction in a chain counts, and a deletion removes the block it corrects.
