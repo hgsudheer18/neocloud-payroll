@@ -11,7 +11,8 @@ import { asOf, STATES } from "../../lib/config/usTax.ts";
 import { pretty } from "../../lib/util/dates.ts";
 import { toCents } from "../../lib/util/money.ts";
 import type { Dataset, Worker } from "../../lib/data/types.ts";
-import type { BPType } from "../../lib/erp/types.ts";
+import { BP_RULES, type BPType } from "../../lib/erp/types.ts";
+import { NoAccess, useAccess } from "../access.tsx";
 
 const SUPPORTED_STATES = Object.keys(asOf(STATES, "2026-10-01"));
 
@@ -25,15 +26,20 @@ export function statusAsOf(w: Worker, ds: Dataset, date: string): string {
 const statusTone = (s: string) => (s === "Active" ? "ok" : s === "Terminated" ? "bad" : s === "On leave" ? "warn" : "info");
 
 export default function Workers({ id, query }: { id?: string; query: URLSearchParams }) {
+  const { me } = useErp();
   if (id === "new") return <Hire />;
   if (id) return <Profile id={id} action={query.get("action") ?? ""} />;
+  // An employee's directory is just themselves: show their own profile.
+  if (me.role === "Employee" && me.workerId) return <Profile id={me.workerId} action={query.get("action") ?? ""} />;
   return <Directory query={query} />;
 }
 
 function Directory({ query }: { query: URLSearchParams }) {
   const { data } = useData();
   const { erp } = useErp();
+  const access = useAccess();
   const ds = data!.dsNow;
+  const visible = ds.workers.filter((w) => access.seesWorker(w.id));
   const ref = today();
   const q = query.get("q") ?? "";
   const dept = query.get("dept") ?? "";
@@ -42,21 +48,21 @@ function Directory({ query }: { query: URLSearchParams }) {
   const set = (k: string, v: string) => setQuery("/workers", { q, dept, country, status, [k]: v });
   const rows = useMemo(
     () =>
-      ds.workers
+      visible
         .map((w) => ({ w, s: statusAsOf(w, ds, ref) }))
         .filter(({ w, s }) => (!dept || w.department === dept) && (!country || w.country === country) && (!status || s === status) && (!q || `${w.id} ${w.name} ${w.jobProfile}`.toLowerCase().includes(q.toLowerCase())))
         .sort((a, b) => (a.w.source === "erp" ? -1 : 0) - (b.w.source === "erp" ? -1 : 0) || a.w.id.localeCompare(b.w.id)),
-    [ds, ref, q, dept, country, status],
+    [visible, ds, ref, q, dept, country, status],
   );
-  const pendingHires = erp.bps.filter((b) => b.type === "Hire" && b.status === "Awaiting Approval");
+  const pendingHires = erp.bps.filter((b) => b.type === "Hire" && b.status === "Awaiting Approval" && access.seesBp(b));
   return (
     <>
       <PageHead title="Workers">
-        {ds.workers.length} workers as of today, {pretty(ref)}. Open a worker to see their effective-dated history and to change their job, pay, location, leave or employment.
+        {visible.length} workers{access.all ? "" : " in your team"} as of today, {pretty(ref)}. Open a worker to see their effective-dated history and to change their job, pay, location, leave or employment.
       </PageHead>
       <div className="filters">
         <label>Search<input type="search" value={q} placeholder="ID, name or job" onChange={(e) => set("q", e.target.value)} /></label>
-        <Select label="Department" value={dept} onChange={(v) => set("dept", v)} options={[...new Set(ds.workers.map((w) => w.department))].sort()} />
+        <Select label="Department" value={dept} onChange={(v) => set("dept", v)} options={[...new Set(visible.map((w) => w.department))].sort()} />
         <Select label="Country" value={country} onChange={(v) => set("country", v)} options={["USA", "CAN", "GBR", "IND"]} />
         <Select label="Status" value={status} onChange={(v) => set("status", v)} options={["Active", "On leave", "Terminated", "Pre-hire", "Contractor"]} />
         <span className="spacer" />
@@ -78,7 +84,7 @@ function Directory({ query }: { query: URLSearchParams }) {
                 <td>{w.department}</td>
                 <td>{ds.locations.find((l) => l.id === w.locationId)?.name ?? w.locationId}</td>
                 <td className="small">{w.payGroup || "None (AP)"}</td>
-                <td className="n">{w.payType === "Hourly" ? `$${w.hourlyRate.toFixed(2)}/hr` : <Money c={toCents(w.annualSalary)} cur={w.currency} />}</td>
+                <td className="n">{!access.seesDetails(w.id) ? <span className="faint">hidden</span> : w.payType === "Hourly" ? `$${w.hourlyRate.toFixed(2)}/hr` : <Money c={toCents(w.annualSalary)} cur={w.currency} />}</td>
                 <td>{w.hireDate}</td>
                 <td><Pill tone={statusTone(s)}>{s}</Pill></td>
               </tr>
@@ -209,10 +215,12 @@ const ACTIONS: { key: string; type: BPType; label: string }[] = [
 
 function Profile({ id, action }: { id: string; action: string }) {
   const { data } = useData();
-  const { erp } = useErp();
+  const { erp, me } = useErp();
+  const access = useAccess();
   const ds = data!.dsNow;
   const w = ds.workers.find((x) => x.id === id);
   const pendingHire = erp.bps.find((b) => b.type === "Hire" && b.subjectId === id);
+  if (!w && pendingHire && !access.seesBp(pendingHire)) return <NoAccess what={`worker ${id}`} />;
   if (!w) {
     return (
       <>
@@ -226,12 +234,36 @@ function Profile({ id, action }: { id: string; action: string }) {
   const status = statusAsOf(w, ds, ref);
   const cc = ds.costCenters.find((c) => c.id === tl.costCenterId);
   const loc = ds.locations.find((l) => l.id === tl.locationId);
+  const manager = w.managerId ? `${w.managerId} ${ds.workers.find((m) => m.id === w.managerId)?.name ?? ""}` : "—";
+  // Outside your directory a profile shows name, job and org details only.
+  if (!access.seesWorker(id)) {
+    return (
+      <>
+        <div className="detail">
+          <div className="detail-head">
+            <h2>{w.id} {w.name}</h2>
+            <span className="muted">{w.jobProfile}</span>
+          </div>
+          <dl className="kv">
+            <dt>Department</dt><dd>{w.department}</dd>
+            <dt>Supervisory org</dt><dd>{cc?.supervisoryOrg ?? w.supervisoryOrg}</dd>
+            <dt>Location</dt><dd>{loc?.name}</dd>
+            <dt>Company</dt><dd>{ds.companies.find((c) => c.id === w.companyId)?.name}</dd>
+            <dt>Manager</dt><dd>{manager}</dd>
+          </dl>
+        </div>
+        <p className="small muted">Only {w.name}'s managers and payroll can see their compensation, time and time off.</p>
+      </>
+    );
+  }
+  const details = access.seesDetails(id);
+  const isComp = (field: string) => /salary|rate|comp|pay/i.test(field);
   const history = [
     { date: w.hireDate, what: "Hire", detail: `${w.jobProfile}, ${w.department}`, entered: w.enteredOn ?? w.hireDate, by: w.source === "erp" ? "Business process" : "Data package" },
-    ...ds.events.filter((e) => e.employeeId === id).map((e) => ({ date: e.effectiveDate, what: e.event, detail: `${e.field}: ${e.oldValue || "—"} → ${e.newValue}${e.reason && !e.reason.startsWith("BP-") ? ` (${e.reason})` : ""}`, entered: e.enteredOn, by: e.source === "erp" ? e.reason.startsWith("BP-") ? e.reason : "Business process" : "Data package" })),
+    ...ds.events.filter((e) => e.employeeId === id && (details || !isComp(`${e.event} ${e.field}`))).map((e) => ({ date: e.effectiveDate, what: e.event, detail: `${e.field}: ${e.oldValue || "—"} → ${e.newValue}${e.reason && !e.reason.startsWith("BP-") ? ` (${e.reason})` : ""}`, entered: e.enteredOn, by: e.source === "erp" ? e.reason.startsWith("BP-") ? e.reason : "Business process" : "Data package" })),
     ...(w.terminationDate && !ds.events.some((e) => e.employeeId === id && e.event === "Termination") ? [{ date: w.terminationDate, what: "Termination", detail: "Last day worked", entered: w.terminationDate, by: "Data package" }] : []),
   ].sort((a, b) => (a.date < b.date ? -1 : 1));
-  const bps = erp.bps.filter((b) => b.subjectId === id).reverse();
+  const bps = erp.bps.filter((b) => b.subjectId === id && access.seesBp(b)).reverse();
   const inRun = data!.result.us.find((c) => c.worker.id === id);
   const intl = data!.result.intl.find((c) => c.worker.id === id);
   const absence = inRun?.absence ?? intl?.absence ?? [];
@@ -257,19 +289,19 @@ function Profile({ id, action }: { id: string; action: string }) {
           <dl className="kv">
             <dt>Pay group</dt><dd>{w.payGroup || "None (contingent worker)"}</dd>
             <dt>FLSA / pay type</dt><dd>{w.flsa}, {w.payType}</dd>
-            <dt>Pay</dt><dd>{w.payType === "Hourly" ? `$${tl.hourlyRate.toFixed(2)} per hour` : `${tl.annualSalary.toLocaleString("en-US")} ${w.currency} per year`}</dd>
-            <dt>Manager</dt><dd>{w.managerId ? `${w.managerId} ${ds.workers.find((m) => m.id === w.managerId)?.name ?? ""}` : "—"}</dd>
+            <dt>Pay</dt><dd>{!details ? <span className="faint">Hidden for your role</span> : w.payType === "Hourly" ? `$${tl.hourlyRate.toFixed(2)} per hour` : `${tl.annualSalary.toLocaleString("en-US")} ${w.currency} per year`}</dd>
+            <dt>Manager</dt><dd>{manager}</dd>
             <dt>Hire date</dt><dd>{w.hireDate}</dd>
             <dt>Termination</dt><dd>{w.terminationDate || "—"}</dd>
           </dl>
         </div>
         <div className="row" style={{ marginTop: 16 }}>
-          {w.workerType === "Employee" && ACTIONS.map((a) => (
+          {w.workerType === "Employee" && ACTIONS.filter((a) => BP_RULES[a.type].initiators.includes(me.role)).map((a) => (
             <button key={a.key} className={`btn ${action === a.key ? "" : "ghost"}`} onClick={() => go(`/workers/${id}`, { action: action === a.key ? "" : a.key })}>{a.label}</button>
           ))}
-          {w.payType === "Hourly" && <a className="btn ghost" href={`#/time-entry?worker=${id}`}>Enter time</a>}
-          {w.workerType === "Employee" && <a className="btn ghost" href={`#/time-off?worker=${id}`}>Request time off</a>}
-          {inRun && <a className="btn ghost" href={`#/register/${id}`}>Payslip</a>}
+          {details && w.payType === "Hourly" && access.canOpen("time-entry") && <a className="btn ghost" href={`#/time-entry?worker=${id}`}>Enter time</a>}
+          {details && w.workerType === "Employee" && access.canOpen("time-off") && <a className="btn ghost" href={`#/time-off?worker=${id}`}>Request time off</a>}
+          {inRun && access.payResults && <a className="btn ghost" href={`#/register/${id}`}>Payslip</a>}
         </div>
       </div>
 
@@ -285,7 +317,7 @@ function Profile({ id, action }: { id: string; action: string }) {
           </div>
         </Section>
         <Section title="Time off balances" lede={`For the selected period (${data!.result.period.start} to ${data!.result.period.end}${intl ? "; international plans for October" : ""}).`}>
-          {absence.length === 0 ? <p className="muted">Not in the selected pay run{w.payGroup ? `: ${w.payGroup} is paid in a different period` : ""}.</p> : (
+          {!details ? <p className="muted">Only {w.name}'s managers and payroll can see their time off.</p> : absence.length === 0 ? <p className="muted">Not in the selected pay run{w.payGroup ? `: ${w.payGroup} is paid in a different period` : ""}.</p> : (
             <div className="table-wrap">
               <table className="reg">
                 <thead><tr><th>Plan</th><th className="n">Opening</th><th className="n">Accrued</th><th className="n">Taken</th><th className="n">Ending</th></tr></thead>
@@ -312,6 +344,7 @@ function Profile({ id, action }: { id: string; action: string }) {
 function ActionForm({ w, action }: { w: Worker; action: string }) {
   const { data } = useData();
   const { submit, erp } = useErp();
+  const details = useAccess().seesDetails(w.id);
   const ds = data!.dsNow;
   const a = ACTIONS.find((x) => x.key === action)!;
   const ref = today();
@@ -337,10 +370,10 @@ function ActionForm({ w, action }: { w: Worker; action: string }) {
         if (w.payType === "Hourly") {
           if (w.workState === "CA" && n < 16.9) errs.push("Below the 2026 California minimum wage ($16.90).");
           payload = { ...payload, hourlyRate: n, oldHourlyRate: tl.hourlyRate };
-          summary = `Hourly rate $${tl.hourlyRate.toFixed(2)} → $${n.toFixed(2)} from ${eff}`;
+          summary = `Hourly rate ${details ? `\$${tl.hourlyRate.toFixed(2)} → ` : "to "}$${n.toFixed(2)} from ${eff}`;
         } else {
           payload = { ...payload, annualSalary: n, oldAnnualSalary: tl.annualSalary };
-          summary = `Salary ${tl.annualSalary.toLocaleString("en-US")} → ${n.toLocaleString("en-US")} ${w.currency} from ${eff}`;
+          summary = `Salary ${details ? `${tl.annualSalary.toLocaleString("en-US")} → ` : "to "}${n.toLocaleString("en-US")} ${w.currency} from ${eff}`;
         }
         break;
       }
@@ -388,7 +421,7 @@ function ActionForm({ w, action }: { w: Worker; action: string }) {
               <input type="date" value={eff} onChange={(e) => setEff(e.target.value)} />
             </Field>
             {a.type === "Change Compensation" && (
-              <Field label={w.payType === "Hourly" ? `New hourly rate (now $${tl.hourlyRate.toFixed(2)})` : `New annual salary (now ${tl.annualSalary.toLocaleString("en-US")} ${w.currency})`}>
+              <Field label={w.payType === "Hourly" ? `New hourly rate${details ? ` (now \$${tl.hourlyRate.toFixed(2)})` : ""}` : `New annual salary (${w.currency})${details ? ` (now ${tl.annualSalary.toLocaleString("en-US")})` : ""}`}>
                 <input type="text" inputMode="decimal" value={val} onChange={(e) => setVal(e.target.value)} />
               </Field>
             )}

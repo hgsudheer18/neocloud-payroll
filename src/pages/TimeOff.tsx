@@ -7,13 +7,16 @@ import { BpStatus, CanInitiate, Checks, Field, FormGrid, Toast, who } from "../e
 import { validateTimeOff, type Check } from "../../lib/erp/validate.ts";
 import { plansForWorker } from "../../lib/engine/absence.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
+import { useAccess } from "../access.tsx";
 
 export default function TimeOff({ query }: { query: URLSearchParams }) {
   const { data } = useData();
   const { erp, me, submit } = useErp();
+  const access = useAccess();
   const ds = data!.dsNow;
-  const employees = ds.workers.filter((w) => w.workerType === "Employee" && !w.terminationDate);
-  const workerId = me.role === "Employee" ? me.workerId! : query.get("worker") ?? me.workerId ?? employees[0].id;
+  const employees = ds.workers.filter((w) => w.workerType === "Employee" && !w.terminationDate && access.seesDetails(w.id));
+  const asked = query.get("worker") ?? "";
+  const workerId = me.role === "Employee" ? me.workerId! : employees.some((e) => e.id === asked) ? asked : me.workerId ?? employees[0]?.id ?? "";
   const w = ds.workers.find((x) => x.id === workerId);
   const plans = w ? plansForWorker(w, ds.balances).filter((p) => p.code !== "US_FLEX_PTO" || p.isEligible(w)) : [];
   const [plan, setPlan] = useState("");
@@ -22,7 +25,7 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
   const [qty, setQty] = useState("");
   const [check, setCheck] = useState<Check | null>(null);
   const [msg, setMsg] = useState("");
-  if (!w) return <div className="callout bad">Worker not found.</div>;
+  if (!w) return <div className="callout info">There are no workers you can request time off for.</div>;
 
   const p = plans.find((x) => x.code === plan) ?? plans[0];
   const perDay = Number(qty) || (p?.unit === "days" ? 1 : 8);

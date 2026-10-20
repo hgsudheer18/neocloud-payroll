@@ -8,6 +8,7 @@ import { validateTimeEntry, type Check } from "../../lib/erp/validate.ts";
 import { buildShift } from "../../lib/engine/time.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
 import type { TimeRow } from "../../lib/data/types.ts";
+import { useAccess } from "../access.tsx";
 
 const RANGES: [string, string, string][] = [
   ["2026-10-01|2026-10-15", "Oct 1–15 (parallel run)", "2026-10-01"],
@@ -23,9 +24,11 @@ const SCHEDULE = {
 export default function TimeEntry({ query }: { query: URLSearchParams }) {
   const { data } = useData();
   const { erp, me, submit, nextSeq } = useErp();
+  const access = useAccess();
   const ds = data!.dsNow;
-  const hourly = ds.workers.filter((w) => w.workerType === "Employee" && w.payType === "Hourly" && w.country === "USA");
-  const workerId = me.role === "Employee" ? me.workerId! : query.get("worker") ?? hourly[0]?.id ?? "";
+  const hourly = ds.workers.filter((w) => w.workerType === "Employee" && w.payType === "Hourly" && w.country === "USA" && access.seesDetails(w.id));
+  const asked = query.get("worker") ?? "";
+  const workerId = me.role === "Employee" ? me.workerId! : hourly.some((h) => h.id === asked) ? asked : hourly[0]?.id ?? "";
   const range = query.get("range") ?? RANGES[1][0];
   const [start, end] = range.split("|");
   const w = ds.workers.find((x) => x.id === workerId);
@@ -41,7 +44,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
   const pendingRows = pending.flatMap((b) => (b.payload.rows as TimeRow[]).map((r) => ({ ...r, bp: b.id })));
   const timeOff = ds.absences.filter((a) => a.employeeId === workerId && a.date >= start && a.date <= end);
 
-  if (!w) return <div className="callout bad">Worker {workerId} not found.</div>;
+  if (!w) return <div className="callout info">{workerId ? `Worker ${workerId} not found.` : "There are no hourly workers you can enter time for."}</div>;
 
   const validate = (row: Partial<TimeRow>) => validateTimeEntry(ds, erp.bps, w, row);
   const send = () => {

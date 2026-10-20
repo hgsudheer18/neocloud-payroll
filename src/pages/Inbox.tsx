@@ -4,19 +4,22 @@ import { setQuery } from "../router.tsx";
 import { PageHead, Pill, Section } from "../ui.tsx";
 import { BpStatus, Toast, who } from "../erpui.tsx";
 import { BP_RULES, type BusinessProcess } from "../../lib/erp/types.ts";
+import { useAccess } from "../access.tsx";
 
 export default function Inbox({ query }: { query: URLSearchParams }) {
   const { erp, me, decide } = useErp();
+  const access = useAccess();
+  const bps = erp.bps.filter(access.seesBp);
   const tab = query.get("tab") ?? "mine";
   const [comment, setComment] = useState("");
   const [msg, setMsg] = useState<{ text: string; tone: "ok" | "bad" }>({ text: "", tone: "ok" });
-  const awaiting = erp.bps.filter((b) => b.status === "Awaiting Approval");
+  const awaiting = bps.filter((b) => b.status === "Awaiting Approval");
   const canApprove = (b: BusinessProcess) => {
     const r = BP_RULES[b.type].approvers;
     return r !== "auto" && r.includes(me.role) && b.initiatedBy !== me.id;
   };
   const mine = awaiting.filter(canApprove);
-  const list = tab === "mine" ? mine : tab === "all" ? awaiting : [...erp.bps].reverse();
+  const list = tab === "mine" ? mine : tab === "all" ? awaiting : [...bps].reverse();
 
   const act = (b: BusinessProcess, approve: boolean) => {
     const err = decide(b.id, approve, comment || undefined);
@@ -34,7 +37,7 @@ export default function Inbox({ query }: { query: URLSearchParams }) {
         Business processes waiting for a decision. You can approve only what your role is allowed to approve, and never something you started yourself (segregation of duties).
       </PageHead>
       <div className="tabs" role="tablist">
-        {[["mine", `For me to approve (${mine.length})`], ["all", `All awaiting approval (${awaiting.length})`], ["log", `Business process log (${erp.bps.length})`]].map(([k, l]) => (
+        {[["mine", `For me to approve (${mine.length})`], ["all", `All awaiting approval (${awaiting.length})`], ["log", `Business process log (${bps.length})`]].map(([k, l]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setQuery("/inbox", { tab: k })}>{l}</button>
         ))}
       </div>

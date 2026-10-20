@@ -167,4 +167,5 @@ The app was built with Claude (Anthropic) acting as the coding agent, directed a
 - Tax amounts are approximations by design (see Assumptions); the structure (separate taxable wages per tax, wage bases, allocation by state) is what is modeled.
 - Not modeled: Colorado FAMLI, NY SDI, local income taxes, supplemental withholding method choice, 401(k) annual limits and employer match, holidays.
 - Data entered in the app is saved in the browser (no shared database) and roles are switched with a selector rather than real logins. See ADR-15 for the production path.
+- Role-based visibility (`src/access.tsx`) shapes each role's view: employees see their own profile and only name and org details for others; a worker's compensation, time and time off are visible to the worker, their managers and payroll; payslips and pay results are visible to payroll only. Because there are no real logins and the data ships to the browser, this is a demonstration of the security design, not protection of the data.
 - New countries (for example Mexico) need a country pack (pay group, absence plans, statutory rules) before people can be hired there.

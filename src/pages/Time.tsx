@@ -5,14 +5,17 @@ import { Hours, Money, PageHead, Pill, Section, Select, sevTone } from "../ui.ts
 import { TIME_CATEGORY_FEEDS } from "../../lib/config/payComponents.ts";
 import { minutesToHHMM, pretty } from "../../lib/util/dates.ts";
 import type { UsWorkerCalc } from "../../lib/engine/build.ts";
+import { useAccess } from "../access.tsx";
 
 const h = (m: number) => m / 60;
 const amt = (c: UsWorkerCalc, codes: string[]) => c.pay.lines.filter((l) => codes.includes(l.code)).reduce((s, l) => s + l.amount, 0);
 
 export default function Time({ id }: { id?: string }) {
   const { data } = useData();
+  const access = useAccess();
+  const pay = access.payResults;
   const r = data!.result;
-  const techs = r.us.filter((c) => c.time);
+  const techs = r.us.filter((c) => c.time && access.seesDetails(c.worker.id));
   const sel = id ? techs.find((c) => c.worker.id === id) : undefined;
   const [code, setCode] = useState("");
   const exceptions = techs.flatMap((c) => c.time!.exceptions.filter((e) => e.date >= r.period.start || e.code === "RETRO_CORRECTION"));
@@ -25,7 +28,7 @@ export default function Time({ id }: { id?: string }) {
         {techs.length} non-exempt data center technicians ({techs.filter((c) => c.time!.rules === "CA").length} in California under CA rules, {techs.filter((c) => c.time!.rules === "FLSA").length} in Texas under FLSA only). Hours are split into categories, then each category feeds a pay component.
       </PageHead>
 
-      {sel && <TimeDetail c={sel} />}
+      {sel && <TimeDetail c={sel} pay={pay} />}
 
       <Section title="Hours by category, in period">
         <div className="table-wrap" style={{ maxHeight: "60vh" }}>
@@ -43,10 +46,12 @@ export default function Time({ id }: { id?: string }) {
                 <th className="n">7th day DT</th>
                 <th className="n">Night</th>
                 <th className="n">Meal prem.</th>
+                {pay && <>
                 <th className="n">OT + DT pay</th>
                 <th className="n">Premium pay</th>
                 <th className="n">Retro</th>
                 <th className="n">Gross</th>
+                </>}
               </tr>
             </thead>
             <tbody>
@@ -68,10 +73,12 @@ export default function Time({ id }: { id?: string }) {
                     <td className="n"><Hours h={h(k.SEVENTH_DT)} /></td>
                     <td className="n"><Hours h={h(k.NIGHT)} /></td>
                     <td className="n">{k.MEAL_PEN || <span className="zero">0</span>}</td>
+                    {pay && <>
                     <td className="n"><Money c={amt(c, ["OT", "DT", "OT_ADJ"])} /></td>
                     <td className="n"><Money c={amt(c, ["SHIFT", "MEAL"])} /></td>
                     <td className="n"><Money c={amt(c, ["RETRO"])} /></td>
                     <td className="n"><Money c={c.pay.totals.gross} /></td>
+                    </>}
                   </tr>
                 );
               })}
@@ -87,10 +94,12 @@ export default function Time({ id }: { id?: string }) {
                 <td className="n">{h(tot("SEVENTH_DT")).toFixed(2)}</td>
                 <td className="n">{h(tot("NIGHT")).toFixed(2)}</td>
                 <td className="n">{tot("MEAL_PEN")}</td>
+                {pay && <>
                 <td className="n"><Money c={techs.reduce((s, c) => s + amt(c, ["OT", "DT", "OT_ADJ"]), 0)} /></td>
                 <td className="n"><Money c={techs.reduce((s, c) => s + amt(c, ["SHIFT", "MEAL"]), 0)} /></td>
                 <td className="n"><Money c={techs.reduce((s, c) => s + amt(c, ["RETRO"]), 0)} /></td>
                 <td className="n"><Money c={techs.reduce((s, c) => s + c.pay.totals.gross, 0)} /></td>
+                </>}
               </tr>
             </tfoot>
           </table>
@@ -134,7 +143,7 @@ export default function Time({ id }: { id?: string }) {
   );
 }
 
-function TimeDetail({ c }: { c: UsWorkerCalc }) {
+function TimeDetail({ c, pay }: { c: UsWorkerCalc; pay: boolean }) {
   const t = c.time!;
   const { data } = useData();
   const rows = data!.ds.time.filter((x) => x.employeeId === c.worker.id);
@@ -181,6 +190,7 @@ function TimeDetail({ c }: { c: UsWorkerCalc }) {
               <strong>Week of {pretty(w.weekStart)}</strong>{w.closedInPeriod ? "" : " (open: closes after period end, trued up next period)"}: regular rate ${w.regularRate.toFixed(4)}; in period {w.current.hours.REG.toFixed(2)} REG, {w.current.hours.OT.toFixed(2)} OT, {w.current.hours.DT.toFixed(2)} DT hrs.
             </p>
           ))}
+          {pay && <>
           <h3 style={{ marginTop: 16 }}>Pay lines from time</h3>
           {c.pay.lines.filter((l) => ["REG", "OT", "DT", "OT_ADJ", "SHIFT", "MEAL", "RETRO", "VAC", "SICK"].includes(l.code)).map((l) => (
             <p key={l.code} className="small" style={{ margin: "0 0 6px" }}>
@@ -189,6 +199,7 @@ function TimeDetail({ c }: { c: UsWorkerCalc }) {
               <span className="faint">{l.explain}</span>
             </p>
           ))}
+          </>}
         </div>
         <div>
           <h3>Source rows</h3>

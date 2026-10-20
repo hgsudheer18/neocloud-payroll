@@ -20,6 +20,7 @@ import TimeEntry from "./pages/TimeEntry.tsx";
 import TimeOff from "./pages/TimeOff.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
+import { NoAccess, useAccess } from "./access.tsx";
 
 const NAV: { group: string; items: [string, string][] }[] = [
   { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Time off"], ["setup", "Organization setup"]] },
@@ -32,11 +33,13 @@ export default function App() {
   const { data, error } = useData();
   const { erp, me, setPersona, periodId, setPeriod } = useErp();
   const { path, query } = useRoute();
+  const access = useAccess();
   const page = path[0] ?? "";
 
   const body = () => {
     if (error) return <div className="callout bad">{error}</div>;
     if (!data) return <div className="loading">Loading the data package and calculating the period…</div>;
+    if (!access.canOpen(page)) return page === "" ? <Inbox query={query} /> : <NoAccess />;
     switch (page) {
       case "inbox": return <Inbox query={query} />;
       case "workers": return <Workers id={path[1]} query={query} />;
@@ -59,7 +62,7 @@ export default function App() {
 
   const unexplained = data?.result.recon.counts.Unexplained ?? 0;
   const tiesOk = data ? data.result.ties.every((t) => t.ok) : true;
-  const toApprove = erp.bps.filter((b) => b.status === "Awaiting Approval" && b.initiatedBy !== me.id && BP_RULES[b.type].approvers !== "auto" && (BP_RULES[b.type].approvers as string[]).includes(me.role)).length;
+  const toApprove = erp.bps.filter((b) => b.status === "Awaiting Approval" && access.seesBp(b) && b.initiatedBy !== me.id && BP_RULES[b.type].approvers !== "auto" && (BP_RULES[b.type].approvers as string[]).includes(me.role)).length;
   const run = erp.payRuns[periodId]?.status ?? "Not started";
 
   return (
@@ -83,11 +86,11 @@ export default function App() {
           {data && <span className="side-note">Check date {pretty(data.result.period.checkDate)}. Pay run: {run}.</span>}
         </label>
         <nav className="nav" aria-label="Main">
-          {NAV.map((g) => (
+          {NAV.map((g) => ({ ...g, items: g.items.filter(([href]) => access.canOpen(href)) })).filter((g) => g.items.length > 0).map((g) => (
             <div key={g.group} style={{ display: "contents" }}>
               <div className="nav-group">{g.group}</div>
               {g.items.map(([href, label]) => (
-                <a key={href} href={`#/${href}`} aria-current={page === href ? "page" : undefined}>
+                <a key={href} href={`#/${href}`} aria-current={page === href || (page === "" && href === "inbox" && !access.canOpen("")) ? "page" : undefined}>
                   {label}
                   {href === "inbox" && toApprove > 0 && <span className="badge">{toApprove}</span>}
                   {href === "reconciliation" && data && data.result.reconciled && <span className="count">{unexplained ? `${unexplained} open` : "tied"}</span>}
