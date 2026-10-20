@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useErp } from "../erp.tsx";
 import { setQuery } from "../router.tsx";
 import { PageHead, Pill, Section } from "../ui.tsx";
@@ -11,6 +11,12 @@ export default function Inbox({ query }: { query: URLSearchParams }) {
   const access = useAccess();
   const bps = erp.bps.filter(access.seesBp);
   const tab = query.get("tab") ?? "mine";
+  // Opened from a status link: highlight that item and bring it into view.
+  const focus = query.get("bp") ?? "";
+  const focusRow = useRef<HTMLTableRowElement>(null);
+  useEffect(() => {
+    focusRow.current?.scrollIntoView({ block: "center" });
+  }, [focus]);
   const [comment, setComment] = useState("");
   const [msg, setMsg] = useState<{ text: string; tone: "ok" | "bad" }>({ text: "", tone: "ok" });
   const awaiting = bps.filter((b) => b.status === "Awaiting Approval");
@@ -42,6 +48,19 @@ export default function Inbox({ query }: { query: URLSearchParams }) {
         ))}
       </div>
       <Toast text={msg.text} tone={msg.tone} />
+      {(() => {
+        const b = awaiting.find((x) => x.id === focus);
+        if (!b || !canApprove(b)) return null;
+        return (
+          <div className="sheet" style={{ marginBottom: 16 }}>
+            <h3>{b.id}: {b.type} for {b.subjectName}</h3>
+            <p className="small">{b.summary}</p>
+            {b.warnings?.map((x) => <div key={x} className="pos-var small">{x}</div>)}
+            <p className="small muted">Started by {who(b.initiatedBy)}</p>
+            <div className="row"><button className="btn" onClick={() => act(b, true)}>Approve</button><button className="btn ghost" onClick={() => act(b, false)}>Deny</button></div>
+          </div>
+        );
+      })()}
       {tab !== "log" && (
         <div className="filters">
           <label>Comment (optional)<input type="text" value={comment} onChange={(e) => setComment(e.target.value)} style={{ minWidth: 320 }} /></label>
@@ -57,7 +76,7 @@ export default function Inbox({ query }: { query: URLSearchParams }) {
               <thead><tr><th>ID</th><th>Process</th><th>Subject</th><th>Summary</th><th>Effective</th><th>Initiated by</th><th>Status</th><th /></tr></thead>
               <tbody>
                 {list.map((b) => (
-                  <tr key={b.id}>
+                  <tr key={b.id} ref={b.id === focus ? focusRow : undefined} className={b.id === focus ? "sel" : undefined}>
                     <td>{b.id}</td>
                     <td>{b.type}</td>
                     <td>{/^E\d{4}$/.test(b.subjectId) ? <a href={`#/workers/${b.subjectId}`}>{b.subjectId}</a> : b.subjectId} {b.subjectName}</td>

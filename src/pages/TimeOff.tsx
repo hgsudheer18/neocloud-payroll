@@ -3,7 +3,7 @@ import { useData } from "../state.tsx";
 import { useErp } from "../erp.tsx";
 import { setQuery } from "../router.tsx";
 import { PageHead, Section, Select } from "../ui.tsx";
-import { BpStatus, CanInitiate, Checks, Field, FormGrid, Toast, who } from "../erpui.tsx";
+import { ApproverJump, BpStatus, CanInitiate, Checks, Field, FormGrid, Toast, who } from "../erpui.tsx";
 import { validateTimeOff, validateTimeOffCorrection, type Check } from "../../lib/erp/validate.ts";
 import { US_PERIODS } from "../../lib/config/period.ts";
 import { plansForWorker } from "../../lib/engine/absence.ts";
@@ -30,6 +30,7 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
   const [newQty, setNewQty] = useState("");
   const [fixCheck, setFixCheck] = useState<Check | null>(null);
   const [fixMsg, setFixMsg] = useState("");
+  const [lastBp, setLastBp] = useState("");
   if (!w) return <div className="callout info">There are no workers you can request time off for.</div>;
 
   const p = plans.find((x) => x.code === plan) ?? plans[0];
@@ -55,6 +56,7 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
     if (c.errors.length) return;
     const bp = submit({ type: "Request Time Off", subjectId: w.id, subjectName: w.name, effectiveDate: days[0].date, summary: `${p.name}: ${days.length} day(s), ${pretty(days[0].date)}–${pretty(days[days.length - 1].date)}, ${days.reduce((s, d) => s + d.quantity, 0)} ${p.unit}`, payload: { plan: p.code, unit: p.unit, days }, warnings: c.warnings });
     setMsg(`${bp.id} submitted to the manager for approval.`);
+    setLastBp(bp.id);
   };
   const mine = erp.bps.filter((b) => (b.type === "Request Time Off" || b.type === "Correct Time Off") && b.subjectId === w.id).reverse();
 
@@ -66,6 +68,7 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
     const what = quantity === 0 ? `Cancel ${planName(edit.plan)} on ${pretty(edit.date)} (${edit.current} ${edit.unit})` : `Change ${planName(edit.plan)} on ${pretty(edit.date)}: ${edit.current} → ${quantity} ${edit.unit}`;
     const bp = submit({ type: "Correct Time Off", subjectId: w.id, subjectName: w.name, effectiveDate: edit.date, summary: what, payload: { plan: edit.plan, unit: edit.unit, date: edit.date, quantity, oldQuantity: edit.current }, warnings: inCompleted(edit.date) ? ["In a completed pay period: the difference is paid as retro in the next period."] : [] });
     setFixMsg(`${bp.id} submitted to the manager for approval. The approved time off stays as it is until then.`);
+    setLastBp(bp.id);
     setEdit(null);
     setNewQty("");
   };
@@ -107,6 +110,7 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
               {days.some((d) => inCompleted(d.date)) && <div className="callout info">Some days are in a completed pay period. Once approved, the difference is paid as retro in the next period.</div>}
               <Checks check={check} />
               <Toast text={msg} />
+              {msg && <ApproverJump bp={erp.bps.find((b) => b.id === lastBp)} />}
               <button className="btn" onClick={send}>Submit request</button>
             </div>
           </CanInitiate>
@@ -154,6 +158,7 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
               </div>
             )}
             <Toast text={fixMsg} />
+            {fixMsg && <ApproverJump bp={erp.bps.find((b) => b.id === lastBp)} />}
           </div>
         </div>
         {edit && (

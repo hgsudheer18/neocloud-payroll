@@ -17,8 +17,8 @@ import { useMemo } from "react";
 import { useData } from "./state.tsx";
 import { useErp } from "./erp.tsx";
 import type { Dataset } from "../lib/data/types.ts";
-import { OPEN_POSITIONS } from "../lib/config/org.ts";
-import type { BPType, BusinessProcess, Persona, Role } from "../lib/erp/types.ts";
+import { chainTo, OPEN_POSITIONS, orgNodes } from "../lib/config/org.ts";
+import { BP_RULES, PERSONAS, type BPType, type BusinessProcess, type Persona, type Role } from "../lib/erp/types.ts";
 
 const PAYROLL: Role[] = ["Payroll Specialist", "Payroll Approver"];
 
@@ -109,4 +109,23 @@ export function NoAccess({ what = "this page" }: { what?: string }) {
       You don't have access to {what} as {me.name} ({me.role}). Switch role at the top of the sidebar, or go to your <a href="#/inbox">inbox</a>.
     </div>
   );
+}
+
+/**
+ * The persona who should approve a waiting business process: someone whose role may approve it,
+ * who did not start it and is not its subject, and who can see it; the closest manager first.
+ */
+export function approverFor(bp: BusinessProcess, ds: Dataset): Persona | undefined {
+  const rule = BP_RULES[bp.type];
+  if (bp.status !== "Awaiting Approval" || rule.approvers === "auto") return undefined;
+  const approvers = rule.approvers;
+  const hire = bp.type === "Hire";
+  const subject = hire ? String(bp.payload.managerId ?? "") : bp.subjectId;
+  // Subject first, then their manager, then up to the CEO.
+  const chain = chainTo(orgNodes(ds.workers), subject).map((n) => n.id).reverse();
+  const rank = (p: Persona) => {
+    const i = p.workerId ? chain.indexOf(p.workerId) : -1;
+    return i >= (hire ? 0 : 1) ? i : 1000;
+  };
+  return PERSONAS.filter((p) => approvers.includes(p.role) && p.id !== bp.initiatedBy && p.workerId !== bp.subjectId && accessFor(p, ds).seesBp(bp)).sort((a, b) => rank(a) - rank(b))[0];
 }

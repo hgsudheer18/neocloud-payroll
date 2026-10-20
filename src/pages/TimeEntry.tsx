@@ -3,7 +3,7 @@ import { useData } from "../state.tsx";
 import { useErp } from "../erp.tsx";
 import { setQuery } from "../router.tsx";
 import { PageHead, Pill, Section, Select } from "../ui.tsx";
-import { CanInitiate, Checks, Field, FormGrid, RoleNote, Toast } from "../erpui.tsx";
+import { ApproverJump, BpStatus, CanInitiate, Checks, Field, FormGrid, RoleNote, Toast } from "../erpui.tsx";
 import { validateTimeEntry, type Check } from "../../lib/erp/validate.ts";
 import { buildShift } from "../../lib/engine/time.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
@@ -34,6 +34,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
   const [f, setF] = useState<Partial<TimeRow>>({ workDate: start, ...SCHEDULE.Day, notes: "" });
   const [check, setCheck] = useState<Check | null>(null);
   const [msg, setMsg] = useState("");
+  const [lastBp, setLastBp] = useState("");
 
   const approved = useMemo(() => ds.time.filter((t) => t.employeeId === workerId && t.workDate >= start && t.workDate <= end), [ds, workerId, start, end]);
   const corrected = new Set(approved.filter((r) => r.entryType === "Correction").map((r) => r.correctsRowId));
@@ -56,6 +57,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
       payload: { rows: [{ ...f, rowId, shift: w.shift || "Day" }] },
       warnings: c.warnings,
     });
+    setLastBp(bp.id);
     setMsg(`${bp.id} submitted for manager approval.${c.warnings.length ? " Warnings recorded on the business process." : ""}`);
     setF({ workDate: f.workDate, ...SCHEDULE[(w.shift as "Day" | "Night") || "Day"], notes: "" });
   };
@@ -77,6 +79,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
         <Select label="Dates" value={range} onChange={(v) => set("range", v)} options={RANGES.map(([k, l]) => [k, l])} all={null} />
       </div>
       <Toast text={msg} tone="info" />
+      {msg && <ApproverJump bp={erp.bps.find((b) => b.id === lastBp)} />}
 
       <div className="grid2">
         <Section title={`${w.name}: ${pretty(start)} to ${pretty(end)}`}>
@@ -94,7 +97,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
                     </td>
                     <td className="n">{(() => { const m = [...rows.filter((r) => !corrected.has(r.rowId)), ...pend].reduce((t, r) => t + buildShift(r as TimeRow).worked, 0); return m ? (m / 60).toFixed(2) : ""; })()}</td>
                     <td>
-                      {rows.length > 0 && <Pill tone="ok">approved</Pill>} {pend.length > 0 && <Pill tone="warn">awaiting approval</Pill>} {off.length > 0 && <Pill tone="info">{off[0].status === "Approved" ? "time off" : "time off requested"}</Pill>}
+                      {rows.length > 0 && <Pill tone="ok">approved</Pill>} {pend.length > 0 && (erp.bps.find((b) => b.id === pend[0].bp) ? <BpStatus bp={erp.bps.find((b) => b.id === pend[0].bp)!} /> : <Pill tone="warn">awaiting approval</Pill>)} {off.length > 0 && <Pill tone="info">{off[0].status === "Approved" ? "time off" : "time off requested"}</Pill>}
                     </td>
                     <td>
                       {rows.filter((r) => !corrected.has(r.rowId)).slice(0, 1).map((r) => (

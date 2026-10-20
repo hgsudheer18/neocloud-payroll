@@ -254,3 +254,8 @@ select, input[type="search"], input[type="text"] {
 .period-bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--s4); flex-wrap: wrap; margin: calc(-1 * var(--s3)) 0 var(--s4); }
 .period-bar label { display: flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--ink-soft); }
 .period-bar select { font-size: 14px; padding: 4px 8px; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--sheet); }
+
+/* Status that opens the approver's inbox (demo sign-in shortcut) */
+.pill-link { background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; text-align: left; }
+.pill-link:hover .pill { outline: 1px solid var(--ink); }
+.pill-link .small { color: var(--ink-soft); text-decoration: underline; text-underline-offset: 2px; }
