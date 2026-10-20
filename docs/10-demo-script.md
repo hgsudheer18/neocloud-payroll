@@ -13,13 +13,13 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 
 ## Part 2. Run the first payroll (3 min)
 
-5. **Signed in as Sam Ortiz, Payroll Specialist → Pay runs → Calculate pay.** The figures show 280 workers, all ties, and 1 critical audit item.
+5. **Signed in as Diego Okafor, Payroll Specialist → Pay runs → Calculate pay.** The figures show 280 workers, all ties, and 1 critical audit item.
 6. Try to approve: Sam can't. "Segregation of duties: the person who calculates can't approve."
-7. **Signed in as Priya Nair, Payroll Approver → Pay runs.** Enter the resolution for the critical item (*"E0148 final pay issued as on-demand payment on Oct 9"*), then **Approve pay run** and **Complete pay run**. The period is now locked.
+7. **Signed in as Aisha Nguyen, Payroll Approver → Pay runs.** Enter the resolution for the critical item (*"E0148 final pay issued as on-demand payment on Oct 9"*), then **Approve pay run** and **Complete pay run**. The period is now locked.
 
 ## Part 3. Hire to terminate (5 min)
 
-8. **Signed in as Jordan Reyes, HR Partner → Organization setup.** Show supervisory orgs and cost centers, locations, companies, job profiles, and **Pay groups and calendars**: salaried semi-monthly, hourly biweekly. Optionally create a job profile or location.
+8. **Signed in as Chloe Novak, HR Partner → Organization setup.** Show supervisory orgs and cost centers, locations, companies, job profiles, and **Pay groups and calendars**: salaried semi-monthly, hourly biweekly. Optionally create a job profile or location.
 9. **Workers → Hire a worker.** Name *Alex Morgan*, hire date today, job profile *Data Center Technician* (the form shows Non-Exempt, Hourly), org *Data Center Ops (E0005)*, location *San Jose*, rate **$15**: the form blocks it ("Below the 2026 California minimum wage"). Change to **$40** and submit. It goes to the inbox.
 10. **Signed in as Ethan Fischer, Manager → Inbox → Approve.** Alex is now a worker, in the US Biweekly pay group.
 11. **Signed in as Jordan (HR) → Workers → E0057 → Change pay:** effective **Oct 12** (inside the completed period), new salary **205,000**. Submit; **Ethan approves** it.

@@ -22,9 +22,9 @@ export interface Persona {
 export const PERSONAS: Persona[] = [
   { id: "emp", name: "Emma Kim", role: "Employee", title: "Data Center Technician, San Jose (E0021)", workerId: "E0021" },
   { id: "mgr", name: "Ethan Fischer", role: "Manager", title: "VP, On-Prem (E0005)", workerId: "E0005" },
-  { id: "hr", name: "Jordan Reyes", role: "HR Partner", title: "HR Partner" },
-  { id: "ps", name: "Sam Ortiz", role: "Payroll Specialist", title: "Payroll Specialist and Time Administrator" },
-  { id: "pa", name: "Priya Nair", role: "Payroll Approver", title: "Payroll Manager (approver)" },
+  { id: "hr", name: "Chloe Novak", role: "HR Partner", title: "HR Partner, People (E0261)", workerId: "E0261" },
+  { id: "ps", name: "Diego Okafor", role: "Payroll Specialist", title: "Payroll Specialist and Time Administrator (E0254)", workerId: "E0254" },
+  { id: "pa", name: "Aisha Nguyen", role: "Payroll Approver", title: "Payroll Manager, approver (E0257)", workerId: "E0257" },
 ];
 
 export type BPType =
