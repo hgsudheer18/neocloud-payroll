@@ -13,6 +13,7 @@ import { toCents } from "../../lib/util/money.ts";
 import type { Dataset, Worker } from "../../lib/data/types.ts";
 import { BP_RULES, type BPType } from "../../lib/erp/types.ts";
 import { NoAccess, useAccess } from "../access.tsx";
+import { OrgChain } from "./Organisation.tsx";
 
 const SUPPORTED_STATES = Object.keys(asOf(STATES, "2026-10-01"));
 
@@ -252,6 +253,7 @@ function Profile({ id, action }: { id: string; action: string }) {
             <dt>Manager</dt><dd>{manager}</dd>
           </dl>
         </div>
+        <Section title="Organisation hierarchy"><OrgChain id={w.id} /></Section>
         <p className="small muted">Only {w.name}'s managers and payroll can see their compensation, time and time off.</p>
       </>
     );
@@ -306,6 +308,8 @@ function Profile({ id, action }: { id: string; action: string }) {
       </div>
 
       {action && <ActionForm w={w} action={action} />}
+
+      <Section title="Organisation hierarchy" lede="From the CEO down to this worker, with their direct reports."><OrgChain id={w.id} withReports /></Section>
 
       <div className="grid2">
         <Section title="Effective-dated history" lede="Nothing is overwritten: each change has an effective date and the date it was entered.">

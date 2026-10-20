@@ -1,6 +1,7 @@
 // CSV files → Dataset, with validation. Pure (no fs) so it runs on the server
 // for the bundled files and in the browser for uploaded files.
 
+import { applyOrgStructure } from "../config/org.ts";
 import { parseCsv, type Row } from "../util/csv.ts";
 import type { Dataset } from "./types.ts";
 
@@ -143,5 +144,7 @@ export function loadDataset(texts: Partial<Record<string, string>>): { ds: Datas
   }
   for (const r of ds.time) if (!ids.has(r.employeeId)) issues.push({ file: FILES.time, severity: "Error", message: `${r.rowId}: unknown employee ${r.employeeId}` });
   for (const r of ds.events) if (!ids.has(r.employeeId)) issues.push({ file: FILES.events, severity: "Error", message: `Event for unknown employee ${r.employeeId}` });
+  // Reporting lines follow the organisation structure (CIO, International and open positions).
+  ds.workers = applyOrgStructure(ds.workers);
   return { ds, issues };
 }

@@ -68,6 +68,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 |---|---|---|
 | Inbox | ERP | Business processes awaiting your approval; full business-process log |
 | Workers | ERP | Directory, hire, worker profile with effective-dated history; change pay, cost center or location, leave, return, terminate |
+| Organisation | ERP | Your organisation hierarchy and the company's organisations (CEO; Finance with People Technology; CIO Organisation with Engineering and GPU Cloud in the USA; International; On-Prem), with tabs for compensation, pay group and job profile. Open positions (CIO, Head of International, Head of People Technology) are shown as such. Structure in `lib/config/org.ts` |
 | Enter time | 3, ERP | Hourly workers' own timesheet with validations; payroll auto-fills from work schedules on Pay runs |
 | Absence | 4, ERP | Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |

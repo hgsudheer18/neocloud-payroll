@@ -17,6 +17,7 @@ import { useMemo } from "react";
 import { useData } from "./state.tsx";
 import { useErp } from "./erp.tsx";
 import type { Dataset } from "../lib/data/types.ts";
+import { OPEN_POSITIONS } from "../lib/config/org.ts";
 import type { BPType, BusinessProcess, Persona, Role } from "../lib/erp/types.ts";
 
 const PAYROLL: Role[] = ["Payroll Specialist", "Payroll Approver"];
@@ -25,6 +26,7 @@ const PAYROLL: Role[] = ["Payroll Specialist", "Payroll Approver"];
 const PAGES: Record<string, Role[]> = {
   inbox: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   workers: ["Employee", "Manager", "HR Partner", ...PAYROLL],
+  organisation: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "time-off": ["Employee", "Manager", "HR Partner", ...PAYROLL],
   payslip: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "team-time-off": ["Manager"],
@@ -39,13 +41,14 @@ export const canOpenPage = (role: Role, page: string) => (PAGES[page] ?? PAYROLL
 /** Business processes that carry a worker's compensation, time or time off. */
 const DETAIL_BPS: BPType[] = ["Change Compensation", "Enter Time", "Request Time Off", "Correct Time Off"];
 
-/** Worker ids in a manager's reporting line, direct and indirect, including the manager. */
+/** Worker ids in a manager's reporting line, direct and indirect, including the manager (and any open positions in it). */
 export function reportingLine(ds: Dataset, managerId: string): Set<string> {
   const ids = new Set([managerId]);
+  const nodes = [...ds.workers, ...OPEN_POSITIONS];
   let added = true;
   while (added) {
     added = false;
-    for (const w of ds.workers) {
+    for (const w of nodes) {
       if (w.managerId && ids.has(w.managerId) && !ids.has(w.id)) {
         ids.add(w.id);
         added = true;

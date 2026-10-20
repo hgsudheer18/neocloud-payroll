@@ -22,10 +22,11 @@ import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
 import TeamTimeOff, { UpcomingTimeOff } from "./pages/TeamTimeOff.tsx";
+import Organisation from "./pages/Organisation.tsx";
 import { NoAccess, useAccess } from "./access.tsx";
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Absence"], ["team-time-off", "Team Time Off"], ["upcoming-time-off", "Upcoming Time Off"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
+  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-entry", "Enter time"], ["time-off", "Absence"], ["team-time-off", "Team Time Off"], ["upcoming-time-off", "Upcoming Time Off"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
   { group: "Payroll", items: [["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
@@ -48,6 +49,7 @@ export default function App() {
       case "time-entry": return <TimeEntry query={query} />;
       case "time-off": return <TimeOff query={query} />;
       case "payslip": return <MyPayslip />;
+      case "organisation": return <Organisation query={query} />;
       case "team-time-off": return <TeamTimeOff query={query} />;
       case "upcoming-time-off": return <UpcomingTimeOff />;
       case "setup": return <Setup query={query} />;

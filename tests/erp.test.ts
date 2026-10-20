@@ -186,3 +186,18 @@ test("A recovery larger than the pay run is a critical error until net pay is he
   const next = computePeriod(base, fixed, "2026-BW-02").result.us.find((c) => c.worker.id === "E0024")!;
   assert.equal(next.pay.lines.find((l) => l.explain.startsWith("Overpayment recovery carried"))!.amount, -deferred);
 });
+
+test("Organisation structure: CIO and International under the CEO, People Technology under the CFO", async () => {
+  const { orgNodes, orgPath, chainTo, directReports } = await import("../lib/config/org.ts");
+  const nodes = orgNodes(base.workers);
+  assert.deepEqual(directReports(nodes, "E0000").map((n) => n.id).sort(), ["E0005", "E0010", "P-CIO", "P-INTL"]);
+  assert.deepEqual(directReports(nodes, "P-CIO").map((n) => n.id).sort(), ["E0002", "E0007"]);
+  assert.ok(directReports(nodes, "E0010").some((n) => n.id === "P-PTECH"));
+  assert.deepEqual(orgPath(nodes, "E0012"), ["NeoCloud", "CIO Organisation", "Engineering, USA"]);
+  assert.deepEqual(orgPath(nodes, "E0008"), ["NeoCloud", "International"]); // Canada
+  assert.deepEqual(chainTo(nodes, "E0021").map((n) => n.id), ["E0000", "E0005", "E0021"]); // On-Prem unchanged
+  // Every US Engineering and GPU Cloud employee is in the CIO organisation; nobody outside the US is.
+  for (const w of base.workers.filter((x) => ["Engineering", "GPU Cloud"].includes(x.department) && x.workerType === "Employee" && !x.terminationDate)) {
+    assert.equal(orgPath(nodes, w.id).includes("CIO Organisation"), w.country === "USA", w.id);
+  }
+});
