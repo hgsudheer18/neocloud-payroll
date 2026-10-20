@@ -45,7 +45,7 @@ The sidebar has two selectors: **Signed in as** (switch between Employee, Manage
 
 1. **Payroll Specialist → Pay runs → Calculate** Oct 1–15; **Payroll Approver → Approve → Complete** (a different person must approve).
 2. **HR Partner → Workers → Hire a worker**; **Manager → Inbox → Approve**.
-3. **Employee → Enter time / Time off**; **Manager → Inbox → Approve**. Or **Payroll Specialist → Enter time → Auto-fill scheduled shifts**.
+3. **Employee → Enter time / Time off**; **Manager → Inbox → Approve**. Or **Payroll Specialist → Pay runs → Auto-fill scheduled shifts**.
 4. Select **Oct 16–31** in the sidebar and run the next pay periods. Changes made to Oct 1–15 after it was completed show up as retro.
 
 Everything you enter is saved in your browser only, so every visitor gets a private sandbox. **Data and demo** has *Download my demo data*, *Load demo data* and *Reset demo data*.
@@ -68,7 +68,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 |---|---|---|
 | Inbox | ERP | Business processes awaiting your approval; full business-process log |
 | Workers | ERP | Directory, hire, worker profile with effective-dated history; change pay, cost center or location, leave, return, terminate |
-| Enter time | 3, ERP | Timesheet by worker with validations; auto-fill from work schedule |
+| Enter time | 3, ERP | Hourly workers' own timesheet with validations; payroll auto-fills from work schedules on Pay runs |
 | Time off | 4, ERP | Requests with balance and eligibility checks |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |

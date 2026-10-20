@@ -8,6 +8,7 @@ import { PERIOD_LABEL, PRIOR_PERIOD, US_PERIODS } from "../../lib/config/period.
 import { approvedCount } from "../../lib/erp/periods.ts";
 import { pretty } from "../../lib/util/dates.ts";
 import { fmt } from "../../lib/util/money.ts";
+import { AutofillShifts } from "./TimeEntry.tsx";
 
 const STEPS = ["Calculated", "Approved", "Completed"] as const;
 
@@ -84,6 +85,8 @@ export default function PayRuns() {
           </tbody>
         </table>
       </div>
+
+      {me.role === "Payroll Specialist" && <AutofillShifts />}
 
       <Section title={PERIOD_LABEL[period.id]} lede={`${pretty(period.start)} to ${pretty(period.end)}, paid ${pretty(period.checkDate)}. ${r.reconciled ? "Parallel-run period: also reconciled to the Rippling register." : "Post go-live period: Workday is the only system."}`}>
         <div className="steps">

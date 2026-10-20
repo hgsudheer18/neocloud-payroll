@@ -47,6 +47,19 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
   };
   const mine = erp.bps.filter((b) => b.type === "Request Time Off" && b.subjectId === w.id).reverse();
 
+  // This year's absence: balance by plan, and every day of time off on record.
+  const year = data!.result.period.start.slice(0, 4);
+  const calc = [...data!.result.us, ...data!.result.intl].find((c) => c.worker.id === w.id);
+  const yearRows = ds.absences.filter((a) => a.employeeId === w.id && a.date.startsWith(year)).sort((a, b) => (a.date < b.date ? -1 : 1));
+  const byPlan = plans.map((pl) => {
+    const l = calc?.absence.find((a) => a.plan.code === pl.code);
+    const rows = yearRows.filter((a) => a.plan === pl.code);
+    const sum = (status: string) => rows.filter((a) => a.status === status).reduce((s, a) => s + a.quantity, 0);
+    const open = ds.balances.find((b) => b.employeeId === w.id && b.plan === pl.code)?.balance ?? null;
+    return { pl, taken: sum("Approved"), pending: sum("Submitted"), balance: l ? (l.tracked ? l.ending : null) : open };
+  });
+  const planName = (code: string) => plans.find((x) => x.code === code)?.name ?? code;
+
   return (
     <>
       <PageHead title="Request time off">Requests go to the manager. Approved hourly time off is paid from the balance and is not hours worked, so it never creates overtime. Exempt Flexible PTO has no balance and no pay impact.</PageHead>
@@ -84,6 +97,28 @@ export default function TimeOff({ query }: { query: URLSearchParams }) {
           )}
         </Section>
       </div>
+      <Section title={`Absence in ${year}`} lede={`Balances after the selected pay period, and the time off on record for ${year}. Time off before go-live is not in the data package.`}>
+        <div className="grid2">
+          <div className="table-wrap">
+            <table className="reg">
+              <thead><tr><th>Plan</th><th className="n">Taken</th><th className="n">Pending</th><th className="n">Balance</th></tr></thead>
+              <tbody>
+                {byPlan.map(({ pl, taken, pending, balance }) => (
+                  <tr key={pl.code}><td>{pl.name}</td><td className="n">{taken.toFixed(2)}</td><td className="n">{pending ? pending.toFixed(2) : <span className="zero">0</span>}</td><td className="n">{balance === null ? "Not tracked" : `${balance.toFixed(2)} ${pl.unit}`}</td></tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {yearRows.length === 0 ? <p className="muted">No time off on record for {year}.</p> : (
+            <div className="table-wrap" style={{ maxHeight: 320 }}>
+              <table className="reg">
+                <thead><tr><th>Date</th><th>Plan</th><th className="n">Amount</th><th>Status</th></tr></thead>
+                <tbody>{yearRows.map((a, i) => <tr key={i}><td>{pretty(a.date)}</td><td>{planName(a.plan)}</td><td className="n">{a.quantity} {a.unit}</td><td>{a.status === "Approved" ? "Approved" : "Awaiting approval"}</td></tr>)}</tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </Section>
     </>
   );
 }

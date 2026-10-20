@@ -29,7 +29,7 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 
 13. **Signed in as Emma Kim, Employee → Enter time.** Add a time block for a day in Oct 16–31 with the meal at **11:30**: the app warns that a CA meal premium will be paid. Try to enter the same block again: it's blocked as a duplicate.
 14. **Time off:** request a day of US Hourly Vacation. The available balance is shown and checked.
-15. **Signed in as Sam (Payroll Specialist) → Enter time → Dates: Oct 16–31 → Auto-fill scheduled shifts for all technicians.**
+15. **Signed in as Diego (Payroll Specialist) → Pay runs → Time administration → Dates: Oct 16–31 → Auto-fill scheduled shifts for all technicians.**
 16. **Signed in as Ethan (Manager) → Inbox → Approve all.**
 
 ## Part 5. Run the next cycle (3 min)

@@ -6,6 +6,7 @@
 //                  see only name, job and org details.
 //   Worker details Compensation, time and time off: the worker, their
 //                  managers (direct and indirect) and payroll only.
+//   Time entry     Hourly workers only (their own time).
 //   Pay results    Payslips, gross to net, pay amounts and payouts: payroll only,
 //                  except that every role sees its own payslip (My payslip).
 //
@@ -24,8 +25,7 @@ const PAYROLL: Role[] = ["Payroll Specialist", "Payroll Approver"];
 const PAGES: Record<string, Role[]> = {
   inbox: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   workers: ["Employee", "Manager", "HR Partner", ...PAYROLL],
-  "time-entry": ["Employee", "Manager", ...PAYROLL],
-  "time-off": ["Employee", "Manager", ...PAYROLL],
+  "time-off": ["Employee", "Manager", "HR Partner", ...PAYROLL],
   payslip: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   setup: ["HR Partner", ...PAYROLL],
   time: ["Manager", ...PAYROLL],
@@ -72,10 +72,12 @@ export function accessFor(me: Persona, ds: Dataset): Access {
   const line = me.role === "Manager" && me.workerId ? reportingLine(ds, me.workerId) : new Set(me.workerId ? [me.workerId] : []);
   const seesWorker = (id: string) => all || line.has(id);
   const seesDetails = (id: string) => payroll || line.has(id);
+  // Time entry is for hourly workers only, whatever their role.
+  const hourly = ds.workers.find((w) => w.id === me.workerId)?.payType === "Hourly";
   return {
     all,
     payResults: payroll,
-    canOpen: (page) => canOpenPage(me.role, page),
+    canOpen: (page) => (page === "time-entry" ? hourly : canOpenPage(me.role, page)),
     seesWorker,
     seesDetails,
     seesBp: (bp) => {

@@ -105,7 +105,7 @@ export const BP_RULES: Record<BPType, { initiators: Role[]; approvers: Role[] | 
   "Return from Leave": { initiators: ["HR Partner", "Manager"], approvers: ["HR Partner", "Manager"], label: "Leave" },
   Terminate: { initiators: ["HR Partner", "Manager"], approvers: ["HR Partner", "Manager"], label: "Staffing" },
   "Enter Time": { initiators: ["Employee", "Payroll Specialist", "Manager"], approvers: ["Manager"], label: "Time" },
-  "Request Time Off": { initiators: ["Employee", "Manager", "HR Partner"], approvers: ["Manager"], label: "Absence" },
+  "Request Time Off": { initiators: ["Employee", "Manager", "HR Partner", "Payroll Specialist", "Payroll Approver"], approvers: ["Manager"], label: "Absence" },
   "Create Company": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Location": { initiators: ["HR Partner"], approvers: "auto", label: "Setup" },
   "Create Cost Center": { initiators: ["HR Partner", "Payroll Specialist"], approvers: "auto", label: "Setup" },

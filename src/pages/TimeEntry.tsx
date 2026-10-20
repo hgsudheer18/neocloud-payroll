@@ -8,7 +8,6 @@ import { validateTimeEntry, type Check } from "../../lib/erp/validate.ts";
 import { buildShift } from "../../lib/engine/time.ts";
 import { eachDay, isWeekday, pretty } from "../../lib/util/dates.ts";
 import type { TimeRow } from "../../lib/data/types.ts";
-import { useAccess } from "../access.tsx";
 
 const RANGES: [string, string, string][] = [
   ["2026-10-01|2026-10-15", "Oct 1–15 (parallel run)", "2026-10-01"],
@@ -24,15 +23,13 @@ const SCHEDULE = {
 export default function TimeEntry({ query }: { query: URLSearchParams }) {
   const { data } = useData();
   const { erp, me, submit, nextSeq } = useErp();
-  const access = useAccess();
   const ds = data!.dsNow;
-  const hourly = ds.workers.filter((w) => w.workerType === "Employee" && w.payType === "Hourly" && w.country === "USA" && access.seesDetails(w.id));
-  const asked = query.get("worker") ?? "";
-  const workerId = me.role === "Employee" ? me.workerId! : hourly.some((h) => h.id === asked) ? asked : hourly[0]?.id ?? "";
+  // Hourly workers enter their own time; payroll auto-fills schedules from Pay runs.
+  const workerId = me.workerId ?? "";
   const range = query.get("range") ?? RANGES[1][0];
   const [start, end] = range.split("|");
   const w = ds.workers.find((x) => x.id === workerId);
-  const set = (k: string, v: string) => setQuery("/time-entry", { worker: workerId, range, [k]: v });
+  const set = (k: string, v: string) => setQuery("/time-entry", { range, [k]: v });
 
   const [f, setF] = useState<Partial<TimeRow>>({ workDate: start, ...SCHEDULE.Day, notes: "" });
   const [check, setCheck] = useState<Check | null>(null);
@@ -44,7 +41,7 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
   const pendingRows = pending.flatMap((b) => (b.payload.rows as TimeRow[]).map((r) => ({ ...r, bp: b.id })));
   const timeOff = ds.absences.filter((a) => a.employeeId === workerId && a.date >= start && a.date <= end);
 
-  if (!w) return <div className="callout info">{workerId ? `Worker ${workerId} not found.` : "There are no hourly workers you can enter time for."}</div>;
+  if (!w) return <div className="callout info">Time entry is for hourly workers.</div>;
 
   const validate = (row: Partial<TimeRow>) => validateTimeEntry(ds, erp.bps, w, row);
   const send = () => {
@@ -63,24 +60,6 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
     setF({ workDate: f.workDate, ...SCHEDULE[(w.shift as "Day" | "Night") || "Day"], notes: "" });
   };
 
-  const autofill = () => {
-    let count = 0;
-    for (const t of hourly) {
-      if (t.hireDate > end || (t.terminationDate && t.terminationDate < start)) continue;
-      const days = eachDay(start, end).filter((d) => isWeekday(d) && d >= t.hireDate && (!t.terminationDate || d <= t.terminationDate));
-      const have = new Set([
-        ...ds.time.filter((r) => r.employeeId === t.id).map((r) => r.workDate),
-        ...erp.bps.filter((b) => b.type === "Enter Time" && b.subjectId === t.id && b.status === "Awaiting Approval").flatMap((b) => (b.payload.rows as TimeRow[]).map((r) => r.workDate!)),
-        ...ds.absences.filter((a) => a.employeeId === t.id).map((a) => a.date),
-      ]);
-      const rows = days.filter((d) => !have.has(d)).map((d) => ({ rowId: `W${String(nextSeq()).padStart(5, "0")}`, workDate: d, ...SCHEDULE[(t.shift as "Day" | "Night") || "Day"], shift: t.shift || "Day", notes: "Auto-filled from work schedule" }));
-      if (!rows.length) continue;
-      submit({ type: "Enter Time", subjectId: t.id, subjectName: t.name, effectiveDate: rows[0].workDate, summary: `Auto-fill ${rows.length} scheduled shifts, ${pretty(start)}–${pretty(end)} (${t.shift || "Day"} schedule)`, payload: { rows } });
-      count++;
-    }
-    setMsg(count ? `Submitted scheduled time for ${count} technicians, ${pretty(start)}–${pretty(end)}. A manager approves it in the inbox ("Approve all I can approve").` : "Every technician already has time for these days.");
-  };
-
   const dayRows = eachDay(start, end).map((d) => ({
     d,
     rows: approved.filter((r) => r.workDate === d),
@@ -94,12 +73,8 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
         Clock in and out for hourly, non-exempt workers. Entries are validated as you submit them (overlaps and duplicates are blocked; meal problems are warned) and go to the manager for approval. Payroll pays approved time only.
       </PageHead>
       <div className="filters">
-        {me.role === "Employee" ? <div><strong>{w.id} {w.name}</strong><div className="small muted">Your timesheet</div></div> : (
-          <Select label="Worker" value={workerId} onChange={(v) => set("worker", v)} options={hourly.map((h) => [h.id, `${h.id} ${h.name} (${h.workState}, ${h.shift || "Day"})`])} all={null} />
-        )}
+        <div><strong>{w.id} {w.name}</strong><div className="small muted">Your timesheet</div></div>
         <Select label="Dates" value={range} onChange={(v) => set("range", v)} options={RANGES.map(([k, l]) => [k, l])} all={null} />
-        <span className="spacer" />
-        {(me.role === "Payroll Specialist" || me.role === "Manager") && <button className="btn ghost" onClick={autofill}>Auto-fill scheduled shifts for all technicians</button>}
       </div>
       <Toast text={msg} tone="info" />
 
@@ -158,5 +133,45 @@ export default function TimeEntry({ query }: { query: URLSearchParams }) {
         </Section>
       </div>
     </>
+  );
+}
+
+/** Payroll's time administration: submit scheduled shifts for every US technician with no time on file. */
+export function AutofillShifts() {
+  const { data } = useData();
+  const { erp, submit, nextSeq } = useErp();
+  const ds = data!.dsNow;
+  const [range, setRange] = useState(RANGES[1][0]);
+  const [msg, setMsg] = useState("");
+  const [start, end] = range.split("|");
+  const hourly = ds.workers.filter((w) => w.workerType === "Employee" && w.payType === "Hourly" && w.country === "USA");
+
+  const autofill = () => {
+    let count = 0;
+    for (const t of hourly) {
+      if (t.hireDate > end || (t.terminationDate && t.terminationDate < start)) continue;
+      const days = eachDay(start, end).filter((d) => isWeekday(d) && d >= t.hireDate && (!t.terminationDate || d <= t.terminationDate));
+      const have = new Set([
+        ...ds.time.filter((r) => r.employeeId === t.id).map((r) => r.workDate),
+        ...erp.bps.filter((b) => b.type === "Enter Time" && b.subjectId === t.id && b.status === "Awaiting Approval").flatMap((b) => (b.payload.rows as TimeRow[]).map((r) => r.workDate!)),
+        ...ds.absences.filter((a) => a.employeeId === t.id).map((a) => a.date),
+      ]);
+      const rows = days.filter((d) => !have.has(d)).map((d) => ({ rowId: `W${String(nextSeq()).padStart(5, "0")}`, workDate: d, ...SCHEDULE[(t.shift as "Day" | "Night") || "Day"], shift: t.shift || "Day", notes: "Auto-filled from work schedule" }));
+      if (!rows.length) continue;
+      submit({ type: "Enter Time", subjectId: t.id, subjectName: t.name, effectiveDate: rows[0].workDate, summary: `Auto-fill ${rows.length} scheduled shifts, ${pretty(start)}–${pretty(end)} (${t.shift || "Day"} schedule)`, payload: { rows } });
+      count++;
+    }
+    setMsg(count ? `Submitted scheduled time for ${count} technicians, ${pretty(start)}–${pretty(end)}. A manager approves it in the inbox ("Approve all I can approve").` : "Every technician already has time for these days.");
+  };
+
+  return (
+    <Section title="Time administration" lede="Submit scheduled shifts for every hourly technician who has no time on file for these dates. Each goes to the technician's manager for approval.">
+      <div className="filters">
+        <Select label="Dates" value={range} onChange={setRange} options={RANGES.map(([k, l]) => [k, l])} all={null} />
+        <span className="spacer" />
+        <button className="btn ghost" onClick={autofill}>Auto-fill scheduled shifts for all technicians</button>
+      </div>
+      <Toast text={msg} tone="info" />
+    </Section>
   );
 }
