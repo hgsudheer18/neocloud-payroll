@@ -110,6 +110,17 @@ International monthly payrolls are calendar months and are posted with a month-e
 - **Re-run and reversal:** a wrong journal is never edited. It is reversed in NetSuite (reversal dated in the same period) and the corrected journal is posted with a new external ID suffix (`-R1`). The recipe exposes "reverse and repost" as a controlled action that requires Accounting approval.
 - **Access:** only the integration user can create payroll journals in NetSuite; people cannot key payroll journals manually.
 
+### For now: a manual post run by payroll
+
+Until the Workato recipe is live, posting is a manual step owned by payroll, and the app enforces the same gates:
+
+1. **Only after the pay run is completed.** On General ledger, **Post journals to NetSuite** is enabled only when the pay run is Completed (calculated, approved by a different person, then completed). Before that, only a preview file can be downloaded.
+2. **Pre-post validation.** Every journal must balance per subsidiary and every account, department, class, location and subsidiary must map; otherwise the button stays disabled and the failing lines are listed.
+3. **Post.** A Payroll Specialist or Payroll Approver posts. The app produces the NetSuite CSV import (one journal per subsidiary, external IDs such as `PR-2026-10-SM1-NC-US`, accounting date = period end) and records who posted and when. In NetSuite: Transactions › Journal Entries › Import (CSV Import Assistant, saved mapping).
+4. **No double posting.** A posted pay run shows as posted and cannot be posted again; NetSuite would also reject the duplicate external IDs.
+5. **Corrections.** A posted pay run cannot be reopened until the journals are reversed in NetSuite and the reversal is recorded (Payroll Approver). Later changes to the period are paid as retro in the next pay run and post with that run.
+6. **Reminder.** Payroll's notifications list completed pay runs that are not yet posted.
+
 ## 4. Multi-entity and multi-currency
 
 - **Local currency:** UK, Canada and India provider results post to their own subsidiaries in GBP, CAD and INR, from provider actuals (not Workday's expected figures). Lines whose currency differs from the subsidiary base currency are rejected by validation.

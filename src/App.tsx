@@ -21,6 +21,7 @@ import Benefits from "./pages/Benefits.tsx";
 import Home from "./pages/Home.tsx";
 import MyInformation from "./pages/MyInformation.tsx";
 import Documents from "./pages/Documents.tsx";
+import DataErrors from "./pages/DataErrors.tsx";
 import { Bell } from "./notifications.tsx";
 import { DemoClock, ScheduledAlerts } from "./alerts.tsx";
 import Inbox from "./pages/Inbox.tsx";
@@ -35,7 +36,7 @@ const PERIOD_PAGES = ["payslip", "benefits", "payruns", "overview", "", "registe
 const NAV: { group: string; items: [string, string][] }[] = [
   { group: "Workforce", items: [["", "Home"], ["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["my-information", "My Information"], ["time-off", "Absence"], ["benefits", "Benefits"], ["documents", "Documents"], ["setup", "Organization setup"]] },
   { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["team-time", "Team Timesheets"], ["payruns", "Pay runs"], ["overview", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"]] },
-  { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
+  { group: "Tie it out", items: [["data-errors", "Data errors (Oct 1–15)"], ["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
 
@@ -83,6 +84,7 @@ export default function App() {
       case "overview": return <Dashboard query={query} />;
       case "my-information": return <MyInformation />;
       case "documents": return <Documents query={query} />;
+      case "data-errors": return <DataErrors />;
       default: return <Home />;
     }
   };

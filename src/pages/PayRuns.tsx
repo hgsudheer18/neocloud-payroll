@@ -53,13 +53,14 @@ export default function PayRuns() {
     if (stale) return setMsg({ text: "Inputs changed after the calculation. Recalculate and re-approve.", tone: "bad" });
     if (negatives.length) return setMsg({ text: "Negative net pay must be fixed before the pay run can be completed.", tone: "bad" });
     updatePayRun(period.id, { status: "Completed", completedBy: me.id, completedAt: now() });
-    setMsg({ text: "Completed. The period is locked: later changes to it are paid as retro in the next period.", tone: "ok" });
+    setMsg({ text: "Completed. The period is locked: later changes to it are paid as retro in the next period. Next: post the journals to NetSuite from the General ledger page.", tone: "ok" });
   };
   const holdAtZero = () => {
     updatePayRun(period.id, { deferRecovery: true, status: "Not started", calculatedAt: undefined, calculatedBy: undefined, approvedAt: undefined, approvedBy: undefined, acknowledged: undefined, completedAt: undefined, completedBy: undefined });
     setMsg({ text: "Net pay will be held at zero and the rest of each recovery taken from the next pay run. Recalculate the pay run.", tone: "info" });
   };
   const reopen = () => {
+    if (run.posted) return setMsg({ text: "Posted to NetSuite: reverse the journals in NetSuite and record the reversal on the General ledger page before reopening.", tone: "bad" });
     if (dependents.length) return setMsg({ text: `Reopen ${dependents.map((d) => PERIOD_LABEL[d.id]).join(", ")} first; it builds on this period.`, tone: "bad" });
     updatePayRun(period.id, { status: "Not started", calculatedAt: undefined, calculatedBy: undefined, approvedAt: undefined, approvedBy: undefined, completedAt: undefined, completedBy: undefined });
     setMsg({ text: "Reopened.", tone: "info" });
@@ -154,7 +155,7 @@ export default function PayRuns() {
           {run.status === "Approved" && !stale && (has(PAYRUN_RULES.complete) ? <button className="btn" onClick={complete}>Complete pay run</button> : <RoleNote roles={PAYRUN_RULES.complete} action="complete the pay run" />)}
           {run.status === "Completed" && (
             <div className="row">
-              <span>Completed and locked. {run.acknowledged && <span className="small muted">Approval note: {run.acknowledged}</span>}</span>
+              <span>Completed and locked. {run.posted ? <>Posted to NetSuite by {who(run.posted.by)}.</> : <><strong>Next: <a href="#/gl">post the journals to NetSuite</a></strong> (run manually by payroll).</>} {run.acknowledged && <span className="small muted">Approval note: {run.acknowledged}</span>}</span>
               {has(PAYRUN_RULES.reopen) && <button className="btn ghost" onClick={reopen}>Reopen (demo)</button>}
             </div>
           )}

@@ -1,4 +1,9 @@
+import { useState } from "react";
 import { useData } from "../state.tsx";
+import { useErp } from "../erp.tsx";
+import { useAccess } from "../access.tsx";
+import { Toast, who } from "../erpui.tsx";
+import { PERIOD_LABEL } from "../../lib/config/period.ts";
 import { setQuery } from "../router.tsx";
 import { Money, PageHead, Pill, Section, Select, downloadText } from "../ui.tsx";
 import { netsuiteCsv } from "../../lib/engine/gl.ts";
@@ -16,6 +21,23 @@ export default function Ledger({ query }: { query: URLSearchParams }) {
   const acctName = (a: string) => ds.glMapping.find((g) => g.workdayAccount === a)?.workdayAccountName ?? "Unmapped";
   // Accounting date = end of the period worked, so expense lands in the right month.
   const dateFor = (journalId: string) => (journalId.includes(r.period.id) ? r.period.end : r.intlPeriod.end);
+  const { erp, me, updatePayRun } = useErp();
+  const access = useAccess();
+  const run = erp.payRuns[r.period.id];
+  const completed = run?.status === "Completed";
+  const [msg, setMsg] = useState("");
+  // Manual post: payroll runs it once the pay run is completed; the external IDs stop a second post.
+  const post = () => {
+    if (!window.confirm(`Post ${r.journal.totals.length} journal(s) for ${PERIOD_LABEL[r.period.id]} to NetSuite?`)) return;
+    exportCsv();
+    updatePayRun(r.period.id, { posted: { by: me.id, at: new Date().toISOString(), journals: r.journal.totals.map((t) => t.journalId) } });
+    setMsg(`Posted ${r.journal.totals.length} journal(s). The import file has been downloaded for NetSuite (Transactions › Journal Entries › Import).`);
+  };
+  const reverse = () => {
+    if (!window.confirm("Record that the posted journals were reversed in NetSuite? The pay run can then be reopened and posted again.")) return;
+    updatePayRun(r.period.id, { posted: undefined });
+    setMsg("Reversal recorded. Post again after the pay run is completed.");
+  };
 
   const exportCsv = () => downloadText(`netsuite-journal-${r.period.id}.csv`, netsuiteCsv(r.journal.mapped, dateFor));
   const exportJson = () =>
@@ -83,11 +105,21 @@ export default function Ledger({ query }: { query: URLSearchParams }) {
                 </table>
               </div>
             )}
+            <Toast text={msg} tone="info" />
+            {run?.posted ? (
+              <div className="callout ok">Posted to NetSuite by {who(run.posted.by)} on {new Date(run.posted.at).toLocaleString()}: {run.posted.journals.join(", ")}. Posting again would be rejected: each journal's external ID is already in NetSuite.</div>
+            ) : completed ? (
+              <div className="callout info">The pay run is completed. Post the journals to NetSuite: this is run manually by payroll.</div>
+            ) : (
+              <div className="callout">Posting opens when the pay run is completed (pay run: {(run?.status ?? "Not started").toLowerCase()}). You can download a preview of the import file now.</div>
+            )}
             <div className="row">
-              <button className="btn" disabled={errors.length > 0} onClick={exportCsv}>Download NetSuite CSV import</button>
+              {access.payResults && !run?.posted && <button className="btn" disabled={errors.length > 0 || !completed} onClick={post}>Post journals to NetSuite</button>}
+              <button className="btn ghost" disabled={errors.length > 0} onClick={exportCsv}>{run?.posted ? "Download the posted file again" : "Download CSV (preview)"}</button>
               <button className="btn ghost" disabled={errors.length > 0} onClick={exportJson}>Download JSON (REST record format)</button>
-              <span className="small muted">External IDs make re-imports idempotent: NetSuite rejects a second journal with the same ID.</span>
+              {run?.posted && me.role === "Payroll Approver" && <button className="btn ghost" onClick={reverse}>Record reversal in NetSuite</button>}
             </div>
+            <p className="small muted">External IDs make the import idempotent: NetSuite rejects a second journal with the same ID. Accounting date is the period end, so expense lands in the month worked.</p>
           </Section>
 
           <Section title={`Lines: ${jid}`} right={<Select label="" value={jid} onChange={(v) => set("j", v)} options={r.journal.totals.map((t) => t.journalId)} all={null} />}>

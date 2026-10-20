@@ -92,6 +92,8 @@ export interface PayRun {
   totals?: { gross: number; net: number; burdened: number; workers: number };
   /** Payroll chose to hold net pay at zero and recover the rest of any overpayment next pay run. */
   deferRecovery?: boolean;
+  /** Journals posted to NetSuite by payroll after completion (manual run). */
+  posted?: { by: string; at: string; journals: string[] };
 }
 
 export interface ErpState {

@@ -64,6 +64,13 @@ export function useNotifications(): { notes: Note[]; unread: Note[] } {
       }
     }
   }
+  // Payroll: completed pay runs not yet posted to NetSuite.
+  if (access.payResults) {
+    for (const p of US_PERIODS) {
+      const run = erp.payRuns[p.id];
+      if (run?.status === "Completed" && !run.posted) notes.push({ id: `post:${p.id}`, text: `${PERIOD_LABEL[p.id]} is completed: post the journals to NetSuite.`, href: "/gl", at: run.completedAt ?? "", period: p.id });
+    }
+  }
   notes.sort((a, b) => (a.at < b.at ? 1 : -1));
   const seen = new Set(erp.seen?.[me.id] ?? []);
   return { notes, unread: notes.filter((n) => !seen.has(n.id)) };

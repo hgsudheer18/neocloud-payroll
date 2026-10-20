@@ -6,7 +6,7 @@ import { fmt } from "../../lib/util/money.ts";
 import { pretty } from "../../lib/util/dates.ts";
 import { PERIOD_LABEL } from "../../lib/config/period.ts";
 
-const tieValue = (name: string, v: number) => (/hours|hrs/i.test(name) ? `${(v / 100).toFixed(2)} hrs` : /Headcount|variance/i.test(name) ? String(v) : fmt(v));
+export const tieValue = (name: string, v: number) => (/hours|hrs/i.test(name) ? `${(v / 100).toFixed(2)} hrs` : /Headcount|variance/i.test(name) ? String(v) : fmt(v));
 
 export default function Dashboard({ query }: { query: URLSearchParams }) {
   const { data } = useData();
