@@ -70,7 +70,8 @@ export function ScheduledAlerts() {
   const access = useAccess();
   const [clock, setClock] = useState(readClock);
   const [, tick] = useState(0);
-  const [later, setLater] = useState<string[]>([]);
+  // Snoozed alerts last for this browser session (Remind me later).
+  const [later, setLater] = useState<string[]>(() => { try { return JSON.parse(window.sessionStorage.getItem("neocloud-alerts-later") ?? "[]"); } catch { return []; } });
   useEffect(() => {
     const t = window.setInterval(() => tick((n) => n + 1), 60_000);
     const onClock = () => setClock(readClock());
@@ -126,9 +127,18 @@ export function ScheduledAlerts() {
   }
 
   const seen = new Set(erp.seen?.[me.id] ?? []);
-  const show = alerts.find((a) => !seen.has(a.id) && !later.includes(a.id));
+  // No pop-up on the page the reminder points to: the person is already doing it.
+  const page = window.location.hash.replace(/^#\/?/, "").split(/[/?]/)[0];
+  const onTarget = (a: Alert) => a.href.replace(/^\//, "").split(/[/?]/)[0] === page;
+  const show = alerts.find((a) => !seen.has(a.id) && !later.includes(a.id) && !onTarget(a));
   if (!show) return null;
-  const close = (dismiss: boolean) => (dismiss ? markSeen([show.id]) : setLater([...later, show.id]));
+  const close = (dismiss: boolean) => {
+    if (dismiss) return markSeen([show.id]);
+    // Remind me later: snooze every reminder that is due now, not just this one.
+    const next = [...new Set([...later, ...alerts.map((a) => a.id)])];
+    try { window.sessionStorage.setItem("neocloud-alerts-later", JSON.stringify(next)); } catch { /* storage unavailable */ }
+    setLater(next);
+  };
   return (
     <div className="alert-backdrop" role="dialog" aria-modal="true" aria-labelledby="alert-title">
       <div className="alert-box">

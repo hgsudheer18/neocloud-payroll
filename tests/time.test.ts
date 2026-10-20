@@ -152,3 +152,11 @@ test("A correction that is later corrected or deleted no longer counts", () => {
   assert.equal(calcWorkerTime("E9", [orig, fix], "CA", 30, P.start, P.end).hoursWorkedInPeriod, 11);
   assert.equal(calcWorkerTime("E9", [orig, fix, del], "CA", 30, P.start, P.end).hoursWorkedInPeriod, 0);
 });
+
+test("Typed times are normalised to HH:MM", async () => {
+  const { normalizeTime } = await import("../lib/util/dates.ts");
+  for (const [typed, want] of [["18.30", "18:30"], ["1830", "18:30"], ["18:30", "18:30"], ["6:30pm", "18:30"], ["6.30 PM", "18:30"], ["6pm", "18:00"], ["12am", "00:00"], ["7", "07:00"], ["930", "09:30"]]) {
+    assert.equal(normalizeTime(typed), want, typed);
+  }
+  assert.equal(normalizeTime("25:00"), "25:00"); // not a time: left as typed and flagged
+});

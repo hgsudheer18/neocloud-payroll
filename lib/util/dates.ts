@@ -77,3 +77,18 @@ export function minutesToHHMM(min: number): string {
 export function hrs(min: number): number {
   return Math.round((min / 60) * 100) / 100;
 }
+
+/** Accept the ways people type a time (18.30, 1830, 18 30, 6:30pm, 6pm) and return HH:MM; anything else is returned unchanged. */
+export function normalizeTime(raw: string): string {
+  const s = raw.trim().toLowerCase().replace(/\s+/g, "");
+  if (!s) return "";
+  const m = s.match(/^(\d{1,2})(?:[:.h]?(\d{2}))?(am|pm|a|p)?$/);
+  if (!m) return raw;
+  let h = Number(m[1]);
+  const min = Number(m[2] ?? "0");
+  const ap = m[3]?.[0];
+  if (ap === "p" && h < 12) h += 12;
+  if (ap === "a" && h === 12) h = 0;
+  if (h > 23 || min > 59) return raw;
+  return `${String(h).padStart(2, "0")}:${String(min).padStart(2, "0")}`;
+}

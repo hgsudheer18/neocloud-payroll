@@ -10,7 +10,7 @@ import { buildShift, calcWorkerTime } from "../../lib/engine/time.ts";
 import { ruleForState, SHIFTS, CROSSING_SHIFTS_PAID_NEXT_FROM } from "../../lib/config/timeRules.ts";
 import { NIGHT_DIFF_PER_HOUR } from "../../lib/config/payComponents.ts";
 import { PERIOD_LABEL, US_PERIODS } from "../../lib/config/period.ts";
-import { addDays, eachDay, isWeekday, minutesToHHMM, pretty, workweekStart } from "../../lib/util/dates.ts";
+import { addDays, eachDay, isWeekday, minutesToHHMM, normalizeTime, pretty, workweekStart } from "../../lib/util/dates.ts";
 import type { TimeRow, Worker } from "../../lib/data/types.ts";
 import type { BusinessProcess } from "../../lib/erp/types.ts";
 
@@ -176,7 +176,21 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
   const editable = (d: string) => !!draftFor(d) || (!pendingRow(d) && !approved(d).length);
   const cell = (d: string, field: keyof TimeRow, placeholder: string) => {
     if (!editable(d)) return <span>{(shown(d)?.[field] as string) || "—"}</span>;
-    return <input type="text" className="grid-input" placeholder={placeholder} value={(draftFor(d)?.[field] as string) ?? ""} onChange={(e) => edit(d, field, e.target.value)} aria-label={`${field} ${d}`} />;
+    const value = (draftFor(d)?.[field] as string) ?? "";
+    const bad = value !== "" && !HHMM.test(value);
+    return (
+      <input
+        type="text"
+        className={`grid-input${bad ? " bad" : ""}`}
+        placeholder={placeholder}
+        value={value}
+        onChange={(e) => edit(d, field, e.target.value)}
+        onBlur={(e) => { const t = normalizeTime(e.target.value); if (t !== e.target.value) edit(d, field, t); }}
+        title={bad ? "Enter a time such as 18:30, 18.30, 1830 or 6:30pm" : undefined}
+        aria-label={`${field} ${d}`}
+        aria-invalid={bad || undefined}
+      />
+    );
   };
   const shiftDef = SHIFTS[(w.shift as "Day" | "Night") || "Day"];
 
