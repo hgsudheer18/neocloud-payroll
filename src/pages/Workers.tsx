@@ -303,7 +303,7 @@ function Profile({ id, action }: { id: string; action: string }) {
           ))}
           {details && w.payType === "Hourly" && access.canOpen("time-entry") && <a className="btn ghost" href={`#/time-entry?worker=${id}`}>Enter time</a>}
           {details && w.workerType === "Employee" && access.canOpen("time-off") && <a className="btn ghost" href={`#/time-off?worker=${id}`}>Request time off</a>}
-          {inRun && (access.payResults ? <a className="btn ghost" href={`#/register/${id}`}>Payslip</a> : id === me.workerId && <a className="btn ghost" href="#/payslip">My payslip</a>)}
+          {inRun && (access.payResults ? <a className="btn ghost" href={`#/register/${id}`}>Payslip</a> : id === me.workerId && <a className="btn ghost" href="#/payslip">Pay Slip</a>)}
         </div>
       </div>
 

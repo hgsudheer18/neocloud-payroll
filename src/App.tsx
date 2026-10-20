@@ -2,7 +2,7 @@ import { useData } from "./state.tsx";
 import { useErp, PERSONAS } from "./erp.tsx";
 import { useRoute } from "./router.tsx";
 import { pretty } from "../lib/util/dates.ts";
-import { BP_RULES } from "../lib/erp/types.ts";
+import { BP_RULES, persona as personaById } from "../lib/erp/types.ts";
 import { PERIOD_LABEL, US_PERIODS } from "../lib/config/period.ts";
 import Dashboard from "./pages/Dashboard.tsx";
 import Register from "./pages/Register.tsx";
@@ -23,11 +23,14 @@ import PayRuns from "./pages/PayRuns.tsx";
 import MyPayslip from "./pages/MyPayslip.tsx";
 import TeamTimeOff, { UpcomingTimeOff } from "./pages/TeamTimeOff.tsx";
 import Organisation from "./pages/Organisation.tsx";
-import { NoAccess, useAccess } from "./access.tsx";
+import { accessFor, NoAccess, useAccess } from "./access.tsx";
+
+// Pages whose figures depend on the selected pay period: they show the pay period picker.
+const PERIOD_PAGES = ["payslip", "payruns", "", "register", "time", "absence", "reconciliation", "gl", "controls"];
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-entry", "Enter time"], ["time-off", "Absence"], ["team-time-off", "Team Time Off"], ["upcoming-time-off", "Upcoming Time Off"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
-  { group: "Payroll", items: [["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
+  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["organisation", "Organisation"], ["time-off", "Absence"], ["team-time-off", "Team Time Off"], ["upcoming-time-off", "Upcoming Time Off"], ["setup", "Organization setup"]] },
+  { group: "Payroll", items: [["payslip", "Pay Slip"], ["time-entry", "Enter time"], ["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
 ];
@@ -37,6 +40,13 @@ export default function App() {
   const { erp, me, setPersona, periodId, setPeriod } = useErp();
   const { path, query } = useRoute();
   const access = useAccess();
+  // Switching user starts fresh: same page if the new role may open it (without a previous
+  // selection such as another worker), otherwise their inbox.
+  const switchUser = (id: string) => {
+    setPersona(id);
+    const next = data ? accessFor(personaById(id), data.dsNow) : null;
+    window.location.hash = next && next.canOpen(page) ? `/${page}` : "/inbox";
+  };
   const page = path[0] ?? "";
 
   const body = () => {
@@ -81,16 +91,9 @@ export default function App() {
         </div>
         <label className="side-select">
           <span>Signed in as</span>
-          <select value={me.id} onChange={(e) => setPersona(e.target.value)}>
+          <select value={me.id} onChange={(e) => switchUser(e.target.value)}>
             {PERSONAS.map((p) => <option key={p.id} value={p.id}>{p.name}, {p.role}</option>)}
           </select>
-        </label>
-        <label className="side-select">
-          <span>Pay period</span>
-          <select value={periodId} onChange={(e) => setPeriod(e.target.value)}>
-            {US_PERIODS.map((p) => <option key={p.id} value={p.id}>{PERIOD_LABEL[p.id]}</option>)}
-          </select>
-          {data && <span className="side-note">Check date {pretty(data.result.period.checkDate)}. Pay run: {run}.</span>}
         </label>
         <nav className="nav" aria-label="Main">
           {NAV.map((g) => ({ ...g, items: g.items.filter(([href]) => access.canOpen(href)) })).filter((g) => g.items.length > 0).map((g) => (
@@ -111,7 +114,20 @@ export default function App() {
           {data && <>Calculated in {data.ms} ms in your browser. Data you enter is saved in this browser only.</>}
         </div>
       </aside>
-      <main className="main">{body()}</main>
+      <main className="main" key={me.id}>
+        {data && PERIOD_PAGES.includes(page) && access.canOpen(page) && (
+          <div className="period-bar">
+            <label>
+              <span>Pay period</span>
+              <select value={periodId} onChange={(e) => setPeriod(e.target.value)}>
+                {US_PERIODS.map((p) => <option key={p.id} value={p.id}>{PERIOD_LABEL[p.id]}</option>)}
+              </select>
+            </label>
+            <span className="small muted">Check date {pretty(data.result.period.checkDate)} · Pay run: {run}</span>
+          </div>
+        )}
+        {body()}
+      </main>
     </div>
   );
 }

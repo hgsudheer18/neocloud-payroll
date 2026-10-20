@@ -73,7 +73,7 @@ button, select, input { font: inherit; color: inherit; }
 .nav a:hover { background: #f2f2f2; color: #000000; }
 .nav a[aria-current="page"] { background: #111111; color: #ffffff; font-weight: 600; }
 .nav .count { font-size: 12px; color: inherit; opacity: 0.75; }
-.nav-group { font-size: 12px; color: #777777; margin: var(--s3) 10px var(--s1); }
+.nav-group { font-size: 15px; font-weight: 700; color: #111111; margin: var(--s4) 10px var(--s1); letter-spacing: 0.01em; }
 .side-foot { margin-top: auto; font-size: 12px; color: #777777; }
 
 .main { padding: var(--s6) var(--s7) var(--s7); max-width: 1400px; width: 100%; min-width: 0; }
@@ -249,3 +249,8 @@ select, input[type="search"], input[type="text"] {
 .tree ul { margin-left: 10px; padding-left: 16px; border-left: 1px solid var(--rule); }
 .tree li { position: relative; padding: 4px 0; }
 .tree ul > li::before { content: ""; position: absolute; left: -16px; top: 15px; width: 12px; border-top: 1px solid var(--rule); }
+
+/* ---------- pay period picker, top right of payroll pages ---------- */
+.period-bar { display: flex; justify-content: flex-end; align-items: center; gap: var(--s4); flex-wrap: wrap; margin: calc(-1 * var(--s3)) 0 var(--s4); }
+.period-bar label { display: flex; align-items: center; gap: var(--s2); font-size: 13px; color: var(--ink-soft); }
+.period-bar select { font-size: 14px; padding: 4px 8px; border: 1px solid var(--rule); border-radius: var(--radius-sm); background: var(--sheet); }

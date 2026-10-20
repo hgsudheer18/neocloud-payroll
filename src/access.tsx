@@ -8,7 +8,7 @@
 //                  managers (direct and indirect) and payroll only.
 //   Time entry     Hourly workers only (their own time).
 //   Pay results    Payslips, gross to net, pay amounts and payouts: payroll only,
-//                  except that every role sees its own payslip (My payslip).
+//                  except that every role sees its own payslip (Pay Slip).
 //
 // The persona switcher has no password, so this shapes each role's view for
 // the demo; in production, Workday's own security does this job.

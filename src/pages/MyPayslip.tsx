@@ -12,11 +12,11 @@ export default function MyPayslip() {
   const status = erp.payRuns[periodId]?.status ?? "Not started";
   return (
     <>
-      <PageHead title="My payslip">
-        {PERIOD_LABEL[periodId]}. Choose another pay period at the top of the sidebar.
+      <PageHead title="Pay Slip">
+        {PERIOD_LABEL[periodId]}. Choose another pay period at the top right.
       </PageHead>
       {!c ? (
-        <div className="callout info">You are not paid in this period. Choose another pay period in the sidebar.</div>
+        <div className="callout info">You are not paid in this period. Choose another pay period at the top right.</div>
       ) : (
         <>
           {status !== "Completed" && <div className="callout info">Preview: payroll has not completed this period yet (pay run: {status.toLowerCase()}), so amounts can still change.</div>}
