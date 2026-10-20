@@ -20,10 +20,11 @@ import TimeEntry from "./pages/TimeEntry.tsx";
 import TimeOff from "./pages/TimeOff.tsx";
 import Inbox from "./pages/Inbox.tsx";
 import PayRuns from "./pages/PayRuns.tsx";
+import MyPayslip from "./pages/MyPayslip.tsx";
 import { NoAccess, useAccess } from "./access.tsx";
 
 const NAV: { group: string; items: [string, string][] }[] = [
-  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Time off"], ["setup", "Organization setup"]] },
+  { group: "Workforce", items: [["inbox", "Inbox"], ["workers", "Workers"], ["time-entry", "Enter time"], ["time-off", "Time off"], ["payslip", "My payslip"], ["setup", "Organization setup"]] },
   { group: "Payroll", items: [["payruns", "Pay runs"], ["", "Period overview"], ["register", "Payroll register"], ["time", "Time calculation"], ["absence", "Absence balances"]] },
   { group: "Tie it out", items: [["reconciliation", "Reconciliation"], ["gl", "General ledger"], ["international", "International"]] },
   { group: "Govern", items: [["controls", "Controls and audit"], ["data", "Data and demo"], ["docs", "Design documents"]] },
@@ -45,6 +46,7 @@ export default function App() {
       case "workers": return <Workers id={path[1]} query={query} />;
       case "time-entry": return <TimeEntry query={query} />;
       case "time-off": return <TimeOff query={query} />;
+      case "payslip": return <MyPayslip />;
       case "setup": return <Setup query={query} />;
       case "payruns": return <PayRuns />;
       case "register": return <Register id={path[1]} query={query} />;

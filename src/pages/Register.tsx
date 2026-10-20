@@ -144,7 +144,8 @@ function noteFor(c: UsWorkerCalc): string[] {
   return n;
 }
 
-export function Payslip({ c }: { c: UsWorkerCalc }) {
+/** The full payslip; `mine` is the worker's own view, without payroll-only detail (employer cost, GL, links to payroll pages). */
+export function Payslip({ c, mine = false }: { c: UsWorkerCalc; mine?: boolean }) {
   const w = c.worker;
   const p = c.pay;
   return (
@@ -156,14 +157,14 @@ export function Payslip({ c }: { c: UsWorkerCalc }) {
         <span className="muted">
           {w.jobProfile}, {w.department}, {w.costCenterId}, {w.locationId} ({w.workState})
         </span>
-        <button className="close" onClick={() => go("/register")}>Close</button>
+        {!mine && <button className="close" onClick={() => go("/register")}>Close</button>}
       </div>
       {p.flags.map((f) => (
         <div key={f} className={`callout ${f.startsWith("Final pay") ? "bad" : ""}`}>{f}</div>
       ))}
       <div className="grid2">
         <div>
-          {GROUPS.map((g) => {
+          {GROUPS.filter((g) => !mine || !g.startsWith("Employer")).map((g) => {
             const ls = p.lines.filter((l) => l.type === g);
             if (!ls.length) return null;
             return (
@@ -180,7 +181,7 @@ export function Payslip({ c }: { c: UsWorkerCalc }) {
                         </td>
                         <td className="n">{l.hours !== undefined ? `${l.hours.toFixed(2)} hrs` : ""}</td>
                         <td className="n"><Money c={l.amount} /></td>
-                        <td className="faint small">GL {l.glAccount}</td>
+                        {!mine && <td className="faint small">GL {l.glAccount}</td>}
                       </tr>
                     ))}
                   </tbody>
@@ -197,9 +198,11 @@ export function Payslip({ c }: { c: UsWorkerCalc }) {
             <dt>Employee taxes</dt><dd><Money c={-p.totals.eeTaxes} /></dd>
             <dt>Post-tax deductions</dt><dd><Money c={-p.totals.postTax} /></dd>
             <dt><strong>Net pay</strong></dt><dd><strong><Money c={p.totals.net} /></strong></dd>
+            {!mine && <>
             <dt>Employer taxes</dt><dd><Money c={p.totals.erTaxes} /></dd>
             <dt>Benefits load</dt><dd><Money c={p.totals.benefits} /></dd>
             <dt><strong>Burdened cost</strong></dt><dd><strong><Money c={p.totals.burdened} /></strong></dd>
+            </>}
           </dl>
           <h3 style={{ marginTop: 20 }}>Taxable wages (each tax has its own base)</h3>
           <dl className="kv">
@@ -228,12 +231,12 @@ export function Payslip({ c }: { c: UsWorkerCalc }) {
               ))}
             </>
           )}
-          {c.time && (
+          {c.time && !mine && (
             <p className="small">
               <a href={`#/time/${w.id}`}>See the daily time calculation for {w.id}</a>
             </p>
           )}
-          <p className="small"><a href={`#/reconciliation/${w.id}`}>Compare with the legacy register</a></p>
+          {!mine && <p className="small"><a href={`#/reconciliation/${w.id}`}>Compare with the legacy register</a></p>}
         </div>
       </div>
     </div>

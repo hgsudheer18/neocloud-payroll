@@ -6,7 +6,8 @@
 //                  see only name, job and org details.
 //   Worker details Compensation, time and time off: the worker, their
 //                  managers (direct and indirect) and payroll only.
-//   Pay results    Payslips, gross to net, pay amounts and payouts: payroll only.
+//   Pay results    Payslips, gross to net, pay amounts and payouts: payroll only,
+//                  except that every worker sees their own payslip.
 //
 // The persona switcher has no password, so this shapes each role's view for
 // the demo; in production, Workday's own security does this job.
@@ -25,6 +26,7 @@ const PAGES: Record<string, Role[]> = {
   workers: ["Employee", "Manager", "HR Partner", ...PAYROLL],
   "time-entry": ["Employee", "Manager", ...PAYROLL],
   "time-off": ["Employee", "Manager", ...PAYROLL],
+  payslip: ["Employee", "Manager"],
   setup: ["HR Partner", ...PAYROLL],
   time: ["Manager", ...PAYROLL],
   absence: ["Manager", ...PAYROLL],
