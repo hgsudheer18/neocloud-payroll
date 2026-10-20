@@ -45,9 +45,11 @@ export function payCalendar(years: number[] = [2026, 2027]): CalendarPeriod[] {
       const first = `${y}-${mm}-01`;
       const mid = `${y}-${mm}-15`;
       const end = lastDay(y, m);
-      const pre = `${y}-${mm}` <= "2026-10";
-      out.push(period("US Semi-Monthly", ++n, first, mid, businessDayOnOrBefore(addDays(mid, 5)), pre ? "All US workers (hourly move to biweekly from Oct 16, 2026)" : "Salaried"));
-      out.push(period("US Semi-Monthly", ++n, `${y}-${mm}-16`, end, businessDayOnOrBefore(addDays(end, 5)), pre && `${y}-${mm}` < "2026-10" ? "All US workers" : "Salaried"));
+      // Hourly workers are paid semi-monthly through Oct 15, 2026 (the parallel run), biweekly after.
+      const ym = `${y}-${mm}`;
+      const firstNote = ym < "2026-10" ? "All US workers" : ym === "2026-10" ? "All US workers: last semi-monthly period for hourly (biweekly from Oct 16)" : "Salaried";
+      out.push(period("US Semi-Monthly", ++n, first, mid, businessDayOnOrBefore(addDays(mid, 5)), firstNote));
+      out.push(period("US Semi-Monthly", ++n, `${ym}-16`, end, businessDayOnOrBefore(addDays(end, 5)), ym < "2026-10" ? "All US workers" : "Salaried"));
     }
   }
   // Biweekly from go-live: a transition period, then 14-day periods (Sunday to Saturday).
