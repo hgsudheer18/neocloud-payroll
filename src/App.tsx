@@ -108,7 +108,7 @@ export default function App() {
               <div className="nav-group">{g.group}</div>
               {g.items.map(([href, label]) => (
                 <a key={href} href={`#/${href}`} aria-current={page === href || (href === "time-off" && ["team-time-off", "upcoming-time-off", "absence"].includes(page)) ? "page" : undefined}>
-                  {label}
+                  {href === "team-time" && me.role !== "Manager" ? "Timesheets" : label}
                   {href === "inbox" && toApprove > 0 && <span className="badge">{toApprove}</span>}
                   {href === "reconciliation" && data && data.result.reconciled && <span className="count">{unexplained ? `${unexplained} open` : "tied"}</span>}
                   {href === "overview" && data && <span className="count">{tiesOk ? "ties" : "check"}</span>}

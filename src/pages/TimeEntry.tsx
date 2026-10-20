@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../state.tsx";
 import { useErp } from "../erp.tsx";
 import { setQuery } from "../router.tsx";
@@ -6,7 +6,7 @@ import { PageHead, Pill, Section, Select } from "../ui.tsx";
 import { ApproverJump, BpStatus, CanInitiate, Toast, today } from "../erpui.tsx";
 import { useAccess } from "../access.tsx";
 import { validateTimeEntry } from "../../lib/erp/validate.ts";
-import { buildShift, calcWorkerTime } from "../../lib/engine/time.ts";
+import { buildShift, calcWorkerTime, type DayCalc } from "../../lib/engine/time.ts";
 import { ruleForState, SHIFTS, CROSSING_SHIFTS_PAID_NEXT_FROM } from "../../lib/config/timeRules.ts";
 import { NIGHT_DIFF_PER_HOUR } from "../../lib/config/payComponents.ts";
 import { PERIOD_LABEL, US_PERIODS } from "../../lib/config/period.ts";
@@ -29,6 +29,19 @@ const FIELDS: [keyof TimeRow, string, string][] = [["timeIn", "Clock in", "08:00
 const filled = (r?: Partial<TimeRow>) => !!r && HHMM.test(r.timeIn ?? "") && HHMM.test(r.timeOut ?? "");
 const worked = (r?: Partial<TimeRow>) => (filled(r) ? buildShift({ mealStart: "", mealEnd: "", ...r } as TimeRow).worked / 60 : 0);
 const h2 = (min: number) => (min / 60).toFixed(2);
+
+/** Calculated rows under the timesheet, per day and for the week (minutes, except the meal premium count). */
+const CALC_ROWS: { label: string; value: (d: DayCalc) => number; fmt: (n: number) => string; strong?: boolean; hot?: boolean; seventh?: boolean; meal?: boolean }[] = [
+  { label: "Total hours", value: (d) => d.workedMin, fmt: h2, strong: true },
+  { label: "Regular", value: (d) => d.cats.REG, fmt: h2 },
+  { label: "Daily overtime (1.5x)", value: (d) => d.cats.OT_DAILY, fmt: h2, hot: true },
+  { label: "Weekly overtime (1.5x)", value: (d) => d.cats.OT_WEEKLY, fmt: h2, hot: true },
+  { label: "Double time (2x)", value: (d) => d.cats.DT_DAILY, fmt: h2, hot: true },
+  { label: "7th day overtime (1.5x)", value: (d) => d.cats.SEVENTH_OT, fmt: h2, hot: true, seventh: true },
+  { label: "7th day double time (2x)", value: (d) => d.cats.SEVENTH_DT, fmt: h2, hot: true, seventh: true },
+  { label: "Night differential (22:00–06:00)", value: (d) => d.nightMin, fmt: h2 },
+  { label: "Meal premium (hours)", value: (d) => d.mealPenalty, fmt: (n) => n.toFixed(2), hot: true, meal: true },
+];
 
 /**
  * Meal period check for a day. California (Labor Code 512): a shift over 5 hours needs
@@ -67,6 +80,8 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
   const { erp, me, submit, nextSeq, setDrafts } = useErp();
   const access = useAccess();
   const ds = data!.dsNow;
+  // Review mode: managers see their team; payroll sees every hourly worker. Only managers' edits are approved on entry.
+  const approves = manager && me.role === "Manager";
   const team = manager ? ds.workers.filter((x) => x.payType === "Hourly" && x.country === "USA" && !x.terminationDate && x.id !== me.workerId && access.seesDetails(x.id)) : [];
   const w: Worker | undefined = manager ? team.find((x) => x.id === query.get("worker")) ?? team[0] : ds.workers.find((x) => x.id === me.workerId);
   const now = today();
@@ -78,6 +93,17 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [msg, setMsg] = useState("");
   const [lastBp, setLastBp] = useState("");
+  // Cell to focus after the next render (Enter moves to it once the typed time is saved).
+  const [focusTo, setFocusTo] = useState("");
+  useEffect(() => {
+    if (!focusTo) return;
+    const el = document.querySelector<HTMLInputElement>(`input[aria-label="${focusTo}"]`);
+    if (el) {
+      el.focus();
+      el.select();
+    }
+    setFocusTo("");
+  }, [focusTo, erp]);
   if (!w) return <div className="callout info">{manager ? "There are no hourly workers in your team." : "Time entry is for hourly workers."}</div>;
 
   const schedule = SCHEDULE[(w.shift as "Day" | "Night") || "Day"];
@@ -140,10 +166,10 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
     const total = weekRows.reduce((s, r) => s + worked(r), 0);
     const fixes = weekRows.filter((r) => r.correctsRowId).length;
     const what = manager ? `Manager edit of ${w.name}'s time, week of ${pretty(week)}` : `Timesheet, week of ${pretty(week)}`;
-    const bp = submit({ type: "Enter Time", subjectId: w.id, subjectName: w.name, effectiveDate: weekRows[0].workDate, summary: `${what}: ${weekRows.length} day(s), ${total.toFixed(2)} hrs${fixes ? ` (${fixes} correction${fixes > 1 ? "s" : ""})` : ""}`, payload: { rows: weekRows }, warnings: warns, ...(manager ? { approvedAs: "Entered by the worker's manager" } : {}) });
+    const bp = submit({ type: "Enter Time", subjectId: w.id, subjectName: w.name, effectiveDate: weekRows[0].workDate, summary: `${what}: ${weekRows.length} day(s), ${total.toFixed(2)} hrs${fixes ? ` (${fixes} correction${fixes > 1 ? "s" : ""})` : ""}`, payload: { rows: weekRows }, warnings: warns, ...(approves ? { approvedAs: "Entered by the worker's manager" } : {}) });
     save(drafts.filter((r) => !days.includes(r.workDate)));
     setLastBp(bp.id);
-    setMsg(manager ? `${bp.id}: saved and approved. Days in a paid period are paid as retro.` : `${bp.id}: week of ${pretty(week)} submitted for manager approval.`);
+    setMsg(approves ? `${bp.id}: saved and approved. Days in a paid period are paid as retro.` : manager ? `${bp.id}: sent to ${w.name}'s manager for approval.` : `${bp.id}: week of ${pretty(week)} submitted for manager approval.`);
   };
 
   // Week summary: approved, pending and draft time through the time engine for this workweek.
@@ -154,6 +180,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
   ].map((r) => ({ ...r, employeeId: w.id, mealStart: (r as Partial<TimeRow>).mealStart || "", mealEnd: (r as Partial<TimeRow>).mealEnd || "", entryType: r.correctsRowId ? "Correction" : "Original", correctsRowId: r.correctsRowId ?? "", enteredOn: r.enteredOn ?? week, notes: r.notes ?? "", shift: r.shift || w.shift || "Day" }) as TimeRow);
   const sum = calcWorkerTime(w.id, summaryRows, w.workState, w.hourlyRate, week, addDays(week, 6));
   const c = sum.catsInPeriod;
+  const calcFor = (d: string) => sum.days.find((x) => x.date === d);
   const rule = ruleForState(w.workState);
 
   // Soft warnings: anything irregular this week, for the employee and their manager.
@@ -174,6 +201,13 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
 
   const weekTotal = days.reduce((s, d) => s + worked(shown(d)), 0);
   const editable = (d: string) => !!draftFor(d) || (!pendingRow(d) && !approved(d).length);
+  // Enter moves down the day (clock in, meal start, meal end, clock out), then to the next day.
+  const focusNext = (d: string, field: keyof TimeRow) => {
+    const order = days.flatMap((x) => FIELDS.map(([f]) => `${f} ${x}`));
+    const from = order.indexOf(`${field} ${d}`);
+    const next = order.slice(from + 1).find((label) => document.querySelector(`input[aria-label="${label}"]`));
+    if (next) setFocusTo(next);
+  };
   const cell = (d: string, field: keyof TimeRow, placeholder: string) => {
     if (!editable(d)) return <span>{(shown(d)?.[field] as string) || "—"}</span>;
     const value = (draftFor(d)?.[field] as string) ?? "";
@@ -186,6 +220,13 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
         value={value}
         onChange={(e) => edit(d, field, e.target.value)}
         onBlur={(e) => { const t = normalizeTime(e.target.value); if (t !== e.target.value) edit(d, field, t); }}
+        onKeyDown={(e) => {
+          if (e.key !== "Enter") return;
+          e.preventDefault();
+          const t = normalizeTime(e.currentTarget.value);
+          if (t !== e.currentTarget.value) edit(d, field, t);
+          focusNext(d, field);
+        }}
         title={bad ? "Enter a time such as 18:30, 18.30, 1830 or 6:30pm" : undefined}
         aria-label={`${field} ${d}`}
         aria-invalid={bad || undefined}
@@ -196,8 +237,10 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
 
   return (
     <>
-      <PageHead title={manager ? "Team Timesheets" : "Enter time"}>
-        {manager
+      <PageHead title={!manager ? "Enter time" : approves ? "Team Timesheets" : "Timesheets"}>
+        {manager && !approves
+          ? "Every hourly worker's timesheet, with daily and weekly totals, overtime and night differential. Edits you make go to the worker's manager for approval."
+          : manager
           ? "Review your team's time week by week. Irregularities are shown as soft warnings. You can edit or delete time for the current and past pay periods: your changes are approved on entry, and anything in a paid period is paid or recovered as retro."
           : "Fill in your week, Sunday to Saturday. It is saved as a draft as you type; submit the week when it is complete and your manager approves it in one go. Payroll pays approved time only."}
       </PageHead>
@@ -214,7 +257,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
       </div>
       <div className="tabs" role="tablist">
         <button role="tab" aria-selected={tab === "sheet"} onClick={() => nav("tab", "sheet")}>Timesheet</button>
-        <button role="tab" aria-selected={tab === "summary"} onClick={() => nav("tab", "summary")}>Week summary</button>
+        <button role="tab" aria-selected={tab === "summary"} onClick={() => nav("tab", "summary")}>How it is paid</button>
       </div>
       <Toast text={msg} tone="info" />
       {msg && <ApproverJump bp={erp.bps.find((b) => b.id === lastBp)} />}
@@ -226,7 +269,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
       )}
 
       {tab === "summary" ? (
-        <Section title={`Week of ${pretty(week)}: summary`} lede="Approved, waiting and draft time, calculated by the time engine with the rules for this work location. Hours in hours and minutes as decimals.">
+        <Section title={`Week of ${pretty(week)}: how each hour is paid`} lede="Reference for the weekly totals on the timesheet: approved, waiting and draft time, calculated with the rules for this work location. Hours as decimals.">
           <div className="table-wrap">
             <table className="reg">
               <thead><tr><th>Category</th><th className="n">Hours</th><th>How it is paid</th></tr></thead>
@@ -251,7 +294,7 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
             <div className="table-wrap">
               <table className="reg timesheet">
                 <thead>
-                  <tr><th />{days.map((d) => <th key={d} className={isWeekday(d) ? "" : "weekend"}>{pretty(d)}<div className="faint small">{hourlyPeriodOf(d) ? PERIOD_LABEL[hourlyPeriodOf(d)!.id].split(" (")[0] : ""}</div></th>)}</tr>
+                  <tr><th />{days.map((d) => <th key={d} className={isWeekday(d) ? "" : "weekend"}>{pretty(d)}<div className="faint small">{hourlyPeriodOf(d) ? PERIOD_LABEL[hourlyPeriodOf(d)!.id].split(" (")[0] : ""}</div></th>)}<th className="n week-total">Week</th></tr>
                 </thead>
                 <tbody>
                   <tr>
@@ -266,41 +309,51 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
                         </td>
                       );
                     })}
+                    <td className="week-total" />
                   </tr>
                   {FIELDS.map(([field, label, ph]) => (
                     <tr key={field}>
                       <th>{label}</th>
                       {days.map((d) => <td key={d}>{cell(d, field, field === "mealStart" && mealCheck(draftFor(d), w.workState).due ? `by ${mealCheck(draftFor(d), w.workState).due}` : (schedule[field as keyof typeof schedule] ?? ph))}</td>)}
+                      <td className="week-total" />
                     </tr>
                   ))}
-                  <tr>
-                    <th>Hours</th>
-                    {days.map((d) => { const hh = worked(shown(d)); return <td key={d} className="n">{hh ? hh.toFixed(2) : ""}</td>; })}
-                  </tr>
+                  {CALC_ROWS.filter((r) => !r.seventh || rule.seventhDay).filter((r) => !r.meal || rule.mealPremium).map((r) => {
+                    const total = days.reduce((s, d) => s + (calcFor(d) ? r.value(calcFor(d)!) : 0), 0);
+                    return (
+                      <tr key={r.label} className={r.strong ? "calc-row strong" : "calc-row"}>
+                        <th>{r.label}</th>
+                        {days.map((d) => { const v = calcFor(d) ? r.value(calcFor(d)!) : 0; return <td key={d} className={`n${v && r.hot ? " hot" : ""}`}>{v ? r.fmt(v) : ""}</td>; })}
+                        <td className="n week-total">{total ? r.fmt(total) : "0.00"}{r.label.startsWith("Night") && total ? <div className="small muted">+${((total / 60) * NIGHT_DIFF_PER_HOUR).toFixed(2)}</div> : null}</td>
+                      </tr>
+                    );
+                  })}
                   <tr>
                     <th>Meal break{rule.mealPremium ? " (CA)" : ""}</th>
                     {days.map((d) => {
                       const m = mealCheck(shown(d), w.workState);
                       return <td key={d} className="small">{m.problem ? <span className="pos-var">{m.problem}. A meal premium (1 hour of pay) applies.</span> : m.soft ? <span className="pos-var">{m.soft}.</span> : m.due ? <span className="muted">30 min, start by {m.due}</span> : null}</td>;
                     })}
+                    <td className="week-total" />
                   </tr>
                   <tr>
                     <th />
                     {days.map((d) => (
                       <td key={d}>
                         {approved(d).length > 0 && !draftFor(d) && !pendingRow(d) && <button className="close" style={{ marginLeft: 0 }} onClick={() => correct(d)}>{manager ? "Edit" : "Correct"}</button>}
-                        {manager && approved(d).length > 0 && !draftFor(d) && !pendingRow(d) && <button className="close" style={{ marginLeft: 6 }} onClick={() => remove(d)}>Delete</button>}
+                        {approves && approved(d).length > 0 && !draftFor(d) && !pendingRow(d) && <button className="close" style={{ marginLeft: 6 }} onClick={() => remove(d)}>Delete</button>}
                         {draftFor(d) && <button className="close" style={{ marginLeft: 0 }} onClick={() => clear(d)}>Clear</button>}
                         {errors[d]?.map((e) => <div key={e} className="small" style={{ color: "var(--red)" }}>{e}</div>)}
                       </td>
                     ))}
+                    <td className="week-total" />
                   </tr>
                 </tbody>
               </table>
             </div>
             <p className="small muted">{rule.mealPremium ? "California law requires a 30-minute meal break that starts before the end of the 5th hour of work for shifts over 5 hours (Labor Code 512). If it is missed, late or short, one hour of pay is added as a meal premium. " : "A missing meal on a shift over 5 hours is flagged against company policy. "}Night shift differential: +${NIGHT_DIFF_PER_HOUR.toFixed(2)}/hr for hours worked 22:00–06:00. A night shift belongs to the day it starts (workday breaks at noon).</p>
             <div className="row" style={{ marginTop: 8 }}>
-              <button className="btn" onClick={submitWeek}>{manager ? "Save changes" : "Submit week for approval"}</button>
+              <button className="btn" onClick={submitWeek}>{approves ? "Save changes" : manager ? "Submit for approval" : "Submit week for approval"}</button>
               <button className="btn ghost" onClick={() => { const r = check(); setMsg(r.ok ? `No errors.${r.warns.length ? ` Warnings: ${r.warns.join(" ")}` : ""}` : "Some days need fixing: see below each day."); }}>Check week</button>
             </div>
           </CanInitiate>
