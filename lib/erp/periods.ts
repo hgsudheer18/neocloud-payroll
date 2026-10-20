@@ -11,7 +11,7 @@
 // base package + business processes approved up to that moment.
 
 import type { AbsenceBalance, Dataset, Ytd } from "../data/types.ts";
-import { PRIOR_PERIOD, US_PERIOD, US_PERIODS, type PayPeriod } from "../config/period.ts";
+import { PERIOD_LABEL, PRIOR_PERIOD, US_PERIOD, US_PERIODS, type PayPeriod } from "../config/period.ts";
 import { runPeriod, type PeriodResult } from "../engine/run.ts";
 import type { PriorPeriodRetro, RetroTimeOff } from "../engine/payroll.ts";
 import { applyBps } from "./apply.ts";
@@ -92,7 +92,7 @@ function resultAsOfUncached(base: Dataset, bps: BusinessProcess[], erp: ErpState
   const prior = PRIOR_PERIOD[id];
   if (!prior) {
     const ds = applyBps(base, bps, { asOf });
-    return { ds, result: runPeriod(ds, period, undefined, { reconcileLegacy: display ? undefined : false }) };
+    return { ds, result: runPeriod(ds, period, undefined, { reconcileLegacy: display ? undefined : false, deferRecovery: erp.payRuns[id]?.deferRecovery }) };
   }
   // The prior period as it was completed (or provisionally, as of now).
   const priorAt = completedAt(erp, prior);
@@ -106,7 +106,13 @@ function resultAsOfUncached(base: Dataset, bps: BusinessProcess[], erp: ErpState
   }
   ds = assignGoLivePayGroups(ds, period);
   const retro = priorAt ? retroFor(base, bps, erp, prior, priorAsPaid, cache) : new Map();
-  return { ds, result: runPeriod(ds, period, undefined, { retro, reconcileLegacy: false }) };
+  // Recovery the prior pay run deferred is taken from this one.
+  const carried = new Map<string, Cents>();
+  for (const c of priorRes.us) {
+    const d = c.pay.lines.filter((l) => l.code === "RETRO" && l.explain.startsWith("Overpayment recovery deferred")).reduce((s, l) => s + l.amount, 0);
+    if (d > 0) carried.set(c.worker.id, d);
+  }
+  return { ds, result: runPeriod(ds, period, undefined, { retro, reconcileLegacy: false, carried: { amounts: carried, from: PERIOD_LABEL[prior] }, deferRecovery: erp.payRuns[id]?.deferRecovery }) };
 }
 
 function retroFor(base: Dataset, bps: BusinessProcess[], erp: ErpState, priorId: string, asPaid: { ds: Dataset; result: PeriodResult }, cache: Cache) {

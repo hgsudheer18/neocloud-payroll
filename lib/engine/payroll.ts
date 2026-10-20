@@ -96,6 +96,10 @@ export interface PriorPeriodRetro {
   explain: string;
   /** Time off days that changed; shown with date and hours, priced as the period was recalculated. */
   timeOff?: RetroTimeOff[];
+  /** Overpayment recovery deferred from the prior pay run, recovered now. */
+  carried?: { amount: Cents; from: string };
+  /** Payroll chose to hold net pay at zero and defer any recovery that would make it negative. */
+  deferAllowed?: boolean;
 }
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -274,6 +278,7 @@ function retroLines(input: WorkerPayInput): PayLine[] {
   const last = input.timeline[input.timeline.length - 1];
   const at = { state: last.workState, costCenterId: last.costCenterId };
   const out: PayLine[] = [];
+  if (r.carried && r.carried.amount > 0) out.push(line("RETRO", -r.carried.amount, `Overpayment recovery carried from the ${r.carried.from} pay run`, at));
   let itemized = 0;
   for (const t of r.timeOff ?? []) {
     const delta = t.after - t.before;
@@ -305,6 +310,15 @@ export function calcUSWorker(input: WorkerPayInput, period: PayPeriod, opts: Pay
   const sal = w.payType === "Salary" ? salaryLines(input, period) : [];
   const timeOff = salariedTimeOff(input, period, sal);
   const earnings = [...sal, ...timeOff, ...timeLines(input), ...absenceLines(input, period), ...retroLines(input)];
+  // Overpayment recovery larger than this pay run: when payroll allows it, hold gross (and so net) at
+  // zero and carry the rest of the recovery to the next pay run.
+  const owed = earnings.reduce((s, l) => s + l.amount, 0);
+  const recovery = -earnings.filter((l) => l.code === "RETRO" && l.amount < 0).reduce((s, l) => s + l.amount, 0);
+  if (owed < 0 && recovery > 0 && input.priorPeriodRetro?.deferAllowed) {
+    const deferred = Math.min(-owed, recovery);
+    const last = input.timeline[input.timeline.length - 1];
+    earnings.push(line("RETRO", deferred, `Overpayment recovery deferred to the next pay run: ${fmt(deferred)} (net pay held at zero)`, { state: last.workState, costCenterId: last.costCenterId }));
+  }
   const gross = earnings.reduce((s, l) => s + l.amount, 0);
   const k401Base = earnings.filter((l) => COMPONENT[l.code].k401Eligible).reduce((s, l) => s + l.amount, 0);
 

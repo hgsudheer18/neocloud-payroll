@@ -162,3 +162,27 @@ test("Retro time off is itemized on the next pay run with the date and hours", (
   assert.equal(sl.amount, 0);
   assert.match(sl.explain, /Tue Oct 13: 8\.00 → 4\.00 hours/);
 });
+
+test("A recovery larger than the pay run is a critical error until net pay is held at zero; the rest is recovered next pay run", () => {
+  const cancel = bp("Correct Time Off", "E0024", "2026-10-09", { plan: "US_HOURLY_VAC", unit: "hours", date: "2026-10-09", quantity: 0, oldQuantity: 8 }, "2026-10-21T10:00:00Z");
+  const done = { [SM1]: "2026-10-20T09:00:00Z" };
+  // Without the fix: negative net pay is a critical finding.
+  const bad = computePeriod(base, erp([cancel], done), BWT).result;
+  const e = bad.us.find((c) => c.worker.id === "E0024")!;
+  assert.ok(e.pay.totals.net < 0);
+  assert.ok(bad.audit.some((a) => a.check === "Negative net pay" && a.employeeId === "E0024" && a.severity === "Critical"));
+  // With the fix: gross and net held at zero, and the controls tie.
+  const fixed = erp([cancel], done);
+  fixed.payRuns[BWT] = { periodId: BWT, status: "Not started", deferRecovery: true };
+  const ok = computePeriod(base, fixed, BWT).result;
+  const f = ok.us.find((c) => c.worker.id === "E0024")!;
+  assert.equal(f.pay.totals.gross, 0);
+  assert.equal(f.pay.totals.net, 0);
+  assert.equal(ok.audit.some((a) => a.check === "Negative net pay"), false);
+  assert.ok(ok.ties.every((t) => t.ok));
+  const deferred = f.pay.lines.find((l) => l.explain.startsWith("Overpayment recovery deferred"))!.amount;
+  assert.ok(deferred > 0);
+  // The next pay run recovers what was deferred.
+  const next = computePeriod(base, fixed, "2026-BW-02").result.us.find((c) => c.worker.id === "E0024")!;
+  assert.equal(next.pay.lines.find((l) => l.explain.startsWith("Overpayment recovery carried"))!.amount, -deferred);
+});

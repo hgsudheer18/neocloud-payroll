@@ -87,6 +87,8 @@ export interface PayRun {
   completedBy?: string;
   completedAt?: string;
   totals?: { gross: number; net: number; burdened: number; workers: number };
+  /** Payroll chose to hold net pay at zero and recover the rest of any overpayment next pay run. */
+  deferRecovery?: boolean;
 }
 
 export interface ErpState {

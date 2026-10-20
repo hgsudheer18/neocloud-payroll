@@ -10,7 +10,7 @@ import { headcountRecon, type HeadcountStep } from "./headcount.ts";
 import { intlJournals, totalsByJournal, usJournal, validateAndMap, type JournalIssue, type JournalLine, type MappedLine } from "./gl.ts";
 import { prepayrollAudit, type AuditFinding } from "./audit.ts";
 import type { PriorPeriodRetro } from "./payroll.ts";
-import { roundCents, type Cents } from "../util/money.ts";
+import { fmt, roundCents, type Cents } from "../util/money.ts";
 
 export interface Rollup {
   key: string;
@@ -51,6 +51,10 @@ export interface RunOptions {
   reconcileLegacy?: boolean;
   /** Retro from recalculating a completed prior period, by worker. */
   retro?: Map<string, PriorPeriodRetro>;
+  /** Overpayment recovery deferred from the prior pay run, by worker, and that run's name. */
+  carried?: { amounts: Map<string, Cents>; from: string };
+  /** Payroll chose to hold net pay at zero and defer recovery that would make it negative. */
+  deferRecovery?: boolean;
 }
 
 export function runPeriod(ds: Dataset, period: PayPeriod = US_PERIOD, intlPeriod: MonthlyPeriod = INTL_PERIOD, opts: RunOptions = {}): PeriodResult {
@@ -63,8 +67,13 @@ export function runPeriod(ds: Dataset, period: PayPeriod = US_PERIOD, intlPeriod
       continue;
     }
     if (w.workerType !== "Employee" || w.payGroup !== period.payGroup) continue;
-    const retro = opts.retro?.get(w.id);
-    if (w.terminationDate && w.terminationDate < period.start && !retro) {
+    const prior = opts.retro?.get(w.id);
+    const carried = opts.carried?.amounts.get(w.id);
+    const retro: PriorPeriodRetro | undefined =
+      prior || carried || opts.deferRecovery
+        ? { amount: prior?.amount ?? 0, explain: prior?.explain ?? "", timeOff: prior?.timeOff, carried: carried ? { amount: carried, from: opts.carried!.from } : undefined, deferAllowed: opts.deferRecovery }
+        : undefined;
+    if (w.terminationDate && w.terminationDate < period.start && !prior && !carried) {
       excluded.push({ worker: w, reason: "Terminated before period" });
       continue;
     }
@@ -150,7 +159,12 @@ export function runPeriod(ds: Dataset, period: PayPeriod = US_PERIOD, intlPeriod
     recon,
     headcount: { steps: hc.steps, movement: hc.legacySteps },
     journal: { lines, mapped, issues, totals: totalsByJournal(lines) },
-    audit: prepayrollAudit(ds, us, period),
+    audit: [
+      ...us
+        .filter((c) => c.pay.totals.net < 0)
+        .map((c): AuditFinding => ({ check: "Negative net pay", severity: "Critical", employeeId: c.worker.id, message: `Net pay is ${fmt(c.pay.totals.net)}: an overpayment recovery or deductions exceed this pay run. Hold net pay at zero and recover the rest next pay run, or fix the inputs. The pay run cannot be approved until net pay is at least zero.` })),
+      ...prepayrollAudit(ds, us, period),
+    ],
     ties,
     totals,
   };

@@ -28,17 +28,22 @@ export default function PayRuns() {
   const stale = (run.status === "Calculated" || run.status === "Approved") && run.bpCountAtCalc !== approvedCount(erp.bps);
   const pendingTime = erp.bps.filter((b) => b.status === "Awaiting Approval" && (b.type === "Enter Time" || b.type === "Request Time Off" || b.type === "Correct Time Off") && b.effectiveDate <= period.end).length;
   const dependents = US_PERIODS.filter((p) => PRIOR_PERIOD[p.id] === period.id && (erp.payRuns[p.id]?.status ?? "Not started") !== "Not started");
+  // Net pay below zero (an overpayment recovery or deductions exceed the pay run) blocks approval.
+  const negatives = r.us.filter((c) => c.pay.totals.net < 0);
+  const deferredLines = r.us.flatMap((c) => c.pay.lines.filter((l) => l.explain.startsWith("Overpayment recovery deferred")).map((l) => ({ id: c.worker.id, name: c.worker.name, amount: l.amount })));
+  const inError = negatives.length > 0 && run.status !== "Completed";
   const has = (roles: string[]) => roles.includes(me.role);
   const now = () => new Date().toISOString();
 
   const calculate = () => {
     if (!view.priorCompleted) return setMsg({ text: `Complete ${PERIOD_LABEL[PRIOR_PERIOD[period.id]!]} first: this period starts from its year-to-date totals and balances.`, tone: "bad" });
     updatePayRun(period.id, { status: "Calculated", calculatedBy: me.id, calculatedAt: now(), bpCountAtCalc: approvedCount(erp.bps), approvedBy: undefined, approvedAt: undefined, acknowledged: undefined, completedAt: undefined, completedBy: undefined, totals: { gross: r.totals.gross, net: r.totals.net, burdened: r.totals.burdened, workers: r.us.length } });
-    setMsg({ text: `Calculated ${r.us.length} workers. Review the audit, then a Payroll Approver approves.`, tone: "ok" });
+    setMsg(negatives.length ? { text: `Calculated with errors: ${negatives.length} worker(s) have negative net pay. Fix before approval.`, tone: "bad" } : { text: `Calculated ${r.us.length} workers. Review the audit, then a Payroll Approver approves.`, tone: "ok" });
   };
   const approve = () => {
     if (run.calculatedBy === me.id) return setMsg({ text: "Segregation of duties: you calculated this pay run, so someone else must approve it.", tone: "bad" });
     if (stale) return setMsg({ text: "Inputs changed after the calculation. Recalculate before approving.", tone: "bad" });
+    if (negatives.length) return setMsg({ text: `${negatives.length} worker(s) have negative net pay. Net pay must be at least zero before the pay run can be approved.`, tone: "bad" });
     if (!tiesOk) return setMsg({ text: "Control totals do not tie. Resolve before approving.", tone: "bad" });
     if (criticals.length && ack.trim().length < 10) return setMsg({ text: `Record how the ${criticals.length} critical finding(s) were resolved before approving.`, tone: "bad" });
     updatePayRun(period.id, { status: "Approved", approvedBy: me.id, approvedAt: now(), acknowledged: ack || undefined });
@@ -46,8 +51,13 @@ export default function PayRuns() {
   };
   const complete = () => {
     if (stale) return setMsg({ text: "Inputs changed after the calculation. Recalculate and re-approve.", tone: "bad" });
+    if (negatives.length) return setMsg({ text: "Negative net pay must be fixed before the pay run can be completed.", tone: "bad" });
     updatePayRun(period.id, { status: "Completed", completedBy: me.id, completedAt: now() });
     setMsg({ text: "Completed. The period is locked: later changes to it are paid as retro in the next period.", tone: "ok" });
+  };
+  const holdAtZero = () => {
+    updatePayRun(period.id, { deferRecovery: true, status: "Not started", calculatedAt: undefined, calculatedBy: undefined, approvedAt: undefined, approvedBy: undefined, acknowledged: undefined, completedAt: undefined, completedBy: undefined });
+    setMsg({ text: "Net pay will be held at zero and the rest of each recovery taken from the next pay run. Recalculate the pay run.", tone: "info" });
   };
   const reopen = () => {
     if (dependents.length) return setMsg({ text: `Reopen ${dependents.map((d) => PERIOD_LABEL[d.id]).join(", ")} first; it builds on this period.`, tone: "bad" });
@@ -77,7 +87,7 @@ export default function PayRuns() {
                   <td>{p.payGroup}</td>
                   <td>{pretty(p.checkDate)}</td>
                   <td className="small">{PRIOR_PERIOD[p.id] ? PERIOD_LABEL[PRIOR_PERIOD[p.id]!] : "Converted balances (parallel run)"}</td>
-                  <td><Pill tone={pr?.status === "Completed" ? "ok" : pr?.status ? "warn" : ""}>{pr?.status ?? "Not started"}</Pill></td>
+                  <td>{p.id === period.id && inError ? <Pill tone="bad">Error</Pill> : <Pill tone={pr?.status === "Completed" ? "ok" : pr?.status ? "warn" : ""}>{pr?.status ?? "Not started"}</Pill>}</td>
                   <td className="n">{pr?.totals ? fmt(pr.totals.gross) : ""}</td>
                 </tr>
               );
@@ -103,6 +113,13 @@ export default function PayRuns() {
         {!view.priorCompleted && <div className="callout">Waiting for {PERIOD_LABEL[PRIOR_PERIOD[period.id]!]} to be completed. Results below are provisional.</div>}
         {stale && <div className="callout bad">Inputs changed since this pay run was calculated ({approvedCount(erp.bps) - (run.bpCountAtCalc ?? 0)} newly approved business processes). Recalculate.</div>}
         {pendingTime > 0 && <div className="callout">{pendingTime} time or time-off entries for this period are still awaiting approval and are not paid. <a href="#/inbox">Open the inbox</a></div>}
+        {inError && (
+          <div className="callout bad">
+            <strong>Error: negative net pay.</strong> {negatives.map((c) => `${c.worker.id} ${c.worker.name} ${fmt(c.pay.totals.net)}`).join(", ")}. An overpayment recovery or deductions exceed this pay run. Net pay must be at least zero before the pay run can be approved or completed.
+            {has(PAYRUN_RULES.calculate) ? <div className="row" style={{ marginTop: 8 }}><button className="btn" onClick={holdAtZero}>Hold net pay at zero and recover the rest next pay run</button></div> : <div className="small" style={{ marginTop: 6 }}>A Payroll Specialist fixes this.</div>}
+          </div>
+        )}
+        {deferredLines.length > 0 && <div className="callout info">Net pay held at zero; recovery carried to the next pay run: {deferredLines.map((d) => `${d.id} ${d.name} ${fmt(d.amount)}`).join(", ")}.</div>}
         {view.retro.size > 0 && <div className="callout info">Retro from changes to the completed prior period: {[...view.retro.entries()].map(([id, v]) => `${id} ${fmt(v.amount)}`).join(", ")}.</div>}
 
         <div className="figures" style={{ marginTop: 12 }}>
