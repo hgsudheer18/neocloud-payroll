@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useData } from "../state.tsx";
 import { go, setQuery } from "../router.tsx";
-import { Money, PageHead, Pill, Section } from "../ui.tsx";
+import { Money, PageHead, Pill, Section, downloadText } from "../ui.tsx";
+import { toCsv } from "../../lib/util/csv.ts";
+import { toDecimalString } from "../../lib/util/money.ts";
 import { COLUMNS, type EmployeeRecon } from "../../lib/engine/reconcile.ts";
 import { buildPayload, groundingCheck, templateCommentary, SYSTEM_PROMPT } from "../../lib/ai/commentary.ts";
 
@@ -17,6 +19,7 @@ export default function Reconciliation({ id, query }: { id?: string; query: URLS
   const r = data!.result;
   const tab = query.get("tab") ?? (r.reconciled ? "legacy" : "headcount");
   const showMatched = query.get("all") === "1";
+  const [full, setFull] = useState(false);
   const setTab = (t: string) => setQuery(`/reconciliation${id ? `/${id}` : ""}`, { tab: t, all: showMatched ? "1" : "" });
   const sel = id ? r.recon.employees.find((e) => e.employeeId === id) : undefined;
   const list = r.recon.employees.filter((e) => showMatched || e.status !== "Matched");
@@ -56,9 +59,34 @@ export default function Reconciliation({ id, query }: { id?: string; query: URLS
 
           {sel && <EmployeeDetail e={sel} />}
 
+          <Section title="Variances by root cause" lede="Amounts are legacy minus Workday. Click a worker to see the column-by-column comparison and the proof.">
+            <div className="table-wrap">
+              <table className="reg">
+                <thead><tr><th>Root cause</th><th>Classification</th><th>Correct system</th><th>Workers</th><th className="n">Gross</th><th className="n">Net</th><th className="n">Employer tax</th></tr></thead>
+                <tbody>
+                  {r.recon.byCause.map((c) => (
+                    <tr key={c.id}>
+                      <td>{c.label}</td>
+                      <td><Pill tone={c.category === "Legacy error" ? "bad" : c.category === "Timing" ? "info" : "warn"}>{c.category}</Pill></td>
+                      <td>{c.correct === "Legacy" ? <strong>Legacy</strong> : c.correct}</td>
+                      <td className="small">{c.employees.map((id, i) => <span key={id}>{i ? ", " : ""}<a href={`#/reconciliation/${id}?tab=legacy`}>{id}</a></span>)}</td>
+                      <td className="n"><Money c={c.grossImpact} signed /></td>
+                      <td className="n"><Money c={c.netImpact} signed /></td>
+                      <td className="n"><Money c={c.erTaxImpact} signed /></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+
           <Section
             title={showMatched ? "All employees" : "Employees with a variance"}
-            right={<label className="small"><input type="checkbox" checked={showMatched} onChange={(e) => setQuery(`/reconciliation${id ? `/${id}` : ""}`, { tab, all: e.target.checked ? "1" : "" })} /> Show matched employees too</label>}
+            right={<div className="row">
+              <label className="small"><input type="checkbox" checked={full} onChange={(e) => setFull(e.target.checked)} /> Show explanations and actions</label>
+              <label className="small"><input type="checkbox" checked={showMatched} onChange={(e) => setQuery(`/reconciliation${id ? `/${id}` : ""}`, { tab, all: e.target.checked ? "1" : "" })} /> Show matched employees too</label>
+              <button className="btn ghost" onClick={() => downloadText("reconciliation-2026-10-SM1.csv", toCsv(r.recon.employees.flatMap((e) => (e.causes.length ? e.causes : [null]).map((c) => ({ employee_id: e.employeeId, name: e.name, status: e.status, workday_gross: e.workday ? toDecimalString(e.workday.gross) : "", legacy_gross: e.legacy ? toDecimalString(e.legacy.gross) : "", delta_gross: toDecimalString(e.delta.gross), delta_net: toDecimalString(e.delta.net), delta_employer_taxes: toDecimalString(e.delta.employerTaxes), root_cause: c?.hypothesis.label ?? "", classification: c?.hypothesis.category ?? "", correct_system: c?.hypothesis.correct ?? "", explanation: c?.explanation ?? "", action: c?.action ?? "" })))))}>Download CSV</button>
+            </div>}
           >
             <div className="table-wrap" style={{ maxHeight: "60vh" }}>
               <table className="reg">
@@ -75,9 +103,31 @@ export default function Reconciliation({ id, query }: { id?: string; query: URLS
                       <td className="n"><Money c={e.delta.gross} signed /></td>
                       <td className="n"><Money c={e.delta.net} signed /></td>
                       <td className="n"><Money c={e.delta.employerTaxes} signed /></td>
-                      <td className="small">{e.causes.map((c) => <div key={c.hypothesis.id}>{c.hypothesis.label} <span className="faint">({c.hypothesis.category.toLowerCase()})</span></div>)}</td>
+                      <td className="small wrap">{e.causes.map((c) => <div key={c.hypothesis.id} style={full ? { marginBottom: 8 } : undefined}>{c.hypothesis.label} <span className="faint">({c.hypothesis.category.toLowerCase()}; correct: {c.hypothesis.correct})</span>{full && <><div>{c.explanation}</div><div className="faint"><strong>Action:</strong> {c.action}</div></>}</div>)}</td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </Section>
+
+          <Section title="Register totals: Workday versus legacy" lede="Every register column summed over all workers, including the two paid in only one system.">
+            <div className="table-wrap">
+              <table className="reg">
+                <thead><tr><th>Register column</th><th className="n">Workday</th><th className="n">Legacy</th><th className="n">Legacy − Workday</th></tr></thead>
+                <tbody>
+                  {COLUMNS.filter((c) => r.recon.totals.workday[c] || r.recon.totals.legacy[c]).map((c) => {
+                    const d = r.recon.totals.legacy[c] - r.recon.totals.workday[c];
+                    const strong = c === "gross" || c === "net" || c === "totalCost";
+                    return (
+                      <tr key={c}>
+                        <td>{strong ? <strong>{COL_LABEL[c]}</strong> : COL_LABEL[c]}</td>
+                        <td className="n"><Money c={r.recon.totals.workday[c]} /></td>
+                        <td className="n"><Money c={r.recon.totals.legacy[c]} /></td>
+                        <td className="n">{d ? <strong><Money c={d} signed /></strong> : <span className="zero">0.00</span>}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -90,8 +140,10 @@ export default function Reconciliation({ id, query }: { id?: string; query: URLS
 
 function EmployeeDetail({ e }: { e: EmployeeRecon }) {
   const cols = COLUMNS.filter((c) => (e.workday?.[c] ?? 0) !== 0 || (e.legacy?.[c] ?? 0) !== 0);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.scrollIntoView({ block: "start", behavior: "smooth" }); }, [e.employeeId]);
   return (
-    <div className="detail" style={{ marginTop: 24 }}>
+    <div className="detail" style={{ marginTop: 24 }} ref={ref}>
       <div className="detail-head">
         <h2>{e.employeeId} {e.name}</h2>
         <Pill tone={tone(e.status)}>{e.status}</Pill>
