@@ -172,6 +172,13 @@ Talking points that sway a decision:
 - **Accounting.** Cost center from the supervisory org; employer taxes and benefits split in proportion to wages; summarized journal; manual post to NetSuite.
 - **Controls.** No self-approval; cross-alerted payroll inputs; locked periods; 11 mapped controls (PR-01 to PR-11).
 
+### Final pay for a mid-period termination (known simplification)
+
+- **What the app does:** a California termination (E0148 in Oct 1–15, Sofia Davis E0024 on 10/23 in testing) raises a critical audit item: final pay is due on the last day (Labor Code 201/202), not the regular check date. The approver must record how it was paid (e.g. "E0024 final pay issued as on-demand payment on 10/23/2026") before the pay run can be approved. Her pay is calculated and completed with the regular run.
+- **Expected for Sofia (last day 10/23):** 48.00 hrs × $38.25 = $1,836.00 + vacation payout 69.93 hrs × $38.25 = $2,674.82; gross $4,510.82; net $3,102.91; Cost to Company $5,300.98.
+- **Talk track:** "Sofia is terminated in California, so her final pay is due on her last day. The engine flags it as critical and blocks approval until payroll records the on-demand payment. In production that is a Workday On-Demand Payment: a separate one-person run check-dated 10/23, so the regular run is not held up or completed early. Here I have modeled the control and the flag; the separate run is the next build."
+- **What the next build adds:** a "Pay final check now" run for one worker, approved by a second person; her result locked at that point (later changes flow as retro); the regular run shows her as paid on demand (out of its bank file, kept in totals, year-to-date and reconciliation); a separate journal for the on-demand check.
+
 ### Cost to Company
 
 The total cost of employing someone: gross pay + employer taxes (Social Security, Medicare, FUTA, SUI) + employer benefits. Not a legal term (finance also calls it burdened or fully loaded cost). Oct 1–15: $1,973,794.91 gross, **$2,299,341.55 Cost to Company**. It is what the journal debits to expense (6100–6300) and what Finance budgets headcount on; a $190,000 salary is roughly $230,000 a year. Employer benefits are a 10% load in this app (the brief gave no premiums); production uses actual premiums and 401(k) match.
