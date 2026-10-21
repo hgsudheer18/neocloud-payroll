@@ -1,0 +1,3465 @@
+{
+  "version": 1,
+  "bps": [
+    {
+      "id": "BP-00005",
+      "type": "Request Time Off",
+      "subjectId": "E0021",
+      "subjectName": "Emma Kim",
+      "effectiveDate": "2026-10-22",
+      "summary": "US Hourly Vacation: 1 day(s), Thu Oct 22–Thu Oct 22, 8 hours",
+      "payload": {
+        "plan": "US_HOURLY_VAC",
+        "unit": "hours",
+        "days": [
+          {
+            "date": "2026-10-22",
+            "quantity": 8
+          }
+        ]
+      },
+      "warnings": [],
+      "status": "Approved",
+      "initiatedBy": "emp",
+      "initiatedAt": "2026-10-21T04:00:27.655Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T04:00:45.456Z",
+      "comment": "test"
+    },
+    {
+      "id": "BP-00006",
+      "type": "Enter Time",
+      "subjectId": "E0021",
+      "subjectName": "Emma Kim",
+      "effectiveDate": "2026-10-18",
+      "summary": "Timesheet, week of Sun Oct 18: 4 day(s), 42.25 hrs",
+      "payload": {
+        "rows": [
+          {
+            "workDate": "2026-10-18",
+            "rowId": "W00001",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "08:00",
+            "mealStart": "12:30",
+            "mealEnd": "13:00",
+            "timeOut": "18:30"
+          },
+          {
+            "workDate": "2026-10-19",
+            "rowId": "W00002",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:45",
+            "timeOut": "17:30"
+          },
+          {
+            "workDate": "2026-10-20",
+            "rowId": "W00003",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "08:00",
+            "mealStart": "12:45",
+            "mealEnd": "13:15",
+            "timeOut": "19:30"
+          },
+          {
+            "workDate": "2026-10-21",
+            "rowId": "W00004",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "21:00"
+          }
+        ]
+      },
+      "warnings": [
+        "Tue Oct 20: Over 10 hours: second meal required unless a waiver is on file.",
+        "Wed Oct 21: Over 12 hours: double time applies and a second meal was required."
+      ],
+      "status": "Approved",
+      "initiatedBy": "emp",
+      "initiatedAt": "2026-10-21T04:03:01.733Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T04:03:22.147Z"
+    },
+    {
+      "id": "BP-00007",
+      "type": "Request Time Off",
+      "subjectId": "E0002",
+      "subjectName": "Liam Singh",
+      "effectiveDate": "2026-10-22",
+      "summary": "US Flexible PTO: 2 day(s), Thu Oct 22–Fri Oct 23, 16 hours",
+      "payload": {
+        "plan": "US_FLEX_PTO",
+        "unit": "hours",
+        "days": [
+          {
+            "date": "2026-10-22",
+            "quantity": 8
+          },
+          {
+            "date": "2026-10-23",
+            "quantity": 8
+          }
+        ]
+      },
+      "warnings": [],
+      "status": "Approved",
+      "initiatedBy": "hr",
+      "initiatedAt": "2026-10-21T04:21:09.538Z",
+      "decidedBy": "ceo",
+      "decidedAt": "2026-10-21T04:21:17.568Z",
+      "comment": "test"
+    },
+    {
+      "id": "BP-00013",
+      "type": "Enter Time",
+      "subjectId": "E0037",
+      "subjectName": "Maya Costa",
+      "effectiveDate": "2026-10-18",
+      "summary": "Timesheet, week of Sun Oct 18: 4 day(s), 46.50 hrs",
+      "payload": {
+        "rows": [
+          {
+            "workDate": "2026-10-18",
+            "rowId": "W00011",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "19:30"
+          },
+          {
+            "workDate": "2026-10-19",
+            "rowId": "W00008",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "07:00",
+            "mealStart": "11:30",
+            "mealEnd": "12:00",
+            "timeOut": "19:00"
+          },
+          {
+            "workDate": "2026-10-20",
+            "rowId": "W00010",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "06:00",
+            "mealStart": "10:30",
+            "mealEnd": "11:00",
+            "timeOut": "19:00"
+          },
+          {
+            "workDate": "2026-10-21",
+            "rowId": "W00012",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "07:00",
+            "mealStart": "11:30",
+            "mealEnd": "12:00",
+            "timeOut": "19:00"
+          }
+        ]
+      },
+      "warnings": [
+        "Mon Oct 19: Starts at 07:00, outside the day shift (08:00–18:00).",
+        "Tue Oct 20: Over 12 hours in one day (no daily overtime in this state; counts toward the weekly 40).",
+        "Tue Oct 20: Starts at 06:00, outside the day shift (08:00–18:00).",
+        "Wed Oct 21: Starts at 07:00, outside the day shift (08:00–18:00)."
+      ],
+      "status": "Approved",
+      "initiatedBy": "emp-tx",
+      "initiatedAt": "2026-10-21T04:37:33.660Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T04:37:42.808Z"
+    },
+    {
+      "id": "BP-00014",
+      "type": "Request Time Off",
+      "subjectId": "E0037",
+      "subjectName": "Maya Costa",
+      "effectiveDate": "2026-10-23",
+      "summary": "US Hourly Vacation: 1 day(s), Fri Oct 23–Fri Oct 23, 8 hours",
+      "payload": {
+        "plan": "US_HOURLY_VAC",
+        "unit": "hours",
+        "days": [
+          {
+            "date": "2026-10-23",
+            "quantity": 8
+          }
+        ]
+      },
+      "warnings": [],
+      "status": "Approved",
+      "initiatedBy": "emp-tx",
+      "initiatedAt": "2026-10-21T04:38:08.234Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T04:38:18.265Z",
+      "comment": "ok"
+    },
+    {
+      "id": "BP-00015",
+      "type": "Hire",
+      "subjectId": "E0400",
+      "subjectName": "Lionel Ronaldo",
+      "effectiveDate": "2026-10-22",
+      "summary": "Hire Lionel Ronaldo as Cloud Solutions IC3, 190,000 USD, San Francisco HQ, from 2026-10-22",
+      "payload": {
+        "name": "Lionel Ronaldo",
+        "hireDate": "2026-10-22",
+        "jobProfile": "Cloud Solutions IC3",
+        "flsa": "Exempt",
+        "payType": "Salary",
+        "level": "IC3",
+        "costCenterId": "CC1100",
+        "locationId": "SF",
+        "workState": "CA",
+        "annualSalary": 190000,
+        "hourlyRate": 0,
+        "managerId": "E0002",
+        "filingStatus": "MFJ",
+        "k401Pct": 0.05,
+        "medicalPerPeriod": 200,
+        "shift": "Day",
+        "positionId": "REQ-S2"
+      },
+      "warnings": [],
+      "status": "Approved",
+      "initiatedBy": "hr",
+      "initiatedAt": "2026-10-21T05:01:59.018Z",
+      "decidedBy": "ceo",
+      "decidedAt": "2026-10-21T05:02:33.505Z"
+    },
+    {
+      "id": "BP-00016",
+      "type": "Hire",
+      "subjectId": "E0401",
+      "subjectName": "Christiano Messi",
+      "effectiveDate": "2026-10-21",
+      "summary": "Hire Christiano Messi as Data Center Technician, $40/hr, San Jose Data Center, from 2026-10-21",
+      "payload": {
+        "name": "Christiano Messi",
+        "hireDate": "2026-10-21",
+        "jobProfile": "Data Center Technician",
+        "flsa": "Non-Exempt",
+        "payType": "Hourly",
+        "level": "T2",
+        "costCenterId": "CC2100",
+        "locationId": "SJ",
+        "workState": "CA",
+        "annualSalary": 0,
+        "hourlyRate": 40,
+        "managerId": "E0005",
+        "filingStatus": "Single",
+        "k401Pct": 0.04,
+        "medicalPerPeriod": 145,
+        "shift": "Day",
+        "positionId": "REQ-H1"
+      },
+      "warnings": [],
+      "status": "Approved",
+      "initiatedBy": "hr",
+      "initiatedAt": "2026-10-21T05:11:26.064Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:11:43.816Z"
+    },
+    {
+      "id": "BP-00018",
+      "type": "Enter Time",
+      "subjectId": "E0401",
+      "subjectName": "Christiano Messi",
+      "effectiveDate": "2026-10-21",
+      "summary": "Manager edit of Christiano Messi's time, week of Sun Oct 18: 1 day(s), 10.00 hrs",
+      "payload": {
+        "rows": [
+          {
+            "workDate": "2026-10-21",
+            "rowId": "W00017",
+            "shift": "Day",
+            "notes": "",
+            "timeIn": "07:00",
+            "mealStart": "11:00",
+            "mealEnd": "11:30",
+            "timeOut": "17:30"
+          }
+        ]
+      },
+      "warnings": [
+        "Wed Oct 21: Starts at 07:00, outside the day shift (08:00–18:00)."
+      ],
+      "approvedAs": "Entered by the worker's manager",
+      "status": "Approved",
+      "initiatedBy": "mgr",
+      "initiatedAt": "2026-10-21T05:12:31.396Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:12:31.396Z",
+      "comment": "Entered by the worker's manager"
+    },
+    {
+      "id": "BP-00019",
+      "type": "Terminate",
+      "subjectId": "E0024",
+      "subjectName": "Sofia Davis",
+      "effectiveDate": "2026-10-23",
+      "payload": {
+        "reason": "Voluntary: resignation"
+      },
+      "summary": "Terminate, last day 2026-10-23 (Voluntary: resignation)",
+      "status": "Approved",
+      "initiatedBy": "hr",
+      "initiatedAt": "2026-10-21T05:13:28.636Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:13:45.448Z"
+    },
+    {
+      "id": "BP-00027",
+      "type": "Enter Time",
+      "subjectId": "E0021",
+      "subjectName": "Emma Kim",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 7 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00020",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00021",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00022",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00023",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00024",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00025",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00026",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.502Z"
+    },
+    {
+      "id": "BP-00039",
+      "type": "Enter Time",
+      "subjectId": "E0023",
+      "subjectName": "Diego Okafor",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00028",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00029",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00030",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00031",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00032",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00033",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00034",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00035",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00036",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00037",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00038",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.503Z"
+    },
+    {
+      "id": "BP-00046",
+      "type": "Enter Time",
+      "subjectId": "E0024",
+      "subjectName": "Sofia Davis",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 6 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00040",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00041",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00042",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00043",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00044",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00045",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Approved",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.503Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:16:19.016Z"
+    },
+    {
+      "id": "BP-00058",
+      "type": "Enter Time",
+      "subjectId": "E0025",
+      "subjectName": "Kenji Hughes",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00047",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00048",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00049",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00050",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00051",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00052",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00053",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00054",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00055",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00056",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00057",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Approved",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.503Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:16:23.684Z"
+    },
+    {
+      "id": "BP-00070",
+      "type": "Enter Time",
+      "subjectId": "E0026",
+      "subjectName": "Aisha Nguyen",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00059",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00060",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00061",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00062",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00063",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00064",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00065",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00066",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00067",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00068",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00069",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Approved",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.504Z",
+      "decidedBy": "mgr",
+      "decidedAt": "2026-10-21T05:16:26.400Z"
+    },
+    {
+      "id": "BP-00082",
+      "type": "Enter Time",
+      "subjectId": "E0027",
+      "subjectName": "Omar Lopez",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Night schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00071",
+            "workDate": "2026-10-16",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00072",
+            "workDate": "2026-10-19",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00073",
+            "workDate": "2026-10-20",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00074",
+            "workDate": "2026-10-21",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00075",
+            "workDate": "2026-10-22",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00076",
+            "workDate": "2026-10-23",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00077",
+            "workDate": "2026-10-26",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00078",
+            "workDate": "2026-10-27",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00079",
+            "workDate": "2026-10-28",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00080",
+            "workDate": "2026-10-29",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00081",
+            "workDate": "2026-10-30",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.504Z"
+    },
+    {
+      "id": "BP-00094",
+      "type": "Enter Time",
+      "subjectId": "E0028",
+      "subjectName": "Grace Murphy",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Night schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00083",
+            "workDate": "2026-10-16",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00084",
+            "workDate": "2026-10-19",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00085",
+            "workDate": "2026-10-20",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00086",
+            "workDate": "2026-10-21",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00087",
+            "workDate": "2026-10-22",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00088",
+            "workDate": "2026-10-23",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00089",
+            "workDate": "2026-10-26",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00090",
+            "workDate": "2026-10-27",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00091",
+            "workDate": "2026-10-28",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00092",
+            "workDate": "2026-10-29",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00093",
+            "workDate": "2026-10-30",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.504Z"
+    },
+    {
+      "id": "BP-00106",
+      "type": "Enter Time",
+      "subjectId": "E0029",
+      "subjectName": "Mateo Ali",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00095",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00096",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00097",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00098",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00099",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00100",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00101",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00102",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00103",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00104",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00105",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.504Z"
+    },
+    {
+      "id": "BP-00118",
+      "type": "Enter Time",
+      "subjectId": "E0030",
+      "subjectName": "Chloe Novak",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00107",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00108",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00109",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00110",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00111",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00112",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00113",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00114",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00115",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00116",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00117",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.505Z"
+    },
+    {
+      "id": "BP-00130",
+      "type": "Enter Time",
+      "subjectId": "E0031",
+      "subjectName": "Ravi Johnson",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00119",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00120",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00121",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00122",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00123",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00124",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00125",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00126",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00127",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00128",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00129",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.505Z"
+    },
+    {
+      "id": "BP-00142",
+      "type": "Enter Time",
+      "subjectId": "E0032",
+      "subjectName": "Isla Silva",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00131",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00132",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00133",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00134",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00135",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00136",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00137",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00138",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00139",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00140",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00141",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.505Z"
+    },
+    {
+      "id": "BP-00154",
+      "type": "Enter Time",
+      "subjectId": "E0033",
+      "subjectName": "Jonah Walker",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00143",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00144",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00145",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00146",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00147",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00148",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00149",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00150",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00151",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00152",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00153",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.505Z"
+    },
+    {
+      "id": "BP-00166",
+      "type": "Enter Time",
+      "subjectId": "E0034",
+      "subjectName": "Leah Iyer",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00155",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00156",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00157",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00158",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00159",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00160",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00161",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00162",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00163",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00164",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00165",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00178",
+      "type": "Enter Time",
+      "subjectId": "E0035",
+      "subjectName": "Wei Smith",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00167",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00168",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00169",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00170",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00171",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00172",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00173",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00174",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00175",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00176",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00177",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00190",
+      "type": "Enter Time",
+      "subjectId": "E0036",
+      "subjectName": "Nina Martin",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00179",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00180",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00181",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00182",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00183",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00184",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00185",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00186",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00187",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00188",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00189",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00202",
+      "type": "Enter Time",
+      "subjectId": "E0022",
+      "subjectName": "Caleb Ivanova",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Night schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00191",
+            "workDate": "2026-10-16",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00192",
+            "workDate": "2026-10-19",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00193",
+            "workDate": "2026-10-20",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00194",
+            "workDate": "2026-10-21",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00195",
+            "workDate": "2026-10-22",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00196",
+            "workDate": "2026-10-23",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00197",
+            "workDate": "2026-10-26",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00198",
+            "workDate": "2026-10-27",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00199",
+            "workDate": "2026-10-28",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00200",
+            "workDate": "2026-10-29",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00201",
+            "workDate": "2026-10-30",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00210",
+      "type": "Enter Time",
+      "subjectId": "E0037",
+      "subjectName": "Maya Costa",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 7 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00203",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00204",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00205",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00206",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00207",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00208",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00209",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00222",
+      "type": "Enter Time",
+      "subjectId": "E0038",
+      "subjectName": "Hugo Garcia",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00211",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00212",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00213",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00214",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00215",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00216",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00217",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00218",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00219",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00220",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00221",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.506Z"
+    },
+    {
+      "id": "BP-00234",
+      "type": "Enter Time",
+      "subjectId": "E0039",
+      "subjectName": "Elena Brown",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Night schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00223",
+            "workDate": "2026-10-16",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00224",
+            "workDate": "2026-10-19",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00225",
+            "workDate": "2026-10-20",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00226",
+            "workDate": "2026-10-21",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00227",
+            "workDate": "2026-10-22",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00228",
+            "workDate": "2026-10-23",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00229",
+            "workDate": "2026-10-26",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00230",
+            "workDate": "2026-10-27",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00231",
+            "workDate": "2026-10-28",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00232",
+            "workDate": "2026-10-29",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00233",
+            "workDate": "2026-10-30",
+            "timeIn": "22:00",
+            "mealStart": "02:00",
+            "mealEnd": "02:30",
+            "timeOut": "06:30",
+            "shift": "Night",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00246",
+      "type": "Enter Time",
+      "subjectId": "E0040",
+      "subjectName": "Sami Khan",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00235",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00236",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00237",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00238",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00239",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00240",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00241",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00242",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00243",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00244",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00245",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00257",
+      "type": "Enter Time",
+      "subjectId": "E0041",
+      "subjectName": "Iris Moreau",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 10 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00247",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00248",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00249",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00250",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00251",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00252",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00253",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00254",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00255",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00256",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00269",
+      "type": "Enter Time",
+      "subjectId": "E0042",
+      "subjectName": "Theo Patel",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00258",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00259",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00260",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00261",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00262",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00263",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00264",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00265",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00266",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00267",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00268",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00281",
+      "type": "Enter Time",
+      "subjectId": "E0043",
+      "subjectName": "Lena Singh",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00270",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00271",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00272",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00273",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00274",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00275",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00276",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00277",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00278",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00279",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00280",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00293",
+      "type": "Enter Time",
+      "subjectId": "E0044",
+      "subjectName": "Rohan Tanaka",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00282",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00283",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00284",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00285",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00286",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00287",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00288",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00289",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00290",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00291",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00292",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00305",
+      "type": "Enter Time",
+      "subjectId": "E0045",
+      "subjectName": "Ana Sato",
+      "effectiveDate": "2026-10-16",
+      "summary": "Auto-fill 11 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00294",
+            "workDate": "2026-10-16",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00295",
+            "workDate": "2026-10-19",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00296",
+            "workDate": "2026-10-20",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00297",
+            "workDate": "2026-10-21",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00298",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00299",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00300",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00301",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00302",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00303",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00304",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.507Z"
+    },
+    {
+      "id": "BP-00313",
+      "type": "Enter Time",
+      "subjectId": "E0401",
+      "subjectName": "Christiano Messi",
+      "effectiveDate": "2026-10-22",
+      "summary": "Auto-fill 7 scheduled shifts, Fri Oct 16–Sat Oct 31 (Day schedule)",
+      "payload": {
+        "rows": [
+          {
+            "rowId": "W00306",
+            "workDate": "2026-10-22",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00307",
+            "workDate": "2026-10-23",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00308",
+            "workDate": "2026-10-26",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00309",
+            "workDate": "2026-10-27",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00310",
+            "workDate": "2026-10-28",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00311",
+            "workDate": "2026-10-29",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          },
+          {
+            "rowId": "W00312",
+            "workDate": "2026-10-30",
+            "timeIn": "08:00",
+            "mealStart": "12:00",
+            "mealEnd": "12:30",
+            "timeOut": "16:30",
+            "shift": "Day",
+            "notes": "Auto-filled from work schedule"
+          }
+        ]
+      },
+      "status": "Awaiting Approval",
+      "initiatedBy": "ps",
+      "initiatedAt": "2026-10-21T05:15:33.508Z"
+    }
+  ],
+  "payRuns": {
+    "2026-10-SM1": {
+      "periodId": "2026-10-SM1",
+      "status": "Completed",
+      "calculatedBy": "ps",
+      "calculatedAt": "2026-10-21T03:31:44.070Z",
+      "bpCountAtCalc": 0,
+      "approvedBy": "pa",
+      "approvedAt": "2026-10-21T03:34:17.182Z",
+      "acknowledged": "E0148 final check paid out as on demand",
+      "completedAt": "2026-10-21T03:34:19.549Z",
+      "completedBy": "pa",
+      "totals": {
+        "gross": 197379491,
+        "net": 131311926,
+        "burdened": 229934155,
+        "workers": 280
+      }
+    },
+    "2026-10-SM2": {
+      "periodId": "2026-10-SM2",
+      "status": "Calculated",
+      "calculatedBy": "ps",
+      "calculatedAt": "2026-10-21T05:16:50.105Z",
+      "bpCountAtCalc": 12,
+      "totals": {
+        "gross": 188137128,
+        "net": 124857558,
+        "burdened": 218606522,
+        "workers": 255
+      }
+    },
+    "2026-BW-T1": {
+      "periodId": "2026-BW-T1",
+      "status": "Not started",
+      "bpCountAtCalc": 12,
+      "totals": {
+        "gross": 1715138,
+        "net": 1278391,
+        "burdened": 2013788,
+        "workers": 26
+      },
+      "acknowledged": "approve as an exception"
+    }
+  },
+  "jobProfiles": [],
+  "seq": 313,
+  "seen": {
+    "emp": [
+      "alert:daily:2026-10-20"
+    ],
+    "emp-tx": [
+      "alert:daily:2026-10-20"
+    ],
+    "ps": [
+      "pay:2026-10-SM1"
+    ],
+    "mgr": [
+      "wait:BP-00019",
+      "wait:BP-00313"
+    ]
+  },
+  "drafts": {
+    "E0021": [],
+    "E0037": [],
+    "mgr:E0401": []
+  }
+}
