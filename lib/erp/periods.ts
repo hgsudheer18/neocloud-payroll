@@ -194,3 +194,23 @@ export function computePeriod(base: Dataset, erp: ErpState, periodId: string): P
 export function approvedCount(bps: BusinessProcess[]): number {
   return bps.filter((b) => b.status === "Approved").length;
 }
+
+/** Business processes that change pay and can be previewed before they are approved. */
+const PREVIEW_TYPES = new Set<string>(["Change Compensation", "Change Cost Center", "Change Location", "Leave of Absence", "Return from Leave", "Terminate", "Enter Time", "Request Time Off", "Correct Time Off", "Payroll Input", "Change Tax Withholding"]);
+
+/** A worker's business processes still awaiting approval that would change their pay. */
+export function pendingForWorker(bps: BusinessProcess[], workerId: string): BusinessProcess[] {
+  return bps.filter((b) => b.status === "Awaiting Approval" && b.subjectId === workerId && PREVIEW_TYPES.has(b.type));
+}
+
+/**
+ * What a period would look like if the worker's pending business processes were
+ * approved now. Nothing is saved: the pay run and everyone else's results are unchanged.
+ */
+export function previewPending(base: Dataset, erp: ErpState, periodId: string, workerId: string): { pending: BusinessProcess[]; view: PeriodView } {
+  const pending = pendingForWorker(erp.bps, workerId);
+  const ids = new Set(pending.map((b) => b.id));
+  const at = new Date().toISOString();
+  const bps = erp.bps.map((b) => (ids.has(b.id) ? { ...b, status: "Approved" as const, decidedBy: "preview", decidedAt: at } : b));
+  return { pending, view: computePeriod(base, { ...erp, bps }, periodId) };
+}

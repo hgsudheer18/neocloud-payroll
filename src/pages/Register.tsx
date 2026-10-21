@@ -1,5 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useData } from "../state.tsx";
+import { useErp } from "../erp.tsx";
+import { BpStatus } from "../erpui.tsx";
+import { pendingForWorker, previewPending } from "../../lib/erp/periods.ts";
+import { PERIOD_LABEL } from "../../lib/config/period.ts";
 import { go, setQuery } from "../router.tsx";
 import { Money, PageHead, Pill, Section, Select, downloadText } from "../ui.tsx";
 import { fmt, toDecimalString } from "../../lib/util/money.ts";
@@ -162,6 +166,7 @@ export function Payslip({ c, mine = false }: { c: UsWorkerCalc; mine?: boolean }
       {p.flags.map((f) => (
         <div key={f} className={`callout ${f.startsWith("Final pay") ? "bad" : ""}`}>{f}</div>
       ))}
+      {!mine && <PendingPreview c={c} />}
       <div className="grid2">
         <div>
           {GROUPS.filter((g) => !mine || !g.startsWith("Employer")).map((g) => {
@@ -239,6 +244,77 @@ export function Payslip({ c, mine = false }: { c: UsWorkerCalc; mine?: boolean }
           {!mine && <p className="small"><a href={`#/reconciliation/${w.id}`}>Compare with the legacy register</a></p>}
         </div>
       </div>
+    </div>
+  );
+}
+
+const TOTALS: [keyof UsWorkerCalc["pay"]["totals"], string][] = [["gross", "Gross pay"], ["preTax", "Pre-tax deductions"], ["eeTaxes", "Employee taxes"], ["postTax", "Post-tax deductions"], ["net", "Net pay"], ["erTaxes", "Employer taxes"], ["benefits", "Benefits load"], ["burdened", "Burdened cost"]];
+
+/**
+ * Preview of this worker's pay if their pending requests (time, time off, payroll
+ * inputs, job changes) were approved now. Results already update on approval; this
+ * shows the effect before it, without saving anything or touching the pay run.
+ */
+function PendingPreview({ c }: { c: UsWorkerCalc }) {
+  const { data } = useData();
+  const { erp, periodId } = useErp();
+  const w = c.worker;
+  const pending = pendingForWorker(erp.bps, w.id);
+  const [open, setOpen] = useState(false);
+  const completed = erp.payRuns[periodId]?.status === "Completed";
+  const preview = useMemo(() => (open && pending.length && !completed ? previewPending(data!.base, erp, periodId, w.id) : null), [open, pending.length, completed, data, erp, periodId, w.id]);
+  if (!pending.length)
+    return <p className="small muted">No pending changes for {w.name}. Pay results update as soon as time, time off or a payroll input is approved.</p>;
+  const after = preview?.view.result.us.find((x) => x.worker.id === w.id);
+  const byCode = (x?: UsWorkerCalc) => (x ? x.pay.lines.reduce((m, l) => m.set(l.name, { amount: (m.get(l.name)?.amount ?? 0) + l.amount, hours: (m.get(l.name)?.hours ?? 0) + (l.hours ?? 0), type: l.type }), new Map<string, { amount: number; hours: number; type: (typeof GROUPS)[number] }>()) : new Map<string, { amount: number; hours: number; type: (typeof GROUPS)[number] }>());
+  const now = byCode(c);
+  const next = byCode(after);
+  const changed = [...new Set([...now.keys(), ...next.keys()])].filter((k) => (now.get(k)?.amount ?? 0) !== (next.get(k)?.amount ?? 0))
+    .sort((a, b) => GROUPS.indexOf((now.get(a) ?? next.get(a))!.type) - GROUPS.indexOf((now.get(b) ?? next.get(b))!.type));
+  const hrs = (v?: { hours: number }) => (v && v.hours ? `${v.hours.toFixed(2)} hrs` : "");
+  return (
+    <div className="callout info" style={{ marginBottom: 16 }}>
+      <div className="row" style={{ justifyContent: "space-between", alignItems: "baseline" }}>
+        <strong>{pending.length} pending change{pending.length > 1 ? "s" : ""} not yet in these results</strong>
+        {!completed && <button className="btn ghost" onClick={() => setOpen(!open)}>{open ? "Hide preview" : "Preview pay with these approved"}</button>}
+      </div>
+      <ul className="small" style={{ margin: "8px 0" }}>
+        {pending.map((b) => <li key={b.id}>{b.id} {b.type}, effective {pretty(b.effectiveDate)}: {b.summary} <BpStatus bp={b} /></li>)}
+      </ul>
+      {completed && <p className="small">{PERIOD_LABEL[periodId]} is completed, so once approved these are paid as retro in the next pay run. Choose the next open period to preview them.</p>}
+      {preview && !after && <p className="small">With these approved, {w.name} would not be paid in {PERIOD_LABEL[periodId]}.</p>}
+      {preview && after && (
+        <div className="grid2" style={{ marginTop: 8 }}>
+          <div>
+            <h3>Totals</h3>
+            <table className="reg">
+              <thead><tr><th /><th className="n">Now</th><th className="n">If approved</th><th className="n">Change</th></tr></thead>
+              <tbody>
+                {TOTALS.map(([k, label]) => {
+                  const d = after.pay.totals[k] - c.pay.totals[k];
+                  return <tr key={k}><td>{k === "net" ? <strong>{label}</strong> : label}</td><td className="n"><Money c={c.pay.totals[k]} /></td><td className="n"><Money c={after.pay.totals[k]} /></td><td className="n">{d ? <strong><Money c={d} /></strong> : <span className="faint">–</span>}</td></tr>;
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Pay lines that change</h3>
+            {changed.length === 0 ? <p className="small muted">No pay line changes in {PERIOD_LABEL[periodId]}. A pending change dated in another period shows when that period is selected.</p> : (
+              <table className="reg">
+                <thead><tr><th>Line</th><th className="n">Now</th><th className="n">If approved</th><th className="n">Change</th></tr></thead>
+                <tbody>
+                  {changed.map((k) => {
+                    const a = now.get(k);
+                    const b = next.get(k);
+                    return <tr key={k}><td>{k}</td><td className="n"><Money c={a?.amount ?? 0} /><div className="faint small">{hrs(a)}</div></td><td className="n"><Money c={b?.amount ?? 0} /><div className="faint small">{hrs(b)}</div></td><td className="n"><strong><Money c={(b?.amount ?? 0) - (a?.amount ?? 0)} /></strong></td></tr>;
+                  })}
+                </tbody>
+              </table>
+            )}
+            <p className="small muted">Preview only: nothing is approved or saved, and the pay run is unchanged.</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

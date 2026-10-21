@@ -8,7 +8,7 @@ import { join } from "node:path";
 import { readTexts } from "../lib/data/fs.ts";
 import { loadDataset } from "../lib/data/load.ts";
 import { applyBps } from "../lib/erp/apply.ts";
-import { computePeriod } from "../lib/erp/periods.ts";
+import { computePeriod, pendingForWorker, previewPending } from "../lib/erp/periods.ts";
 import { validateHire, validateTimeEntry, validateTimeOff } from "../lib/erp/validate.ts";
 import { plansForWorker } from "../lib/engine/absence.ts";
 import type { BusinessProcess, ErpState } from "../lib/erp/types.ts";
@@ -286,4 +286,23 @@ test("Payroll inputs: one-time for a pay period, retro for a completed one, ongo
   const after = computePeriod(base, erp([k], done), SM2).result.us.find((c) => c.worker.id === "E0001")!.pay;
   assert.equal(after.totals.preTax - before.totals.preTax, 15000);
   assert.equal(before.taxable.fit - after.taxable.fit, 15000);
+});
+
+test("Pending time can be previewed on a worker's pay without being approved", () => {
+  const rows = [{ rowId: "WP1", workDate: "2026-10-19", timeIn: "08:00", timeOut: "20:30", mealStart: "12:00", mealEnd: "12:30", shift: "Day", notes: "" }];
+  const pending = bp("Enter Time", "E0021", "2026-10-19", { rows }, "2026-10-21T10:00:00Z", "Awaiting Approval");
+  const state = erp([pending], { [SM1]: "2026-10-20T09:00:00Z" });
+  const emma = (v: ReturnType<typeof computePeriod>) => v.result.us.find((c) => c.worker.id === "E0021")!;
+  const now = emma(computePeriod(base, state, BWT));
+  const { pending: found, view } = previewPending(base, state, BWT, "E0021");
+  assert.deepEqual(found.map((b) => b.id), [pending.id]);
+  assert.equal(pendingForWorker(state.bps, "E0020").length, 0);
+  const after = emma(view);
+  const hours = (c: typeof now, code: string) => c.pay.lines.filter((l) => l.code === code).reduce((s, l) => s + (l.hours ?? 0), 0);
+  assert.equal(hours(after, "OT") - hours(now, "OT"), 4, "12 hours worked: 4 daily overtime hours in California");
+  assert.ok(after.pay.totals.gross > now.pay.totals.gross);
+  assert.equal(state.bps[0].status, "Awaiting Approval", "the preview approves nothing");
+  // Same as actually approving it.
+  const approved = emma(computePeriod(base, erp([{ ...pending, status: "Approved" }], { [SM1]: "2026-10-20T09:00:00Z" }), BWT));
+  assert.equal(after.pay.totals.net, approved.pay.totals.net);
 });
