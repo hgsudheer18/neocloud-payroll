@@ -38,17 +38,19 @@ export default function Register({ id, query }: { id?: string; query: URLSearchP
   const sel = id ? r.us.find((c) => c.worker.id === id) : undefined;
   const sum = (k: keyof UsWorkerCalc["pay"]["totals"]) => rows.reduce((s, c) => s + c.pay.totals[k], 0);
 
-  const exportCsv = () =>
-    downloadText(
-      "payroll-register-2026-10-SM1.csv",
-      toCsv(
-        rows.map((c) => ({
+  const exportCsv = () => {
+    const out = rows.map((c) => ({
           employee_id: c.worker.id, name: c.worker.name, department: c.worker.department, cost_center: c.worker.costCenterId, location: c.worker.locationId, work_state: c.worker.workState,
           ...Object.fromEntries(Array.from(c.pay.lines.reduce((m, l) => m.set(l.code, (m.get(l.code) ?? 0) + l.amount), new Map<string, number>()).entries(), ([k, v]) => [k, toDecimalString(v)])),
+          ...(() => { const hs = (codes: string[]) => c.pay.lines.filter((l) => codes.includes(l.code)).reduce((t, l) => t + (l.hours ?? 0), 0).toFixed(2); return { regular_hours: hs(["SAL", "REG"]), overtime_hours: hs(["OT"]), double_time_hours: hs(["DT"]), time_off_hours: hs(["PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID"]) }; })(),
           gross: toDecimalString(c.pay.totals.gross), net: toDecimalString(c.pay.totals.net), employer_taxes: toDecimalString(c.pay.totals.erTaxes), benefits: toDecimalString(c.pay.totals.benefits), burdened: toDecimalString(c.pay.totals.burdened),
-        })),
-      ),
-    );
+        }) as Record<string, string>);
+    // Every pay code any worker has, in a fixed order, so no column is lost.
+    const fixed = ["employee_id", "name", "department", "cost_center", "location", "work_state"];
+    const tail = ["regular_hours", "overtime_hours", "double_time_hours", "time_off_hours", "gross", "net", "employer_taxes", "benefits", "burdened"];
+    const codes = [...new Set(out.flatMap((o) => Object.keys(o)))].filter((k) => !fixed.includes(k) && !tail.includes(k));
+    downloadText(`payroll-register-${r.period.id}.csv`, toCsv(out.map((o) => Object.fromEntries([...fixed, ...codes, ...tail].map((k) => [k, o[k] ?? ""]))), [...fixed, ...codes, ...tail]));
+  };
 
   return (
     <>
@@ -196,6 +198,14 @@ export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: 
           })}
         </div>
         <div>
+          {hoursSummary(c).length > 0 && (
+            <>
+              <h3>Hours</h3>
+              <dl className="kv" style={{ marginBottom: 20 }}>
+                {hoursSummary(c).map(([label, h], i, all) => <span key={label} style={{ display: "contents" }}><dt>{i === all.length - 1 ? <strong>{label}</strong> : label}</dt><dd>{i === all.length - 1 ? <strong>{h.toFixed(2)}</strong> : h.toFixed(2)}</dd></span>)}
+              </dl>
+            </>
+          )}
           <h3>Totals</h3>
           <dl className="kv">
             <dt>Gross pay</dt><dd><Money c={p.totals.gross} /></dd>
@@ -317,4 +327,18 @@ function PendingPreview({ c }: { c: UsWorkerCalc }) {
       )}
     </div>
   );
+}
+
+/** Paid hours by kind for the pay slip: regular (salary standard hours or hours worked), overtime, double time, time off, total. */
+export function hoursSummary(c: UsWorkerCalc): [string, number][] {
+  const sum = (codes: string[]) => c.pay.lines.filter((l) => codes.includes(l.code)).reduce((t, l) => t + (l.hours ?? 0), 0);
+  const rows: [string, number][] = [
+    [c.worker.payType === "Hourly" ? "Regular hours worked" : "Regular salary hours", sum(["SAL", "REG"])],
+    ["Overtime (1.5x)", sum(["OT"])],
+    ["Double time (2x)", sum(["DT"])],
+    ["Time off", sum(["PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID"])],
+  ];
+  const shown = rows.filter(([label, h]) => h > 0 || label.startsWith("Regular"));
+  const total = shown.reduce((t, [, h]) => t + h, 0);
+  return total > 0 ? [...shown, ["Total paid hours", total]] : [];
 }
