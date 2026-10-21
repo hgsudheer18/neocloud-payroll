@@ -212,3 +212,27 @@ A deliberate one-time transition period, not an error. Talking points:
 - Unlock **Administrator access** from the sidebar if you want all-access shortcuts.
 - Approver shortcut: after submitting, click **Sign in as … to approve**.
 - Hard refresh (Cmd+Shift+R) after a new deploy.
+
+## 11. Demo sequence for the team (about 30 minutes)
+
+Present from the browser that holds your data (or Load demo data first). Share your screen so everyone sees the same numbers. Hard refresh (Cmd+Shift+R) before starting. Use **Sign in as … to approve** after each submission to jump to the approver.
+
+| # | Minutes | Signed in as | Show | Say / expected |
+|---|---|---|---|---|
+| 1 | 2 | Anyone | Home, then the deck's brief slide if useful | 280 US workers, 4 countries, IPO-track controls; Workday-style HCM, time and payroll posting to NetSuite |
+| 2 | 5 | Diego | Period overview (Oct 1–15): 8 control ties; **Reconciliation → Legacy register**: variances by root cause, Show explanations, E0148, E0057, E0003 | 262 matched, 17 explained, 0 unexplained; legacy pays $12,658.51 more gross; "every variance explained, proven by recalculation"; legacy is right on the wage base |
+| 3 | 3 | Diego, then Aisha | **Pay runs → Oct 1–15**: Calculate; Aisha records the E0148 resolution, Approve, Complete | Segregation of duties: Diego cannot approve; CA final pay critical item needs a recorded resolution; $1,973,794.91 gross, $2,299,341.55 Cost to Company |
+| 4 | 3 | Chloe | **Workers → Hire a worker → Position REQ-H1** (hourly, San Jose, $40) from 10/19; **REQ-S2** (salaried) from 10/22 at $190,000, married filing jointly, medical $200 | Position pre-fills job, pay, cost center, manager; approvals go to Ethan / Morgan |
+| 5 | 2 | Chloe | **Workers → E0024 Sofia Davis → Terminate**, last day 10/23 | CA final pay due on the last day; on-demand payment talk track (section 9) |
+| 6 | 4 | Emma, then Maya, then Ethan | **Enter time**, week of 10/18: Emma Mon 08:00–20:30, Wed 08:00–21:30; Maya same days; Ethan approves | Emma (CA): daily OT, double time over 12, meal premium; Maya (TX): weekly OT over 40 only; meal entries never reduce hours, they warn |
+| 7 | 2 | Chloe, then Morgan | **Workers → E0002 Liam Singh → Request time off**, 8 hrs US Flexible PTO | Salaried time off: gross unchanged, hours move from salary to time off |
+| 8 | 2 | Diego, then Ethan | **Pay runs → Time administration → Auto-fill** Oct 16–31; Ethan Approve all; show **Preview pay with these approved** on a pending worker first if useful | Payroll pays approved time only; preview shows the effect before approval |
+| 9 | 4 | Diego, then Aisha | **Pay runs → Oct 16–31 semi-monthly**, Calculate / Approve / Complete; then **biweekly transition** with the E0024 resolution | **Pay results**: Liam 78.67 + 8.00 hrs = 86.67, $12,500; salaried hire 55.15 hrs, $5,037.88, net $3,655.43; hourly hire 80 hrs, $3,200; Sofia $4,510.82 incl. $2,674.82 payout; 16-day transition talk track |
+| 10 | 2 | Diego | **General ledger**: journals balance → Post journals to NetSuite | Manual post by payroll after completion; summarized journal by account, cost center, location |
+| 11 | 2 | Diego, then Aisha | **Payroll inputs**: a bonus for a worker; Aisha sees the SOX audit alert and approves | Either payroll role enters, the other approves and is alerted |
+| 12 | 1 | Emma | **Pay Slip**: net pay masked until clicked; Hours box | Employee self-service |
+| 13 | 2 | Anyone | Wrap up: design decisions (section 9), open items (on-demand final pay, W-2s at year-end, wage base, holidays) | What is next |
+
+Expected amounts in rows 6–9 assume the dates and inputs above; different dates change them (the payroll register preview shows the effect before approving).
+
+**If something goes wrong live:** Data and demo → Load demo data with your saved file, or switch to the Oct 1–15 story (rows 2–3), which never changes.
