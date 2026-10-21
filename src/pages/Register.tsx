@@ -216,7 +216,7 @@ export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: 
             {!mine && <>
             <dt>Employer taxes</dt><dd><Money c={p.totals.erTaxes} /></dd>
             <dt>Benefits load</dt><dd><Money c={p.totals.benefits} /></dd>
-            <dt><strong>Cost to Company</strong></dt><dd><strong><Money c={p.totals.burdened} /></strong></dd>
+            <dt><strong>Cost to Company (burdened)</strong></dt><dd><strong><Money c={p.totals.burdened} /></strong></dd>
             </>}
           </dl>
           <h3 style={{ marginTop: 20 }}>Taxable wages (each tax has its own base)</h3>

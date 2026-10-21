@@ -61,7 +61,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
             ["Net pay", r.totals.net],
             ["Employer taxes", r.totals.erTaxes],
             ["Benefits load", r.totals.benefits],
-            ["Cost to Company", r.totals.burdened],
+            ["Cost to Company (total burdened cost)", r.totals.burdened],
           ].map(([l, v]) => (
             <div className="figure" key={l as string}>
               <div className="v">{fmt(v as number)}</div>
@@ -71,7 +71,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
         </div>
       </Section>
 
-      <Section title="Cost to Company rollup" lede="US semi-monthly period plus October international employer cost translated to USD at the reporting rates (GBP 1.27, CAD 0.73, INR 0.012).">
+      <Section title="Cost to Company (burdened cost) rollup by department, location or cost center" lede="US semi-monthly period plus October international employer cost translated to USD at the reporting rates (GBP 1.27, CAD 0.73, INR 0.012).">
         <div className="filters">
           <Select label="Group by" value={by} onChange={(v) => set("by", v)} options={[["department", "Department"], ["location", "Location"], ["costCenter", "Cost center"]]} all={null} />
           <Select label="Department" value={dept} onChange={(v) => set("dept", v)} options={depts} />

@@ -28,7 +28,7 @@ npm run dev          # then open http://127.0.0.1:5173
 Other commands:
 
 ```bash
-npm test             # 46 tests: overtime, proration, termination payout, absence, GL, reconciliation, AI guardrails, business processes, retro, roll-forward, biweekly
+npm test             # 66 tests: overtime, double time, meal rules, proration, termination payout, absence, GL, reconciliation, AI guardrails, business processes, retro, roll-forward, biweekly
 npm run build        # static site in ./dist
 npm run report       # regenerates docs/07-period-results.md from the engine
 npm run generate     # regenerates the data package in ./data (deterministic)
@@ -110,6 +110,43 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | [docs/08-architecture-decisions.md](docs/08-architecture-decisions.md) | 8. Architecture decision record |
 | [docs/09-ai-in-payroll.md](docs/09-ai-in-payroll.md) | 9. AI feature and guardrails |
 | [docs/10-demo-script.md](docs/10-demo-script.md) | Walkthrough for the panel |
+| [docs/11-presenter-reference.md](docs/11-presenter-reference.md) | Test scenarios, expected results and demo sequence |
+| [docs/12-reconciliation-memo.md](docs/12-reconciliation-memo.md) | Deliverable 5: reconciliation memo to the Controller |
+
+The consolidated design document (deliverable 4: requirements 1, 3, 4, 5, 6 and 7, with assumptions and limitations) is published separately as a PDF / shared document; docs/01–06 are its source sections.
+
+## Architecture decisions (summary)
+
+The full decision log, with alternatives considered for each choice, is [docs/08-architecture-decisions.md](docs/08-architecture-decisions.md). In short:
+
+**Technology.** A static React + TypeScript single-page app built with esbuild and deployed on Vercel. No database and no server: the brief asks for an app that ingests CSV files and calculates, and a static app runs locally in minutes and keeps payroll data in the reviewer's browser. TypeScript gives one language for the engine, the tests and the UI.
+
+**Where calculations run.** All rules live in `lib/` as pure functions with no UI code: the same engine runs in the browser, in the Node test suite and in `npm run report`, which generates the period results document so numbers in documents cannot drift from the app. The UI only renders results.
+
+**Data model and effective dating.** The CSV package is the base record. Every change made in the app is a business process (hire, change pay, cost center or location, leave, terminate, enter time, request time off, payroll input) with an effective date, an initiator, an approver and timestamps; nothing is overwritten. For each worker the engine materializes a per-day timeline (salary, cost center, work state, leave status) from the effective-dated records, so proration, mid-period changes and multi-state allocation are all "sum over days". Data as of any moment is "base package + business processes approved up to that moment", which makes a completed period reproducible (bitemporal): the next pay run recalculates a completed period with today's data and pays the difference as retro. Money is integer cents, rounded once per line.
+
+**Reconciliation design.** Re-performance, not tolerance. For each employee the engine compares every legacy register column with Workday's; for a difference it tests documented hypotheses (legacy error, configuration difference, timing, data) by recalculating the worker with that cause applied. A variance is "explained" only when the recalculation reproduces the legacy row to the cent; the reconciler never reads the list of seeded errors. Headcount reconciles from workers on file to workers paid with every exclusion listed.
+
+**How the app maps to Workday.**
+
+| App | Workday construct |
+|---|---|
+| `lib/config/payComponents.ts`: code, calculation basis, feed, taxability flags, GL account | Pay components; taxability through pay component group membership (Federal Taxable Wages, FICA Wages, 401(k) Eligible Earnings, state wages); account posting rules |
+| `lib/engine/time.ts` categories: REG, OT_DAILY, OT_WEEKLY, DT, SEVENTH_OT/DT, NIGHT, MEAL | Time calculation tags produced by time calculations in a defined order (state rules by work location), mapped to pay components (REG → Regular Hours, OT tags → Overtime, NIGHT → Shift Differential, MEAL → Meal Premium) |
+| `lib/config/timeRules.ts`: shifts, day breakers, state rules | Work schedule calendars, time entry templates and validations, time period schedules |
+| `lib/config/absencePlans.ts` | Absence accrual plans (frequency, per-hour or per-period accrual, waiting period, carryover, cap, payout on termination) and time-off plans with eligibility rules |
+| Worker cost center from supervisory org; company, location, function | Worktags defaulted from the supervisory org, posted through account posting rules and mapped to NetSuite subsidiary, department, location and class |
+| `lib/config/period.ts`, `payCalendar.ts` | Pay groups and pay period schedules (US Semi-Monthly, US Biweekly), check dates and cutoffs |
+| `lib/erp/types.ts` business process rules | Business process definitions and security groups: initiator and approver must differ |
+| Retro by recalculating a completed period | Workday retro processing: completed results stay, the delta is paid as retro in the open period |
+| Pre-payroll audit, entry validations | Pay calculation audit reports and critical/warning validations on time entry and business processes |
+
+**What I would do differently with more time.**
+- A server-side store and single sign-on so every reviewer shares one live dataset with real logins, instead of per-browser state.
+- On-demand payments: a terminated worker's final check run on its own on the last day (California), without completing the regular run.
+- A real tax engine (or Workday's) instead of approximations; Colorado FAMLI, local taxes, the 2026 Social Security wage base.
+- Year-end: W-2 generation, review, publishing and SSA filing; a holiday calendar for check dates; a second meal per day on the timesheet.
+- End-to-end UI tests alongside the engine tests, and the Workato integration to NetSuite in place of the manual export.
 
 ## Project layout
 
@@ -174,6 +211,9 @@ The app was built with Claude (Anthropic) acting as the coding agent, directed a
 | Narrowed the scope to the brief (a CSV calculation app) and dropped my original requirement for a working ERP (hire, time, absence, run payroll) | When I tried to hire someone in the demo | Added the ERP layer as business processes on top of the unchanged engine (ADR-14) |
 | First retro design treated time entered before the next period's start date as already paid; time approved after a period was completed but before the next one started would have been paid twice | Design review before coding the pay-run chain | "Already paid" is now decided by the completion timestamp of the prior period, with a test for both cases |
 | Recommended a single semi-monthly pay group for everyone | My own preference and research on FLSA workweeks | Hourly moved to biweekly (ADR-16) |
+| A meal typed outside clock in and clock out (for example 1:00 meant as 1 pm) was still subtracted, so a day could show negative or far too few hours | My own timesheet testing | Hours now run from clock in to clock out; only a real meal inside the shift (up to 2 hours) is deducted; anything else is a warning (ADR-18) |
+| The register download took its columns from the first worker, so pay codes such as overtime could be missing from the file | Reviewing the CSV | Columns are the union of every pay code |
+| The presenter's scenario loaded only on a browser's very first visit, and browsers kept running a cached copy of the old app after a deploy | Opening the live site in a private window | Any browser with no entries of its own loads the scenario; app files are versioned on every build |
 
 ## Limitations
 

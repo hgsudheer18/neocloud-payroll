@@ -46,7 +46,7 @@
 | RETRO Retro Pay | $243.38 |
 | PTO_PAYOUT Vacation Payout on Termination | $2,629.69 |
 
-## Cost to Company by department (US + international in USD)
+## Cost to Company (total burdened cost) by department (US + international in USD)
 
 | Department | Workers | Gross | Employer taxes | Benefits | Cost to Company |
 |---|---|---|---|---|---|
@@ -55,7 +55,7 @@
 | On-Prem | 75 | $484,169.55 | $39,010.46 | $43,580.42 | $566,760.43 |
 | G&A | 40 | $306,503.79 | $17,439.60 | $30,650.38 | $354,593.77 |
 
-## Cost to Company by location
+## Cost to Company (total burdened cost) by location
 
 | Location | Workers | Cost to Company |
 |---|---|---|

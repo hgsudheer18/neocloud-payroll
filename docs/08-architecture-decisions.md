@@ -161,6 +161,36 @@ A payroll console for a CFO, Controller and payroll analysts: dense tables with 
 
 Preventing a bad entry is cheaper than explaining it in a reconciliation.
 
+## ADR-18: A meal entry never reduces hours unless it is a real break
+
+**Decision.** Hours worked run from clock in to clock out. A meal is deducted only when it falls inside the shift and lasts no more than 2 hours; a meal over 1 hour is deducted but flagged; a meal typed in 12-hour style (1:00 for 1 pm) is read as pm when that puts it inside the shift; anything else is ignored with a warning. Warnings never block submission; a shift over 16 hours does. The same rule applies in every state.
+**Alternatives.** Subtract whatever is typed (wrong hours from a typo); block submission on any meal problem (workers enter fake times to get past it).
+**Why.** A data-entry mistake must not underpay a worker. Warnings reach the worker, the approving manager and payroll's data errors list, which is where they get corrected. In California a meal that is not a real break is treated as missed, so the meal premium is paid, which is the legally safe outcome.
+
+## ADR-19: Salaried pay shows standard hours; pay stays salary ÷ periods
+
+**Decision.** Regular Salary carries 86.67 standard hours per semi-monthly period (2,080 ÷ 24), prorated by working days and reduced by time off hours, so salary and time off add up to the standard. The amount remains annual salary ÷ 24 (prorated by working days).
+**Alternatives.** Pay salaried workers as hours × hourly equivalent (creates penny differences every period and breaks the legacy reconciliation).
+**Why.** Employees and payroll read hours more easily, and the amount stays exactly what the comp plan says.
+
+## ADR-20: The first biweekly period is 16 days
+
+**Decision.** Hourly workers move to biweekly with one 16-day transition period, Oct 16–31 (a 2-day stub that completes the Oct 11–17 workweek plus two full workweeks), then 14-day periods from Nov 1.
+**Alternatives.** A separate 2-day stub pay run for Oct 16–17 (an extra check, bank file, tax deposit and journal for two days; annualized federal withholding on two days of wages under-withholds; deductions need suppressing); starting the first period on Oct 18 (leaves Oct 16–17 unpaid).
+**Why.** One longer first period is the standard way to change pay frequency: simpler, cheaper and easy to explain to 25 employees.
+
+## ADR-21: California final pay is flagged, not run as a separate on-demand payment
+
+**Decision.** A California termination raises a critical audit item (final pay due on the last day); the approver records how it was paid before the run can be approved. The final pay is calculated and completed with the regular run.
+**Alternatives.** A one-person on-demand run check-dated the last day, with the worker's result locked and excluded from the regular run's bank file (the production design).
+**Why.** The demo's purpose is accurate numbers and the control; the separate run touches pay runs, results, journal and year-to-date and is listed as the next build.
+
+## ADR-22: Presenter's scenario for reviewers
+
+**Decision.** A downloaded demo data file in the repository (`scenario/demo-scenario.json`) is published with the site. A browser with no entries of its own loads it; Reset demo data chooses a blank start; Restore presenter's scenario returns to it.
+**Alternatives.** A shared server-side database (every reviewer's click changes everyone's data; needs logins and a reset process); sending each reviewer a file to load.
+**Why.** Reviewers see the prepared scenario immediately and each has a private sandbox they cannot break for anyone else.
+
 ## What the AI tool decided, and what was overridden
 
 | Area | AI tool generated | Human decision or override |
