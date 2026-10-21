@@ -1,6 +1,6 @@
 import { useData } from "../state.tsx";
 import { useErp } from "../erp.tsx";
-import { Money, PageHead, Pill, Section } from "../ui.tsx";
+import { MaskedMoney, Money, PageHead, Pill, Section } from "../ui.tsx";
 import { today } from "../erpui.tsx";
 import { reportingLine, useAccess } from "../access.tsx";
 import { useNotifications } from "../notifications.tsx";
@@ -69,7 +69,7 @@ export default function Home() {
             <h3>Pay</h3>
             {nextPay && <p className="small" style={{ margin: 0 }}>Next pay date</p>}
             {nextPay && <div className="big">{pretty(nextPay.checkDate)}</div>}
-            {myCalc && <p className="small">{PERIOD_LABEL[periodId]}: net <strong><Money c={myCalc.pay.totals.net} /></strong>{erp.payRuns[periodId]?.status === "Completed" ? "" : " (preview)"}</p>}
+            {myCalc && <p className="small">{PERIOD_LABEL[periodId]}: net <strong><MaskedMoney c={myCalc.pay.totals.net} /></strong>{erp.payRuns[periodId]?.status === "Completed" ? "" : " (preview)"}</p>}
             {lastPaid && <p className="small">Last paid: {PERIOD_LABEL[lastPaid.id]}</p>}
             <a href="#/payslip">Open pay slip</a>
           </div>

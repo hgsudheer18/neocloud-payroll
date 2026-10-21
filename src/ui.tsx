@@ -1,9 +1,20 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 import { fmt } from "../lib/util/money.ts";
 
 export function Money({ c, cur = "USD", signed = false }: { c: number; cur?: string; signed?: boolean }) {
   const cls = c < 0 ? "neg" : c === 0 ? "zero" : "";
   return <span className={cls}>{signed && c > 0 ? "+" : ""}{fmt(c, cur)}</span>;
+}
+
+/** An amount hidden until clicked (an employee's own net pay), like a banking app. */
+export function MaskedMoney({ c, cur = "USD" }: { c: number; cur?: string }) {
+  const [shown, setShown] = useState(false);
+  return (
+    <button type="button" className="masked" onClick={() => setShown(!shown)} title={shown ? "Hide" : "Show net pay"} aria-label={shown ? "Hide net pay" : "Show net pay"} style={{ background: "none", border: 0, padding: 0, font: "inherit", color: "inherit", cursor: "pointer" }}>
+      {shown ? <Money c={c} cur={cur} /> : <span>$ ••••••</span>} <span className="faint small" style={{ fontWeight: 400 }}>{shown ? "hide" : "show"}</span>
+    </button>
+  );
 }
 
 export function Hours({ h }: { h: number }) {

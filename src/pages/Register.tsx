@@ -5,7 +5,7 @@ import { BpStatus } from "../erpui.tsx";
 import { pendingForWorker, previewPending } from "../../lib/erp/periods.ts";
 import { PERIOD_LABEL } from "../../lib/config/period.ts";
 import { go, setQuery } from "../router.tsx";
-import { Money, PageHead, Pill, Section, Select, downloadText } from "../ui.tsx";
+import { MaskedMoney, Money, PageHead, Pill, Section, Select, downloadText } from "../ui.tsx";
 import { fmt, toDecimalString } from "../../lib/util/money.ts";
 import { toCsv } from "../../lib/util/csv.ts";
 import type { UsWorkerCalc } from "../../lib/engine/build.ts";
@@ -212,7 +212,7 @@ export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: 
             <dt>Pre-tax deductions</dt><dd><Money c={-p.totals.preTax} /></dd>
             <dt>Employee taxes</dt><dd><Money c={-p.totals.eeTaxes} /></dd>
             <dt>Post-tax deductions</dt><dd><Money c={-p.totals.postTax} /></dd>
-            <dt><strong>Net pay</strong></dt><dd><strong><Money c={p.totals.net} /></strong></dd>
+            <dt><strong>Net pay</strong></dt><dd><strong>{mine ? <MaskedMoney c={p.totals.net} /> : <Money c={p.totals.net} />}</strong></dd>
             {!mine && <>
             <dt>Employer taxes</dt><dd><Money c={p.totals.erTaxes} /></dd>
             <dt>Benefits load</dt><dd><Money c={p.totals.benefits} /></dd>
