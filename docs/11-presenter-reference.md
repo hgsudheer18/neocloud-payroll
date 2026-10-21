@@ -195,6 +195,12 @@ Talking points that sway a decision:
 
 The total cost of employing someone: gross pay + employer taxes (Social Security, Medicare, FUTA, SUI) + employer benefits. The brief's term; finance also calls it fully loaded cost or cost to company. Not a legal term. Oct 1–15: $1,973,794.91 gross, **$2,300,424.38 Burdened cost**. It is what the journal debits to expense (6100–6300) and what Finance budgets headcount on; a $190,000 salary is roughly $230,000 a year. Employer benefits are a 10% load in this app (the brief gave no premiums); production uses actual premiums and 401(k) match.
 
+### Go-live date: January 1, 2027 (the app's Oct 16 is a demonstration)
+
+- **Recommendation (design document section 10):** go live with the first payroll of a quarter and a tax year, January 1, 2027. Rippling files the 2026 W-2s and Q4 941, so no tax balances are converted, which removes the riskiest part of the cutover. Never mid-quarter.
+- **Talk track:** "In the app I kept running past the October parallel into Oct 16–31 and November. Treat those as parallels 2 and 3, processed in Workday as if live, to show what a single parallel can't: the pay-run chain, retro into a completed period, year-to-date roll-forward and the hourly move to biweekly."
+- **Same transition in January:** Jan 1, 2027 is a Friday, so the first biweekly period is Fri Jan 1 – Sat Jan 16 (a 2-day stub plus two full workweeks), exactly like Oct 16–31 in the app; normal 14-day periods from Sun Jan 17.
+
 ### Why the first biweekly period is 16 days (Oct 16–31)
 
 A deliberate one-time transition period, not an error. Talking points:
