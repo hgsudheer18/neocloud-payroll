@@ -179,6 +179,17 @@ Talking points that sway a decision:
 - **Talk track:** "Sofia is terminated in California, so her final pay is due on her last day. The engine flags it as critical and blocks approval until payroll records the on-demand payment. In production that is a Workday On-Demand Payment: a separate one-person run check-dated 10/23, so the regular run is not held up or completed early. Here I have modeled the control and the flag; the separate run is the next build."
 - **What the next build adds:** a "Pay final check now" run for one worker, approved by a second person; her result locked at that point (later changes flow as retro); the regular run shows her as paid on demand (out of its bank file, kept in totals, year-to-date and reconciliation); a separate journal for the on-demand check.
 
+### W-2s (year-end, not built)
+
+- **Why they are not in the demo:** it is October; 2026 W-2s are produced after the last pay run of the year and are due to employees and the SSA by Jan 31, 2027. The data package also carries no year-to-date federal or state withholding or 401(k) from Rippling (only YTD gross and Social Security, Medicare, FUTA and SUI wages), so a full-year W-2 could not be accurate. In production, those YTD tax balances are converted at go-live (see the cutover plan in doc 06).
+- **Talk track:** "W-2s are a year-end process. Every pay result already carries the W-2 amounts: federal taxable wages (box 1), Social Security and Medicare wages (boxes 3 and 5), the 401(k) deferral (box 12 code D), and state wages and tax by work state (boxes 16 and 17), so E0088 would get a CA and a CO line. At year-end the process is:"
+  1. **Year-end audit**: missing SSNs or addresses, negative YTD balances, Social Security over the wage base, multi-state workers, terminated workers' final pay complete.
+  2. **Generate** W-2s from the year's completed pay results plus converted pre-go-live balances.
+  3. **Review and approve**: Payroll Specialist reviews, Payroll Approver approves (same segregation of duties as a pay run).
+  4. **Publish** to each employee's Documents (electronic consent on file; paper otherwise) and **file** W-2s with the W-3 to the SSA electronically (EFW2), plus state filings, by Jan 31.
+  5. **Corrections** after publishing go out as a W-2c.
+- **Where it would live:** Payroll → Year-end, and the employee's Documents.
+
 ### Cost to Company
 
 The total cost of employing someone: gross pay + employer taxes (Social Security, Medicare, FUTA, SUI) + employer benefits. Not a legal term (finance also calls it burdened or fully loaded cost). Oct 1–15: $1,973,794.91 gross, **$2,299,341.55 Cost to Company**. It is what the journal debits to expense (6100–6300) and what Finance budgets headcount on; a $190,000 salary is roughly $230,000 a year. Employer benefits are a 10% load in this app (the brief gave no premiums); production uses actual premiums and 401(k) match.
