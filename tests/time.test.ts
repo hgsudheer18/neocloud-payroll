@@ -160,3 +160,14 @@ test("Typed times are normalised to HH:MM", async () => {
   }
   assert.equal(normalizeTime("25:00"), "25:00"); // not a time: left as typed and flagged
 });
+
+test("A meal typed outside the shift never makes hours negative", () => {
+  const row = (timeIn: string, timeOut: string, mealStart: string, mealEnd: string) => buildShift({ rowId: "M1", employeeId: "E0021", workDate: "2026-10-18", timeIn, timeOut, mealStart, mealEnd, shift: "Day", entryType: "Original", correctsRowId: "", enteredOn: "2026-10-18", notes: "" });
+  // 8:30 typed as 08:30 instead of 20:30: the 12:00 meal is after clock out.
+  assert.equal(row("08:00", "08:30", "12:00", "12:30").worked, 30);
+  assert.equal(row("08:00", "08:15", "12:00", "12:30").worked, 15);
+  // Meal partly after clock out: only the part inside the shift is unpaid.
+  assert.equal(row("08:00", "12:15", "12:00", "12:30").worked, 240);
+  // A normal day is unchanged.
+  assert.equal(row("08:00", "20:30", "12:00", "12:30").worked, 720);
+});

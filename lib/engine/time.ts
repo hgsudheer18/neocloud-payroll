@@ -202,10 +202,13 @@ export function buildShift(r: TimeRow): Shift {
     me = hhmm(r.mealEnd);
     while (me < ms) me += 1440;
   }
-  const intervals: [number, number][] = ms !== null && me !== null ? [[start, ms], [me, end]] : [[start, end]];
+  // Only the part of a meal inside the shift is unpaid, so hours never go negative
+  // when a meal is typed outside clock in and clock out (validation flags that).
+  const intervals: [number, number][] = ms !== null && me !== null ? [[start, Math.min(ms, end)], [Math.max(me, start), end]] : [[start, end]];
   let worked = 0;
   let night = 0;
   for (const [a, b] of intervals) {
+    if (b <= a) continue;
     worked += b - a;
     for (let k = -1; k <= 2; k++) night += overlap(a, b, 1320 + 1440 * k, 1800 + 1440 * k); // 22:00–06:00
   }
