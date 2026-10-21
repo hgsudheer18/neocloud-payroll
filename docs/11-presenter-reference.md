@@ -51,7 +51,7 @@ The only critical audit item is **E0148 Felix Fischer**: terminated Oct 9 in Cal
 
 ## 5. Full-cycle test with expected results
 
-Start: Reset demo data, then close Oct 1–15 as in section 3.
+Start: Reset demo data, then close Oct 1–15 as in section 3. For a shorter run of the same flows, see section 6.
 
 | Step | Who and where | Expected |
 |---|---|---|
@@ -69,7 +69,53 @@ Start: Reset demo data, then close Oct 1–15 as in section 3.
 
 Tip: before a manager approves, use the payroll register preview (section 4) to check the expected pay.
 
-## 6. Presenting the reconciliation (Oct 1–15)
+## 6. Quick test: hire, time entry, absence, terminate (about 20 minutes)
+
+Normal browser window, **Data and demo → Reset demo data** first, times in 24-hour format.
+
+**Step 0. Close Oct 1–15** (later periods need it completed first)
+- Diego Okafor → Pay runs → Calculate pay.
+- Aisha Nguyen → enter the E0148 resolution → Approve → Complete.
+
+**Step 1. Hire**
+- Chloe Novak → Staffing → REQ-H2 (night technician, $41.50/hr) → Hire into this position, hire date 10/21 → submit → Sign in as … to approve.
+- Chloe → Staffing → REQ-S2 (salaried, $150,000), hire date 10/21 → submit and approve.
+- Check: both appear under Workers.
+
+**Step 2. Time entry**
+- Ethan Fischer → Team Timesheets → the new night technician, week of 10/18 → Fill in the schedule → Save. Only 10/21–10/23 fill: 24 hours, 22.5 at night differential.
+- Emma Kim → Enter time → week of 10/18 → Monday 10/19 08:00–20:30, meal 12:00–12:30 → Submit week; Ethan → Inbox → Approve. Expect 12 hours that day: 8 regular, 4 daily overtime.
+- Optional: Maya Costa with the same entry. Expect 12 regular hours and no daily overtime (Texas).
+
+**Step 3. Absence**
+- Emma → Absence → request US Hourly Vacation, 8 hours on 10/22; Ethan approves. Expect 8 hours of vacation pay at $42 = $336, and her vacation balance down by 8.
+- Optional: a day of US Flexible PTO for a salaried worker. Gross is unchanged; part of the salary moves to the Time Off Taken line.
+
+**Step 4. Terminate**
+- Chloe → Workers → E0024 Sofia Davis → Terminate, last day 10/23; Ethan approves.
+
+**Step 5. Pay and check**
+- Diego → Time administration → Auto-fill scheduled shifts (10/16–10/31); Ethan → Approve all.
+- Pay period Oct 16–31 semi-monthly: Diego calculates; Aisha approves and completes. The salaried hire gets $4,545.45 (8 of 11 working days).
+- Pay period Oct 16–31 biweekly transition: same steps. The night technician gets $1,063.50; Emma shows overtime and vacation; Sofia is paid through 10/23 plus her vacation payout.
+- Payroll register → click each worker to check the lines.
+- General ledger → confirm the journals balance → Post journals to NetSuite.
+
+**Step 6. Save:** Data and demo → Download my demo data.
+
+Tip: before Ethan approves anything, Payroll register → the worker → Preview pay with these approved shows the effect on pay.
+
+## 7. Timesheet rules to remember
+
+- **Total hours** run from clock in to clock out. A meal is deducted only when it is a real break inside the shift and no longer than 2 hours. Every state.
+- **Meal warnings** (amber, never block submission): meal over 1 hour (deducted, check it); meal over 2 hours or outside the shift (not deducted); meal typed in 12-hour style such as 1:00 (read as 1 pm when that fits the shift). They show on the timesheet, on the manager's approval and in Data errors.
+- **Blocking error:** clock out more than 16 hours after clock in (usually 12-hour time typed, e.g. 8:30 for 20:30).
+- **California overtime:** over 8 hours a day 1.5x; over 12 hours 2x; 7th consecutive workday first 8 hours 1.5x, beyond 8 2x; weekly overtime on regular hours beyond 40. Double time starts after 12 hours, not 10.
+- **California meal premium:** one hour at the regular rate per workday, at most one a day, for no meal on a shift over 5 hours, a meal starting after the 5th hour, a meal under 30 minutes, or over 12 hours with one meal (the second meal cannot be waived over 12 hours). The timesheet takes one meal a day, so a day over 12 hours always carries the premium.
+- **Texas and other FLSA states:** weekly overtime over 40 only; no daily overtime, double time or meal premium (warning only).
+- **Where the meal premium comes from:** the data package flags Emma's late and missed meals; the premium itself is California Labor Code 226.7, configured in the app. Legacy did not pay it, which is one of the explained reconciliation variances (Workday is right).
+
+## 8. Presenting the reconciliation (Oct 1–15)
 
 Where: pay period Oct 1–15 → **Reconciliation → Legacy register**.
 
@@ -88,7 +134,7 @@ Talking points that sway a decision:
 - Good workers to click: **E0148** (vacation payout), **E0057** (mid-period raise prorated by working days, $530.30), **E0088** (CA → CO move), **E0035** (duplicate punch), **E0003** (wage base).
 - Method (doc 06): three parallels, $0.00 unexplained per employee, two consecutive clean parallels to exit, sign-off by Payroll Manager, Controller, Head of People Technology and CFO.
 
-## 7. Design decisions in one line each
+## 9. Design decisions in one line each
 
 - **Two pay groups.** Salaried semi-monthly (24/yr); hourly biweekly (26/yr) from 10/16/2026, because overtime is weekly and only biweekly periods hold whole workweeks.
 - **Time rules by work location.** CA daily 8/12 and 7th day, meal premiums; AK/NV over 8; CO over 12; else FLSA weekly. Night differential $3, 22:00–06:00.
@@ -96,7 +142,7 @@ Talking points that sway a decision:
 - **Accounting.** Cost center from the supervisory org; employer taxes and benefits split in proportion to wages; summarized journal; manual post to NetSuite.
 - **Controls.** No self-approval; cross-alerted payroll inputs; locked periods; 11 mapped controls (PR-01 to PR-11).
 
-## 8. Before the live demo
+## 10. Before the live demo
 
 - Use a normal browser window; load your saved demo data file (or reset and run the script).
 - The **Demo clock** in the sidebar triggers the Friday 5 pm and Monday 6 am PT timesheet reminders on demand.
