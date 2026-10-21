@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useData } from "../state.tsx";
 import { useErp } from "../erp.tsx";
 import { Money, PageHead, Pill, Section } from "../ui.tsx";
@@ -9,6 +9,8 @@ import { approvedCount } from "../../lib/erp/periods.ts";
 import { pretty } from "../../lib/util/dates.ts";
 import { fmt } from "../../lib/util/money.ts";
 import { AutofillShifts } from "./TimeEntry.tsx";
+import { Payslip } from "./Register.tsx";
+import type { UsWorkerCalc } from "../../lib/engine/build.ts";
 
 const STEPS = ["Calculated", "Approved", "Completed"] as const;
 
@@ -161,6 +163,50 @@ export default function PayRuns() {
           )}
         </div>
       </Section>
+
+      <PayResults key={period.id} workers={r.us} label={PERIOD_LABEL[period.id]} />
     </>
+  );
+}
+
+/** Every worker in the selected pay run; clicking one opens their pay slip in place. */
+function PayResults({ workers, label }: { workers: UsWorkerCalc[]; label: string }) {
+  const [q, setQ] = useState("");
+  const [type, setType] = useState("");
+  const [open, setOpen] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (open) ref.current?.scrollIntoView({ block: "start", behavior: "smooth" }); }, [open]);
+  const rows = workers.filter((c) => (!type || c.worker.payType === type) && (!q || `${c.worker.id} ${c.worker.name} ${c.worker.jobProfile}`.toLowerCase().includes(q.toLowerCase())));
+  const sel = workers.find((c) => c.worker.id === open);
+  const hours = (c: UsWorkerCalc, codes: string[]) => c.pay.lines.filter((l) => codes.includes(l.code)).reduce((t, l) => t + (l.hours ?? 0), 0);
+  const sum = (k: "gross" | "net") => rows.reduce((t, c) => t + c.pay.totals[k], 0);
+  return (
+    <Section title={`Pay results: ${label}`} lede="Every worker in this pay run. Click a worker to open their pay slip with each pay line and how it was calculated.">
+      <div ref={ref}>{sel && <Payslip c={sel} onClose={() => setOpen("")} />}</div>
+      <div className="filters">
+        <label>Search<input type="search" value={q} placeholder="ID, name or job" onChange={(e) => setQ(e.target.value)} /></label>
+        <label>Pay type<select value={type} onChange={(e) => setType(e.target.value)}><option value="">All</option><option>Hourly</option><option>Salary</option></select></label>
+      </div>
+      <div className="table-wrap" style={{ maxHeight: "60vh" }}>
+        <table className="reg">
+          <thead><tr><th>Worker</th><th>Pay type</th><th className="n">Regular hrs</th><th className="n">OT hrs</th><th className="n">DT hrs</th><th className="n">Gross</th><th className="n">Net</th><th>Flags</th></tr></thead>
+          <tbody>
+            {rows.map((c) => (
+              <tr key={c.worker.id} className={`click ${open === c.worker.id ? "sel" : ""}`} onClick={() => setOpen(open === c.worker.id ? "" : c.worker.id)}>
+                <td><a href={`#/register/${c.worker.id}`} onClick={(e) => e.preventDefault()}>{c.worker.id}</a> {c.worker.name}<div className="faint small">{c.worker.jobProfile}, {c.worker.workState}</div></td>
+                <td>{c.worker.payType}</td>
+                <td className="n">{c.worker.payType === "Hourly" ? hours(c, ["REG"]).toFixed(2) : ""}</td>
+                <td className="n">{hours(c, ["OT"]) ? hours(c, ["OT"]).toFixed(2) : ""}</td>
+                <td className="n">{hours(c, ["DT"]) ? hours(c, ["DT"]).toFixed(2) : ""}</td>
+                <td className="n"><Money c={c.pay.totals.gross} /></td>
+                <td className="n"><Money c={c.pay.totals.net} /></td>
+                <td className="small">{c.pay.flags.length ? <Pill tone={c.pay.flags.some((f) => /final pay|negative/i.test(f)) ? "bad" : "warn"}>{c.pay.flags.length} flag{c.pay.flags.length > 1 ? "s" : ""}</Pill> : ""}{c.pay.lines.some((l) => l.code === "RETRO") && <Pill tone="info">Retro</Pill>}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot><tr><td colSpan={5}>{rows.length} of {workers.length} workers</td><td className="n"><Money c={sum("gross")} /></td><td className="n"><Money c={sum("net")} /></td><td /></tr></tfoot>
+        </table>
+      </div>
+    </Section>
   );
 }

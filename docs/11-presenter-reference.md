@@ -44,6 +44,8 @@ The only critical audit item is **E0148 Felix Fischer**: terminated Oct 9 in Cal
 
 ## 4. How pay results update
 
+- **Where to see them:** Pay runs → click the pay group row for the period → **Pay results** lists every worker in that run with hours, gross, net and flags; click a worker to open their pay slip on the same page. Hourly workers are in the biweekly periods from 10/16; salaried workers in the semi-monthly ones. (Payroll register shows the same results with more columns.)
+
 - Results recalculate automatically the moment time, time off, a payroll input or a job change is **approved**. Requests awaiting approval do not count.
 - If something is approved after a pay run was calculated, Pay runs shows "Inputs changed… Recalculate" and blocks approval until it is recalculated.
 - A completed period stays exactly as paid. Later changes to it are paid as **retro** in the next pay run.

@@ -149,7 +149,7 @@ function noteFor(c: UsWorkerCalc): string[] {
 }
 
 /** The full payslip; `mine` is the worker's own view, without payroll-only detail (employer cost, GL, links to payroll pages). */
-export function Payslip({ c, mine = false }: { c: UsWorkerCalc; mine?: boolean }) {
+export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: boolean; onClose?: () => void }) {
   const w = c.worker;
   const p = c.pay;
   return (
@@ -161,7 +161,7 @@ export function Payslip({ c, mine = false }: { c: UsWorkerCalc; mine?: boolean }
         <span className="muted">
           {w.jobProfile}, {w.department}, {w.costCenterId}, {w.locationId} ({w.workState})
         </span>
-        {!mine && <button className="close" onClick={() => go("/register")}>Close</button>}
+        {!mine && <button className="close" onClick={() => (onClose ? onClose() : go("/register"))}>Close</button>}
       </div>
       {p.flags.map((f) => (
         <div key={f} className={`callout ${f.startsWith("Final pay") ? "bad" : ""}`}>{f}</div>
