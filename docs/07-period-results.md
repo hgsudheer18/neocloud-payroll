@@ -8,7 +8,7 @@
 |---|---|---|---|
 | Gross − pre-tax − EE taxes − post-tax = net | $1,313,119.26 | $1,313,119.26 | Yes |
 | US journal balances | $2,299,341.55 | $2,299,341.55 | Yes |
-| Register burdened cost = journal expense debits | $2,299,341.55 | $2,299,341.55 | Yes |
+| Register cost to company = journal expense debits | $2,299,341.55 | $2,299,341.55 | Yes |
 | Approved time hours = hours paid (REG+OT+DT) | 2281.92 | 2281.92 | Yes |
 | Hourly PTO taken = PTO hours paid | 24.00 | 24.00 | Yes |
 | Termination payout hours = payout hours paid | 33.15 | 33.15 | Yes |
@@ -27,7 +27,7 @@
 | Net pay | $1,313,119.26 |
 | Employer taxes | $128,167.06 |
 | Benefits load (10%) | $197,379.58 |
-| Total burdened cost | $2,299,341.55 |
+| Total cost to company | $2,299,341.55 |
 
 ## Gross by pay component
 
@@ -46,18 +46,18 @@
 | RETRO Retro Pay | $243.38 |
 | PTO_PAYOUT Vacation Payout on Termination | $2,629.69 |
 
-## Burdened cost by department (US + international in USD)
+## Cost to Company by department (US + international in USD)
 
-| Department | Workers | Gross | Employer taxes | Benefits | Burdened |
+| Department | Workers | Gross | Employer taxes | Benefits | Cost to Company |
 |---|---|---|---|---|---|
 | Engineering | 144 | $1,075,241.00 | $72,651.38 | $89,698.25 | $1,237,590.63 |
 | GPU Cloud | 90 | $683,968.92 | $51,718.06 | $62,255.00 | $797,941.98 |
 | On-Prem | 75 | $484,169.55 | $39,010.46 | $43,580.42 | $566,760.43 |
 | G&A | 40 | $306,503.79 | $17,439.60 | $30,650.38 | $354,593.77 |
 
-## Burdened cost by location
+## Cost to Company by location
 
-| Location | Workers | Burdened |
+| Location | Workers | Cost to Company |
 |---|---|---|
 | San Francisco HQ | 178 | $1,537,055.41 |
 | Remote - US | 55 | $459,770.57 |

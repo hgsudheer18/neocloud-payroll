@@ -9,7 +9,7 @@ Pay groups: salaried employees are paid **semi-monthly**; hourly employees move 
 
 Parallel-run results (Oct 1–15):
 
-- 280 US workers paid, $1,973,794.91 gross, $2,299,341.55 burdened cost
+- 280 US workers paid, $1,973,794.91 gross, $2,299,341.55 cost to company (gross plus employer taxes and benefits)
 - 25 non-exempt technicians under California and FLSA time rules
 - Absence balances for six accruing plans across four countries, plus sick, bereavement and jury duty time off types without a balance
 - Employee-level reconciliation to the legacy Rippling register: 262 match to the cent, 19 variances explained by re-performance, 0 unexplained
@@ -85,7 +85,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Benefits | ERP | Your benefit enrolments by type (healthcare: medical; retirement: 401(k)), with this pay period's deduction; payroll can view anyone's. Benefits a worker is not enrolled in are not shown |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |
-| Period overview | 2 | Control-total tie-out, period totals, burdened cost rollup by department, location or cost center (filterable), variance summary |
+| Period overview | 2 | Control-total tie-out, period totals, cost to company rollup by department, location or cost center (filterable), variance summary |
 | Payroll register | 2 | Gross to net for every worker; payslip drill-down with the calculation behind every line |
 | Time calculation | 3 | Hours by category per technician, daily detail with meal checks and workweeks, exceptions, category-to-component mapping |
 | Absence › Absence Balances | 4 | Tab of Absence for managers (their team) and payroll: sample-worker ending balances, payout to payroll, plan configuration, all balances |

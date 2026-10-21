@@ -26,7 +26,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
   return (
     <>
       <PageHead title={`${PERIOD_LABEL[r.period.id] ?? r.period.id}`}>
-        {r.us.length} employees paid in the {r.period.payGroup} run ({pretty(r.period.start)} to {pretty(r.period.end)}, check date {pretty(r.period.checkDate)}), {fmt(r.totals.burdened)} burdened cost. {r.intl.length} international employees in the October provider run,{" "}
+        {r.us.length} employees paid in the {r.period.payGroup} run ({pretty(r.period.start)} to {pretty(r.period.end)}, check date {pretty(r.period.checkDate)}), {fmt(r.totals.burdened)} cost to company. {r.intl.length} international employees in the October provider run,{" "}
         {fmt(r.totals.intlUsd)} in USD. {allOk ? "Every control total ties" : "Some control totals do not tie"}{r.reconciled ? <> and {r.recon.counts.Unexplained === 0 ? `all ${variances} legacy variances are explained` : `${r.recon.counts.Unexplained} legacy variances are unexplained`}</> : null}.
       </PageHead>
 
@@ -61,7 +61,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
             ["Net pay", r.totals.net],
             ["Employer taxes", r.totals.erTaxes],
             ["Benefits load", r.totals.benefits],
-            ["Burdened cost", r.totals.burdened],
+            ["Cost to Company", r.totals.burdened],
           ].map(([l, v]) => (
             <div className="figure" key={l as string}>
               <div className="v">{fmt(v as number)}</div>
@@ -71,7 +71,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
         </div>
       </Section>
 
-      <Section title="Burdened cost rollup" lede="US semi-monthly period plus October international employer cost translated to USD at the reporting rates (GBP 1.27, CAD 0.73, INR 0.012).">
+      <Section title="Cost to Company rollup" lede="US semi-monthly period plus October international employer cost translated to USD at the reporting rates (GBP 1.27, CAD 0.73, INR 0.012).">
         <div className="filters">
           <Select label="Group by" value={by} onChange={(v) => set("by", v)} options={[["department", "Department"], ["location", "Location"], ["costCenter", "Cost center"]]} all={null} />
           <Select label="Department" value={dept} onChange={(v) => set("dept", v)} options={depts} />
@@ -95,7 +95,7 @@ export default function Dashboard({ query }: { query: URLSearchParams }) {
                   <th className="n">Gross</th>
                   <th className="n">Employer taxes</th>
                   <th className="n">Benefits</th>
-                  <th className="n">Burdened</th>
+                  <th className="n">Cost to Company</th>
                 </tr>
               </thead>
               <tbody>

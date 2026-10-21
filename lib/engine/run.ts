@@ -137,7 +137,7 @@ export function runPeriod(ds: Dataset, period: PayPeriod = US_PERIOD, intlPeriod
   const ties: Tie[] = [
     { name: "Gross − pre-tax − EE taxes − post-tax = net", left: { label: "Gross less deductions", value: totals.gross - totals.preTax - totals.eeTaxes - totals.postTax }, right: { label: "Net pay", value: totals.net }, ok: totals.gross - totals.preTax - totals.eeTaxes - totals.postTax === totals.net },
     { name: "US journal balances", left: { label: "Debits", value: jDebit }, right: { label: "Credits", value: jCredit }, ok: jDebit === jCredit },
-    { name: "Register burdened cost = journal expense debits", left: { label: "Register gross + ER tax + benefits", value: totals.burdened }, right: { label: "Journal expense + PTO liability relief", value: expenseDebits }, ok: totals.burdened === expenseDebits },
+    { name: "Register cost to company = journal expense debits", left: { label: "Register gross + ER tax + benefits", value: totals.burdened }, right: { label: "Journal expense + PTO liability relief", value: expenseDebits }, ok: totals.burdened === expenseDebits },
     { name: "Approved time hours = hours paid (REG+OT+DT)", left: { label: "Hours worked (time)", value: h(timeHours) }, right: { label: "Hours on pay lines", value: h(paidHours) }, ok: h(timeHours) === h(paidHours) },
     { name: "Hourly PTO taken = PTO hours paid", left: { label: "Balance reduction (hrs)", value: h(ptoTaken) }, right: { label: "VAC + SICK hours paid", value: h(ptoPaid) }, ok: h(ptoTaken) === h(ptoPaid) },
     { name: "Termination payout hours = payout hours paid", left: { label: "Balance paid out (hrs)", value: h(payoutHrs) }, right: { label: "PTO_PAYOUT hours", value: h(payoutPaidHrs) }, ok: h(payoutHrs) === h(payoutPaidHrs) },

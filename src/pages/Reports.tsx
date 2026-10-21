@@ -98,7 +98,7 @@ export default function Reports({ query }: { query: URLSearchParams }) {
         <Section title="Pay schedule" lede="Each pay period with its dates, check date, status and totals." right={<button className="btn ghost" onClick={() => downloadText("pay-schedule.csv", toCsv(periods.map((p) => { const r = views.get(p.id)!.result; return { period: PERIOD_LABEL[p.id], pay_group: p.payGroup, start: p.start, end: p.end, check_date: p.checkDate, status: status(p.id), workers: r.us.length, gross: dollars(r.totals.gross), employee_taxes: dollars(r.totals.eeTaxes), deductions: dollars(r.totals.preTax + r.totals.postTax), net: dollars(r.totals.net), employer_taxes: dollars(r.totals.erTaxes), burdened_cost: dollars(r.totals.burdened) }; })))}>Download CSV</button>}>
           <div className="table-wrap">
             <table className="reg">
-              <thead><tr><th>Pay period</th><th>Pay group</th><th>Dates</th><th>Check date</th><th>Status</th><th className="n">Workers</th><th className="n">Gross</th><th className="n">Employee taxes</th><th className="n">Deductions</th><th className="n">Net pay</th><th className="n">Employer taxes</th><th className="n">Burdened cost</th></tr></thead>
+              <thead><tr><th>Pay period</th><th>Pay group</th><th>Dates</th><th>Check date</th><th>Status</th><th className="n">Workers</th><th className="n">Gross</th><th className="n">Employee taxes</th><th className="n">Deductions</th><th className="n">Net pay</th><th className="n">Employer taxes</th><th className="n">Cost to Company</th></tr></thead>
               <tbody>
                 {periods.map((p) => {
                   const r = views.get(p.id)!.result;

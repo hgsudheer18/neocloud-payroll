@@ -129,7 +129,7 @@ export default function PayRuns() {
           <div className="figure"><div className="v">{r.us.length}</div><div className="l">Workers in run</div></div>
           <div className="figure"><div className="v"><Money c={r.totals.gross} /></div><div className="l">Gross</div></div>
           <div className="figure"><div className="v"><Money c={r.totals.net} /></div><div className="l">Net pay (bank file)</div></div>
-          <div className="figure"><div className="v"><Money c={r.totals.burdened} /></div><div className="l">Burdened cost</div></div>
+          <div className="figure"><div className="v"><Money c={r.totals.burdened} /></div><div className="l">Cost to Company</div></div>
           <div className="figure"><div className="v">{tiesOk ? "All tie" : "Check"}</div><div className="l">{r.ties.length} control totals</div></div>
           <div className="figure"><div className="v">{criticals.length} / {warnings.length}</div><div className="l">Critical / warning audit items</div></div>
           <div className="figure"><div className="v">{glOk ? "Ready" : "Blocked"}</div><div className="l">NetSuite journal</div></div>
