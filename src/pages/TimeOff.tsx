@@ -15,7 +15,8 @@ export default function TimeOff({ query, embedded = false }: { query: URLSearchP
   const { erp, me, submit } = useErp();
   const access = useAccess();
   const ds = data!.dsNow;
-  const employees = ds.workers.filter((w) => w.workerType === "Employee" && !w.terminationDate && access.seesDetails(w.id));
+  // HR Partners request time off on anyone's behalf, as in Workday; others see their own team.
+  const employees = ds.workers.filter((w) => w.workerType === "Employee" && !w.terminationDate && (access.seesDetails(w.id) || me.role === "HR Partner")).sort((a, b) => a.id.localeCompare(b.id));
   const asked = query.get("worker") ?? "";
   const workerId = me.role === "Employee" ? me.workerId! : employees.some((e) => e.id === asked) ? asked : me.workerId ?? employees[0]?.id ?? "";
   const w = ds.workers.find((x) => x.id === workerId);

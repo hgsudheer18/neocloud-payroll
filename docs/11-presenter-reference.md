@@ -93,6 +93,8 @@ Normal browser window, **Data and demo → Reset demo data** first, times in 24-
 - Emma → Absence → request US Hourly Vacation, 8 hours on 10/22; Ethan approves. Expect 8 hours of vacation pay at $42 = $336, and her vacation balance down by 8.
 - Optional: a day of US Flexible PTO for a salaried worker. Gross is unchanged; part of the salary moves to the Time Off Taken line.
 
+- Any other worker: Chloe → Workers → open the worker → **Request time off** (the Absence page opens with that worker selected). Approval goes to the worker's manager (Ethan for technicians, Morgan Hale for most others).
+
 **Step 4. Terminate**
 - Chloe → Workers → E0024 Sofia Davis → Terminate, last day 10/23; Ethan approves.
 

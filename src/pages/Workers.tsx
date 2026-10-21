@@ -311,8 +311,8 @@ function Profile({ id, action }: { id: string; action: string }) {
           {w.workerType === "Employee" && ACTIONS.filter((a) => BP_RULES[a.type].initiators.includes(me.role)).map((a) => (
             <button key={a.key} className={`btn ${action === a.key ? "" : "ghost"}`} onClick={() => go(`/workers/${id}`, { action: action === a.key ? "" : a.key })}>{a.label}</button>
           ))}
-          {details && w.payType === "Hourly" && access.canOpen("time-entry") && <a className="btn ghost" href={`#/time-entry?worker=${id}`}>Enter time</a>}
-          {details && w.workerType === "Employee" && access.canOpen("time-off") && <a className="btn ghost" href={`#/time-off?worker=${id}`}>Request time off</a>}
+          {details && w.payType === "Hourly" && !w.terminationDate && (id === me.workerId ? access.canOpen("time-entry") && <a className="btn ghost" href="#/time-entry">Enter time</a> : access.canOpen("team-time") && <a className="btn ghost" href={`#/team-time?worker=${id}`}>Enter time</a>)}
+          {(details || me.role === "HR Partner") && w.workerType === "Employee" && !w.terminationDate && access.canOpen("time-off") && BP_RULES["Request Time Off"].initiators.includes(me.role) && <a className="btn ghost" href={`#/time-off?worker=${id}`}>Request time off</a>}
           {inRun && (access.payResults ? <a className="btn ghost" href={`#/register/${id}`}>Payslip</a> : id === me.workerId && <a className="btn ghost" href="#/payslip">Pay Slip</a>)}
         </div>
       </div>
