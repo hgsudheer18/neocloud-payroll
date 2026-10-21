@@ -113,7 +113,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | [docs/11-presenter-reference.md](docs/11-presenter-reference.md) | Test scenarios, expected results and demo sequence |
 | [docs/12-reconciliation-memo.md](docs/12-reconciliation-memo.md) | Deliverable 5: reconciliation memo to the Controller |
 
-The consolidated design document (deliverable 4: requirements 1, 3, 4, 5, 6 and 7, with assumptions and limitations) is published separately as a PDF / shared document; docs/01–06 are its source sections.
+The consolidated design document (deliverable 4: requirements 1, 3, 4, 5, 6 and 7, with assumptions and limitations) and the reconciliation memo (deliverable 5) are also shared as documents and PDFs; docs/01–06 and docs/12 are their sources.
 
 ## Architecture decisions (summary)
 
