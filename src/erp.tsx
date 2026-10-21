@@ -8,6 +8,8 @@ import { US_PERIOD } from "../lib/config/period.ts";
 
 const KEY = "neocloud-erp-v1";
 const PREFS = "neocloud-erp-prefs-v1";
+/** Set by Reset demo data: this browser chose a blank start, so the scenario is not auto-loaded again. */
+const NO_SCENARIO = "neocloud-no-scenario";
 
 const empty = (): ErpState => ({ version: 1, bps: [], payRuns: {}, jobProfiles: [], seq: 0 });
 
@@ -139,6 +141,7 @@ export function ErpProvider({ children }: { children: ReactNode }) {
   );
 
   const reset = useCallback(() => {
+    try { window.localStorage.setItem(NO_SCENARIO, "1"); } catch { /* storage unavailable */ }
     seqRef.current = 0;
     setErp(empty());
     setPrefs((p) => ({ ...p, period: US_PERIOD.id }));
@@ -147,15 +150,22 @@ export function ErpProvider({ children }: { children: ReactNode }) {
   const importState = useCallback((s: ErpState): string | null => {
     if (!s || s.version !== 1 || !Array.isArray(s.bps) || typeof s.payRuns !== "object") return "This file is not NeoCloud demo data.";
     seqRef.current = Math.max(s.seq ?? 0, s.bps.length);
+    try { window.localStorage.removeItem(NO_SCENARIO); } catch { /* storage unavailable */ }
     setErp({ ...empty(), ...s });
     return null;
   }, []);
 
-  // A first-time visitor starts from the presenter's scenario, when the site has one.
+  // A visitor with nothing of their own (first visit, or only visits before the scenario
+  // was published) starts from the presenter's scenario, when the site has one.
+  const untouched = erp.bps.length === 0 && Object.keys(erp.payRuns).length === 0;
+  const tried = useRef(false);
   useEffect(() => {
-    if (!firstVisit) return;
+    let declined = false;
+    try { declined = window.localStorage.getItem(NO_SCENARIO) === "1"; } catch { /* storage unavailable */ }
+    if (tried.current || declined || !(firstVisit || untouched)) return;
+    tried.current = true;
     fetchScenario().then((s) => { if (s) importState(s); });
-  }, [importState]);
+  }, [importState, untouched]);
 
   return (
     <ErpContext.Provider
