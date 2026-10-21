@@ -146,6 +146,17 @@ Talking points that sway a decision:
 - **Accounting.** Cost center from the supervisory org; employer taxes and benefits split in proportion to wages; summarized journal; manual post to NetSuite.
 - **Controls.** No self-approval; cross-alerted payroll inputs; locked periods; 11 mapped controls (PR-01 to PR-11).
 
+### Why the first biweekly period is 16 days (Oct 16–31)
+
+A deliberate one-time transition period, not an error. Talking points:
+
+- **Biweekly periods must be whole Sunday–Saturday workweeks**, because overtime is counted per workweek. The last semi-monthly period ended Thursday 10/15, mid-week, so the first clean biweekly boundary is Sunday 10/18.
+- **The 2-day stub (Fri 10/16 – Sat 10/17) is folded into the first period**: 2 days that finish the Oct 11–17 workweek plus two full workweeks Oct 18–31. Check date Fri 11/06. From Nov 1 every period is a normal 14 days.
+- **Nothing is overpaid**: hourly pay is hours worked, so 2 extra days are just more approved hours. Overtime for the Oct 11–17 week uses all 7 days, including Oct 11–15 already paid in Oct 1–15.
+- **Per-period deductions are taken once** (medical at the biweekly amount, × 24/26), not twice in three weeks.
+- **Alternative considered: a separate 2-day stub run for 10/16–10/17, then a regular Oct 18–31 period.** Rejected because it adds a pay run, check date, bank file, tax deposit and journal for 2 days of pay; federal withholding annualizes 2 days of wages × 26 and under-withholds; and it needs special rules so medical, 401(k) catch-up and garnishments are not taken an extra time. One longer first period is the standard way to change pay frequency.
+- **If asked "could Workday do the stub?"** Yes: an off-cycle or short period with deductions suppressed. It is a policy choice; the 16-day period is simpler, cheaper and easier to explain to the 25 employees.
+
 ## 10. Before the live demo
 
 - Use a normal browser window; load your saved demo data file (or reset and run the script).
