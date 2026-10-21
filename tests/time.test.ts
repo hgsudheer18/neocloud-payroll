@@ -175,6 +175,11 @@ test("Hours run from clock in to clock out; only a real meal inside the shift is
   assert.equal(out.worked, 30);
   assert.match(out.mealNote ?? "", /not deducted/);
   assert.equal(row("08:00", "19:30", "12:00", "18:30").worked, 690);
+  // A meal over 1 hour is deducted but flagged.
+  const long = row("08:00", "19:30", "12:00", "13:30");
+  assert.equal(long.worked, 600);
+  assert.match(long.mealNote ?? "", /1 h 30 min \(over 1 hour\)/);
+  assert.equal(row("08:00", "19:30", "12:00", "13:00").mealNote, undefined);
   // Night shift meal after midnight is still a normal meal.
   assert.equal(row("18:00", "06:30", "23:45", "00:15").worked, 720);
 });

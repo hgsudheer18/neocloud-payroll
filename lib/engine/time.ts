@@ -63,6 +63,7 @@ export interface DayCalc {
 }
 
 export type ExceptionCode =
+  | "MEAL_ENTRY"
   | "DUPLICATE_PUNCH"
   | "OVERLAPPING_BLOCKS"
   | "RETRO_CORRECTION"
@@ -193,6 +194,9 @@ function overlap(a0: number, a1: number, b0: number, b1: number) {
 
 /** Longest break deducted as a meal; anything longer is treated as a data entry problem. */
 export const MAX_MEAL_MIN = 120;
+/** Meals longer than this are deducted but flagged so the worker or manager can check them. */
+export const LONG_MEAL_MIN = 60;
+const duration = (m: number) => `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ""}`;
 const clock = (m: number) => `${String(Math.floor((m % 1440) / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 /**
@@ -212,7 +216,13 @@ function placeMeal(r: TimeRow, start: number, end: number, off: number): { ms: n
     const ms = onTimeline(x);
     let me = onTimeline(y);
     while (me <= ms) me += 1440;
-    if (ok(ms, me)) return { ms, me, ...(x !== a || y !== b ? { note: `Meal read as ${clock(ms)}–${clock(me)} (12-hour time entered). Use 24-hour time.` } : {}) };
+    if (ok(ms, me)) {
+      const notes = [
+        ...(x !== a || y !== b ? [`Meal read as ${clock(ms)}–${clock(me)} (12-hour time entered). Use 24-hour time.`] : []),
+        ...(me - ms > LONG_MEAL_MIN ? [`Meal is ${duration(me - ms)} (over 1 hour). Check the meal times.`] : []),
+      ];
+      return { ms, me, ...(notes.length ? { note: notes.join(" ") } : {}) };
+    }
   }
   const ms = onTimeline(a);
   let me = onTimeline(b);
@@ -440,6 +450,7 @@ export function calcWorkerTime(
       short: ["SHORT_MEAL", "Meal period shorter than 30 minutes."],
       second_missed: ["NO_SECOND_MEAL", "Shift over 12 hours with no second meal period (cannot be waived)."],
     };
+    for (const sh of d.shifts) if (sh.mealNote) exceptions.push({ employeeId, rowId: sh.rowId, date: d.date, code: "MEAL_ENTRY", severity: "Warning", message: sh.mealNote, treatment: "Ask the worker or manager to correct the meal times before the cutoff." });
     if (meal[d.mealStatus]) {
       exceptions.push({ employeeId, rowId, date: d.date, code: meal[d.mealStatus][0], severity: "Warning", message: meal[d.mealStatus][1], treatment: "One hour of pay at the regular rate (MEAL premium)." });
     }
