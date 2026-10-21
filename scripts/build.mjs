@@ -2,7 +2,7 @@
 // design documents next to it. Output is a static site in ./dist (plus the
 // optional /api function, which Vercel deploys separately).
 import * as esbuild from "esbuild";
-import { cpSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -40,6 +40,15 @@ export function copyStatic() {
     return { slug: file.replace(/^\d+-/, "").replace(/\.md$/, ""), file, title, summary };
   });
   writeFileSync(join(dist, "docs/manifest.json"), JSON.stringify(meta));
+  // Presenter's scenario: loaded for every first-time visitor (see src/erp.tsx).
+  // scenario/demo-scenario.json, or else the newest neocloud-demo-*.json in the project folder.
+  const named = join(root, "scenario/demo-scenario.json");
+  const dropped = readdirSync(root).filter((f) => /^neocloud-demo-.*\.json$/.test(f)).sort().pop();
+  const scenario = existsSync(named) ? named : dropped ? join(root, dropped) : null;
+  if (scenario) {
+    cpSync(scenario, join(dist, "scenario.json"));
+    console.log(`Presenter scenario: ${scenario.slice(root.length + 1)}`);
+  }
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {

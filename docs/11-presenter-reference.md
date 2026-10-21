@@ -18,6 +18,7 @@ Key steps, expected numbers and talking points for testing and presenting the Ne
   - *Load demo data* replaces this browser's entries with a file. Download first if you want to keep what is there.
   - *Reset demo data* clears your entries and starts clean.
 - To show your scenario in another browser: Download in yours, then Load in the other.
+- **Presenter's scenario (auto-load):** a downloaded demo data file saved in the project folder as `neocloud-demo-*.json` (or `scenario/demo-scenario.json`) is published with the site. Every **first-time** visitor starts from it automatically; their own clicks then stay private to their browser. **Data and demo → Restore presenter's scenario** brings anyone back to it. Visitors who already used the site keep their own data until they restore. To update the scenario: download again, replace the file, commit and push.
 - Open item: the site could load your scenario automatically for every visitor (a snapshot you refresh by sending a new file). A shared live database is possible but riskier: any panelist's click would change everyone's data.
 
 ## 2. Personas

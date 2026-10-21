@@ -48,7 +48,7 @@ The sidebar has two selectors: **Signed in as** (switch between Employee, Manage
 3. **Employee → Enter time / Absence**; **Manager → Inbox → Approve**. Or **Payroll Specialist → Pay runs → Auto-fill scheduled shifts**.
 4. Select **Oct 16–31** in the sidebar and run the next pay periods. Changes made to Oct 1–15 after it was completed show up as retro.
 
-Everything you enter is saved in your browser only, so every visitor gets a private sandbox. **Data and demo** has *Download my demo data*, *Load demo data* and *Reset demo data*.
+Everything you enter is saved in your browser only, so every visitor gets a private sandbox. **Data and demo** has *Download my demo data*, *Load demo data* and *Reset demo data*. A downloaded demo data file saved in the project folder as `neocloud-demo-*.json` (or `scenario/demo-scenario.json`) is published with the site as the presenter's scenario: first-time visitors start from it, and *Restore presenter's scenario* returns to it.
 
 ## Deploy to Vercel
 

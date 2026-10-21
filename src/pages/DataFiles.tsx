@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useData } from "../state.tsx";
-import { useErp } from "../erp.tsx";
+import { fetchScenario, useErp } from "../erp.tsx";
 import { PageHead, Pill, Section, downloadText, sevTone } from "../ui.tsx";
 import { FILES } from "../../lib/data/load.ts";
 import { parseCsv } from "../../lib/util/csv.ts";
@@ -25,6 +25,8 @@ export default function DataFiles() {
   const { data, replaceFiles, reset } = useData();
   const erpCtx = useErp();
   const [demoMsg, setDemoMsg] = useState("");
+  const [hasScenario, setHasScenario] = useState(false);
+  useEffect(() => { fetchScenario().then((sc) => setHasScenario(!!sc)); }, []);
   const loadDemo = async (list: FileList | null) => {
     const f = list?.[0];
     if (!f) return;
@@ -57,6 +59,7 @@ export default function DataFiles() {
         <div className="row">
           <button className="btn ghost" onClick={() => downloadText(`neocloud-demo-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(erpCtx.erp, null, 2), "application/json")}>Download my demo data</button>
           <label className="btn ghost">Load demo data<input type="file" accept=".json" hidden onChange={(e) => loadDemo(e.target.files)} /></label>
+          {hasScenario && <button className="btn ghost" onClick={async () => { if (!window.confirm("Replace everything entered in this browser with the presenter's scenario?")) return; const sc = await fetchScenario(); setDemoMsg(sc ? erpCtx.importState(sc) ?? "Restored the presenter's scenario." : "The presenter's scenario is not available."); }}>Restore presenter's scenario</button>}
           <button className="btn ghost" onClick={() => { if (window.confirm("Remove every business process and pay run entered in this browser?")) { erpCtx.reset(); setDemoMsg("Demo data reset to the original package."); } }}>Reset demo data</button>
         </div>
         {demoMsg && <div className="callout info">{demoMsg}</div>}

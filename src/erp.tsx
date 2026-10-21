@@ -57,6 +57,21 @@ interface Ctx {
 
 const ErpContext = createContext<Ctx>(null as unknown as Ctx);
 
+/** True on a visitor's first visit (nothing saved in this browser yet). */
+const firstVisit = (() => { try { return window.localStorage.getItem(KEY) === null; } catch { return false; } })();
+
+/** The presenter's scenario published with the site (scenario.json), or null when there is none. */
+export async function fetchScenario(): Promise<ErpState | null> {
+  try {
+    const res = await fetch("scenario.json", { cache: "no-store" });
+    if (!res.ok) return null;
+    const s = (await res.json()) as ErpState;
+    return s && s.version === 1 && Array.isArray(s.bps) ? s : null;
+  } catch {
+    return null;
+  }
+}
+
 export function ErpProvider({ children }: { children: ReactNode }) {
   const [erp, setErp] = useState<ErpState>(() => load(KEY, empty()));
   const [prefs, setPrefs] = useState<{ persona: string; period: string }>(() => load(PREFS, { persona: "hr", period: US_PERIOD.id }));
@@ -135,6 +150,12 @@ export function ErpProvider({ children }: { children: ReactNode }) {
     setErp({ ...empty(), ...s });
     return null;
   }, []);
+
+  // A first-time visitor starts from the presenter's scenario, when the site has one.
+  useEffect(() => {
+    if (!firstVisit) return;
+    fetchScenario().then((s) => { if (s) importState(s); });
+  }, [importState]);
 
   return (
     <ErpContext.Provider
