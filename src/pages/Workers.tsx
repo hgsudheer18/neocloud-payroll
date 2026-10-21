@@ -153,6 +153,15 @@ function Hire({ position }: { position: string }) {
       <CanInitiate type="Hire">
         <div className="sheet">
           <FormGrid>
+            <Field label="Position" wide hint="Choose an open position to fill in the job, pay, location, cost center and manager, or hire without one.">
+              <select value={req?.id ?? ""} onChange={(e) => go("/workers/new", { position: e.target.value })}>
+                <option value="">No position (enter the details below)</option>
+                {REQUISITIONS.filter((r) => requisitionStatus(r, erp.bps).status === "Open").map((r) => {
+                  const loc = ds.locations.find((l) => l.id === r.locationId);
+                  return <option key={r.id} value={r.id}>{r.id} {r.title}, {loc?.name} ({loc?.state}), {r.payType === "Hourly" ? `$${r.pay.toFixed(2)}/hr` : `$${r.pay.toLocaleString("en-US")}/yr`}, from {pretty(r.startFrom)}</option>;
+                })}
+              </select>
+            </Field>
             <Field label="Legal name"><input type="text" value={f.name} onChange={(e) => set({ name: e.target.value })} /></Field>
             <Field label="Hire date" hint="Backdate into a completed period to see retro."><input type="date" value={f.hireDate} onChange={(e) => set({ hireDate: e.target.value })} /></Field>
             <Field label="Job profile" hint={f.jobProfile ? `${f.flsa}, ${f.payType}${f.level ? `, level ${f.level}` : ""}` : "Sets FLSA status and pay type"}>
