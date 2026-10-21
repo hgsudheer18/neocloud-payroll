@@ -21,6 +21,7 @@ export interface Persona {
 
 export const PERSONAS: Persona[] = [
   { id: "emp", name: "Emma Kim", role: "Employee", title: "Data Center Technician, San Jose (E0021)", workerId: "E0021" },
+  { id: "emp-tx", name: "Maya Costa", role: "Employee", title: "Data Center Technician, Austin TX (E0037)", workerId: "E0037" },
   { id: "mgr", name: "Ethan Fischer", role: "Manager", title: "VP, On-Prem (E0005)", workerId: "E0005" },
   { id: "ceo", name: "Morgan Hale", role: "Manager", title: "Chief Executive Officer (E0000)", workerId: "E0000" },
   { id: "hr", name: "Chloe Novak", role: "HR Partner", title: "HR Partner, People (E0261)", workerId: "E0261" },

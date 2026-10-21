@@ -25,6 +25,7 @@ Key steps, expected numbers and talking points for testing and presenting the Ne
 | Persona | Role | Does |
 |---|---|---|
 | Emma Kim (E0021) | Employee, hourly technician, San Jose CA, $42/hr | Enters time, requests time off |
+| Maya Costa (E0037) | Employee, hourly technician, Austin TX, $36.75/hr | Same as Emma under Texas rules: federal weekly overtime over 40 only, no daily overtime, double time or meal premium |
 | Ethan Fischer (E0005) | Manager, Data Center Ops | Approves time, hires, terminations |
 | Chloe Novak (E0261) | HR Partner | Hires, terminations, comp changes |
 | Diego Okafor (E0254) | Payroll Specialist | Calculates pay runs, payroll inputs, time administration |
