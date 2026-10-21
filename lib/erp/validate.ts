@@ -35,8 +35,9 @@ export function validateTimeEntry(ds: Dataset, pending: BusinessProcess[], worke
   if (errors.length) return { errors, warnings };
 
   const s = buildShift({ rowId: "new", employeeId: worker.id, workDate: r.workDate!, timeIn: r.timeIn!, timeOut: r.timeOut!, mealStart: r.mealStart ?? "", mealEnd: r.mealEnd ?? "", shift: "", entryType: "Original", correctsRowId: "", enteredOn: r.workDate!, notes: "" });
-  if (s.mealStart !== null && (s.mealStart < s.start || (s.mealEnd as number) > s.end)) errors.push("The meal must fall inside the shift.");
-  if (s.end - s.start > 16 * 60) errors.push("Shift longer than 16 hours: check the times (critical validation).");
+  // A meal that is not a real break inside the shift is not deducted: a warning, never a block (all states).
+  if (s.mealNote) warnings.push(s.mealNote);
+  if (s.end - s.start > 16 * 60) errors.push("Shift longer than 16 hours: check the times, in 24-hour time (for example 20:30 for 8:30 pm). Critical validation.");
   if (s.worked <= 0) errors.push("Clock out must be after clock in.");
 
   // Overlap / duplicate against approved and pending time for the same workday.

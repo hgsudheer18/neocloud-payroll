@@ -28,14 +28,13 @@ const HHMM = /^([01]\d|2[0-3]):[0-5]\d$/;
 const FIELDS: [keyof TimeRow, string, string][] = [["timeIn", "Clock in", "08:00"], ["mealStart", "Meal start", "12:00"], ["mealEnd", "Meal end", "12:30"], ["timeOut", "Clock out", "16:30"]];
 const filled = (r?: Partial<TimeRow>) => !!r && HHMM.test(r.timeIn ?? "") && HHMM.test(r.timeOut ?? "");
 const worked = (r?: Partial<TimeRow>) => (filled(r) ? buildShift({ mealStart: "", mealEnd: "", ...r } as TimeRow).worked / 60 : 0);
-/** A problem with a day's times to show as they are typed (submission also blocks it). */
-const timeProblem = (r?: Partial<TimeRow>): string => {
-  if (!filled(r)) return "";
+/** A day's times as typed: a blocking problem (red) or a note about the meal (amber). Meal problems never reduce hours. */
+const timeProblem = (r?: Partial<TimeRow>): { error?: string; note?: string } => {
+  if (!filled(r)) return {};
   const meal = HHMM.test(r!.mealStart ?? "") && HHMM.test(r!.mealEnd ?? "");
   const s = buildShift({ ...r, mealStart: meal ? r!.mealStart : "", mealEnd: meal ? r!.mealEnd : "" } as TimeRow);
-  if (s.end - s.start > 16 * 60) return `Clock out is ${((s.end - s.start) / 60).toFixed(1)} hours after clock in. Use 24-hour time, e.g. 20:30 for 8:30 pm.`;
-  if (s.mealStart !== null && (s.mealEnd as number) > s.end) return `The meal (${r!.mealStart}–${r!.mealEnd}) is outside the shift (${r!.timeIn}–${r!.timeOut}). Check the times; use 24-hour time.`;
-  return "";
+  if (s.end - s.start > 16 * 60) return { error: `Clock out is ${((s.end - s.start) / 60).toFixed(1)} hours after clock in. Use 24-hour time, e.g. 20:30 for 8:30 pm.` };
+  return s.mealNote ? { note: s.mealNote } : {};
 };
 const h2 = (min: number) => (min / 60).toFixed(2);
 
@@ -352,7 +351,8 @@ export default function TimeEntry({ query, manager = false }: { query: URLSearch
                         {approved(d).length > 0 && !draftFor(d) && !pendingRow(d) && <button className="close" style={{ marginLeft: 0 }} onClick={() => correct(d)}>{manager ? "Edit" : "Correct"}</button>}
                         {approves && approved(d).length > 0 && !draftFor(d) && !pendingRow(d) && <button className="close" style={{ marginLeft: 6 }} onClick={() => remove(d)}>Delete</button>}
                         {draftFor(d) && <button className="close" style={{ marginLeft: 0 }} onClick={() => clear(d)}>Clear</button>}
-                        {!errors[d]?.length && timeProblem(shown(d)) && <div className="small" style={{ color: "var(--red)" }}>{timeProblem(shown(d))}</div>}
+                        {!errors[d]?.length && timeProblem(shown(d)).error && <div className="small" style={{ color: "var(--red)" }}>{timeProblem(shown(d)).error}</div>}
+                        {timeProblem(shown(d)).note && <div className="small pos-var">{timeProblem(shown(d)).note}</div>}
                         {errors[d]?.map((e) => <div key={e} className="small" style={{ color: "var(--red)" }}>{e}</div>)}
                       </td>
                     ))}

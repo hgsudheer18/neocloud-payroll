@@ -161,13 +161,20 @@ test("Typed times are normalised to HH:MM", async () => {
   assert.equal(normalizeTime("25:00"), "25:00"); // not a time: left as typed and flagged
 });
 
-test("A meal typed outside the shift never makes hours negative", () => {
+test("Hours run from clock in to clock out; only a real meal inside the shift is deducted", () => {
   const row = (timeIn: string, timeOut: string, mealStart: string, mealEnd: string) => buildShift({ rowId: "M1", employeeId: "E0021", workDate: "2026-10-18", timeIn, timeOut, mealStart, mealEnd, shift: "Day", entryType: "Original", correctsRowId: "", enteredOn: "2026-10-18", notes: "" });
-  // 8:30 typed as 08:30 instead of 20:30: the 12:00 meal is after clock out.
-  assert.equal(row("08:00", "08:30", "12:00", "12:30").worked, 30);
-  assert.equal(row("08:00", "08:15", "12:00", "12:30").worked, 15);
-  // Meal partly after clock out: only the part inside the shift is unpaid.
-  assert.equal(row("08:00", "12:15", "12:00", "12:30").worked, 240);
-  // A normal day is unchanged.
-  assert.equal(row("08:00", "20:30", "12:00", "12:30").worked, 720);
+  // A normal meal is deducted.
+  assert.equal(row("08:00", "19:30", "12:00", "12:30").worked, 660);
+  assert.equal(row("08:00", "19:30", "12:00", "12:30").mealNote, undefined);
+  // Meal end typed as 1:00 for 1 pm: read as 13:00, 30 minutes deducted, with a note.
+  const pm = row("07:30", "19:00", "12:30", "01:00");
+  assert.equal(pm.worked, 660);
+  assert.match(pm.mealNote ?? "", /12-hour/);
+  // A meal outside the shift or longer than 2 hours is not deducted; hours stay whole.
+  const out = row("08:00", "08:30", "12:00", "12:30");
+  assert.equal(out.worked, 30);
+  assert.match(out.mealNote ?? "", /not deducted/);
+  assert.equal(row("08:00", "19:30", "12:00", "18:30").worked, 690);
+  // Night shift meal after midnight is still a normal meal.
+  assert.equal(row("18:00", "06:30", "23:45", "00:15").worked, 720);
 });

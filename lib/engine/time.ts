@@ -45,6 +45,8 @@ export interface Shift {
   worked: number;
   night: number;
   crossesMidnight: boolean;
+  /** Why a typed meal was reinterpreted or not deducted. */
+  mealNote?: string;
 }
 
 export interface DayCalc {
@@ -189,30 +191,50 @@ function overlap(a0: number, a1: number, b0: number, b1: number) {
   return Math.max(0, Math.min(a1, b1) - Math.max(a0, b0));
 }
 
+/** Longest break deducted as a meal; anything longer is treated as a data entry problem. */
+export const MAX_MEAL_MIN = 120;
+const clock = (m: number) => `${String(Math.floor((m % 1440) / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+
+/**
+ * Places a typed meal on the shift's timeline. A meal is deducted only when it is a real
+ * break: inside clock in and clock out and no longer than MAX_MEAL_MIN. A time typed in
+ * 12-hour style (1:00 for 1 pm) is read as pm when that puts the meal inside the shift.
+ * Anything else is not deducted: hours stay whole and the note says why.
+ */
+function placeMeal(r: TimeRow, start: number, end: number, off: number): { ms: number | null; me: number | null; note?: string } {
+  if (!r.mealStart || !r.mealEnd || r.mealStart === "—" || r.mealEnd === "—") return { ms: null, me: null };
+  const onTimeline = (t: number) => { let x = t + off; while (x < start) x += 1440; return x; };
+  const a = hhmm(r.mealStart);
+  const b = hhmm(r.mealEnd);
+  const ok = (ms: number, me: number) => ms >= start && me > ms && me <= end && me - ms <= MAX_MEAL_MIN;
+  const tries: [number, number][] = [[a, b], [a, b < 720 ? b + 720 : b], [a < 720 ? a + 720 : a, b < 720 ? b + 720 : b]];
+  for (const [x, y] of tries) {
+    const ms = onTimeline(x);
+    let me = onTimeline(y);
+    while (me <= ms) me += 1440;
+    if (ok(ms, me)) return { ms, me, ...(x !== a || y !== b ? { note: `Meal read as ${clock(ms)}–${clock(me)} (12-hour time entered). Use 24-hour time.` } : {}) };
+  }
+  const ms = onTimeline(a);
+  let me = onTimeline(b);
+  while (me <= ms) me += 1440;
+  const why = me - ms > MAX_MEAL_MIN && me <= end ? `longer than ${MAX_MEAL_MIN / 60} hours` : "not inside the shift";
+  return { ms: null, me: null, note: `Meal ${r.mealStart}–${r.mealEnd} is ${why}, so it was not deducted: hours count from clock in to clock out. Check the meal times (24-hour time).` };
+}
+
 export function buildShift(r: TimeRow): Shift {
   const off = r.dayOffset ?? 0; // night shift after midnight: minutes after the previous workday's 00:00
   const start = hhmm(r.timeIn) + off;
   let end = hhmm(r.timeOut) + off;
   if (end <= start) end += 1440; // crosses midnight
-  let ms: number | null = null;
-  let me: number | null = null;
-  if (r.mealStart && r.mealEnd && r.mealStart !== "—" && r.mealEnd !== "—") {
-    ms = hhmm(r.mealStart) + off;
-    if (ms < start) ms += 1440;
-    me = hhmm(r.mealEnd);
-    while (me < ms) me += 1440;
-  }
-  // Only the part of a meal inside the shift is unpaid, so hours never go negative
-  // when a meal is typed outside clock in and clock out (validation flags that).
-  const intervals: [number, number][] = ms !== null && me !== null ? [[start, Math.min(ms, end)], [Math.max(me, start), end]] : [[start, end]];
+  const { ms, me, note } = placeMeal(r, start, end, off);
+  const intervals: [number, number][] = ms !== null && me !== null ? [[start, ms], [me, end]] : [[start, end]];
   let worked = 0;
   let night = 0;
   for (const [a, b] of intervals) {
-    if (b <= a) continue;
     worked += b - a;
     for (let k = -1; k <= 2; k++) night += overlap(a, b, 1320 + 1440 * k, 1800 + 1440 * k); // 22:00–06:00
   }
-  return { rowId: r.rowId, start, end, mealStart: ms, mealEnd: me, worked, night, crossesMidnight: end > 1440 };
+  return { rowId: r.rowId, start, end, mealStart: ms, mealEnd: me, worked, night, crossesMidnight: end > 1440, ...(note ? { mealNote: note } : {}) };
 }
 
 function mealCheck(shifts: Shift[], worked: number): { status: MealStatus; secondWarning: boolean } {
