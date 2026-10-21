@@ -71,11 +71,11 @@
 
 | Case | Worker | Result | Calculation |
 |---|---|---|---|
-| New hire mid-period | E0203 | $2,878.79 | $190,000.00 ÷ 24 × 4/11 working days (Mon Oct 12–Thu Oct 15, CA) |
-| Termination final pay | E0148 | $4,375.00 salary + $2,629.69 payout | $165,000.00 ÷ 24 × 7/11 working days (Thu Oct 1–Fri Oct 9, CA); 33.15 hrs (31.00 opening + 2.15 final accrual − 0.00 taken) × $165,000.00 ÷ 2080 = $79.3269 |
-| Unpaid leave mid-period | E0149 | $3,409.09 | $180,000.00 ÷ 24 × 5/11 working days (Thu Oct 1–Wed Oct 7, NY) |
-| Comp change on the 10th | E0057 | $7,594.70 | $175,000.00 ÷ 24 × 7/11 working days (Thu Oct 1–Fri Oct 9, CA); $195,000.00 ÷ 24 × 4/11 working days (Mon Oct 12–Thu Oct 15, CA) |
-| State-to-state move | E0088 | $7,166.67 | $172,000.00 ÷ 24 × 3/11 working days (Thu Oct 1–Mon Oct 5, CA); segment total $7,166.67 allocated by days; $172,000.00 ÷ 24 × 8/11 working days (Tue Oct 6–Thu Oct 15, CO); segment total $7,166.67 allocated by days |
+| New hire mid-period | E0203 | $2,878.79 | $190,000.00 ÷ 24 × 4/11 working days (Mon Oct 12–Thu Oct 15, CA); 31.52 of 86.67 standard hours |
+| Termination final pay | E0148 | $4,375.00 salary + $2,629.69 payout | $165,000.00 ÷ 24 × 7/11 working days (Thu Oct 1–Fri Oct 9, CA); 55.15 of 86.67 standard hours; 33.15 hrs (31.00 opening + 2.15 final accrual − 0.00 taken) × $165,000.00 ÷ 2080 = $79.3269 |
+| Unpaid leave mid-period | E0149 | $3,409.09 | $180,000.00 ÷ 24 × 5/11 working days (Thu Oct 1–Wed Oct 7, NY); 39.40 of 86.67 standard hours |
+| Comp change on the 10th | E0057 | $7,594.70 | $175,000.00 ÷ 24 × 7/11 working days (Thu Oct 1–Fri Oct 9, CA); 55.15 of 86.67 standard hours; $195,000.00 ÷ 24 × 4/11 working days (Mon Oct 12–Thu Oct 15, CA); 31.52 of 86.67 standard hours |
+| State-to-state move | E0088 | $7,166.67 | $172,000.00 ÷ 24 × 3/11 working days (Thu Oct 1–Mon Oct 5, CA); segment total $7,166.67 allocated by days; 23.64 of 86.67 standard hours; $172,000.00 ÷ 24 × 8/11 working days (Tue Oct 6–Thu Oct 15, CO); segment total $7,166.67 allocated by days; 63.03 of 86.67 standard hours |
 | Garnishment | E0031 | $450.00 | min(order $450.00, 60% × disposable $3,370.97 = $2,022.58); case CS-2026-118842 |
 | Retro timesheet correction | E0033 | $243.38 | wk Sun Sep 27 prior-period days: owed $1,294.31 (REG 24.00, OT 3.50, DT 0.00 hrs) − paid $1,050.94 (REG 21.50, OT 1.50, DT 0.00 hrs) |
 | Contractors | C0001–C0005 | Not paid | C0001, C0002, C0003, C0004, C0005 excluded: contingent workers are paid through AP |

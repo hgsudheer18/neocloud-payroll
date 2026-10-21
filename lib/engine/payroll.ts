@@ -106,6 +106,12 @@ export interface PriorPeriodRetro {
 
 const money = (n: number) => `$${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const h2 = (n: number) => n.toFixed(2);
+/** "8.00 hrs × $42.00", one entry per distinct rate: pay slips show hours, not dates. */
+const hoursByRate = (items: { hours: number; rate: number }[], suffix = "") => {
+  const m = new Map<number, number>();
+  for (const i of items) m.set(i.rate, (m.get(i.rate) ?? 0) + i.hours);
+  return [...m.entries()].map(([rate, hrs]) => `${h2(hrs)} hrs × ${money(rate)}${suffix}`).join("; ");
+};
 
 function line(code: string, amount: Cents, explain: string, extra: Partial<PayLine> = {}): PayLine {
   const c = COMPONENT[code];
@@ -130,6 +136,16 @@ function salaryLines(input: WorkerPayInput, period: PayPeriod): PayLine[] {
     if (!bySalary.has(d.annualSalary)) bySalary.set(d.annualSalary, []);
     bySalary.get(d.annualSalary)!.push(d);
   }
+  // Standard hours shown on the salary lines (2,080 ÷ periods per year, e.g. 86.67
+  // semi-monthly), prorated by paid working days. Display only: pay is salary ÷ periods.
+  const groups = [...bySalary.values()].flatMap((segDays) => {
+    const m = new Map<string, number>();
+    for (const d of segDays) m.set(`${d.annualSalary}|${d.workState}|${d.costCenterId}`, (m.get(`${d.annualSalary}|${d.workState}|${d.costCenterId}`) ?? 0) + 1);
+    return [...m.entries()];
+  });
+  const stdHundredths = Math.round((STANDARD_ANNUAL_HOURS / period.periodsPerYear) * 100);
+  const hourParts = allocate(Math.round((stdHundredths * paid.length) / Math.max(1, workingDays)), groups.map(([, n]) => n));
+  const hoursFor = new Map(groups.map(([k], i) => [k, hourParts[i] / 100]));
   for (const [annual, segDays] of bySalary) {
     const periodSalary = annual / period.periodsPerYear;
     const amount = roundCents((periodSalary * 100 * segDays.length) / workingDays);
@@ -147,9 +163,10 @@ function salaryLines(input: WorkerPayInput, period: PayPeriod): PayLine[] {
       const range = `${pretty(sd[0].date)}–${pretty(sd[sd.length - 1].date)}`;
       const full = segDays.length === workingDays && keys.length === 1;
       const explain = full
-        ? `${money(annual)} ÷ ${period.periodsPerYear} = ${fmt(parts[i])} (full period)`
+        ? `${money(annual)} ÷ ${period.periodsPerYear} = ${fmt(parts[i])}`
         : `${money(annual)} ÷ ${period.periodsPerYear} × ${sd.length}/${workingDays} working days (${range}, ${state})${keys.length > 1 ? `; segment total ${fmt(amount)} allocated by days` : ""}`;
-      out.push(line("SAL", parts[i], explain, { state, costCenterId: cc, hours: undefined }));
+      const hrs = hoursFor.get(`${annual}|${state}|${cc}`) ?? 0;
+      out.push(line("SAL", parts[i], `${explain}; ${full ? `${h2(hrs)} standard hours` : `${h2(hrs)} of ${h2(stdHundredths / 100)} standard hours`}`, { state, costCenterId: cc, hours: hrs }));
     });
   }
   return out;
@@ -214,20 +231,20 @@ function absenceLines(input: WorkerPayInput, period: PayPeriod): PayLine[] {
       const taken = input.absencesTaken.filter((a) => a.plan === plan && a.status === "Approved" && a.date >= period.start && a.date <= period.end);
       if (!taken.length) continue;
       let exact = 0;
-      const parts: string[] = [];
+      const items: { hours: number; rate: number }[] = [];
       for (const a of taken) {
         const wk = input.time?.weeks.find((x) => a.date >= x.weekStart && a.date <= addDaysLocal(x.weekStart, 6));
         const rate = code === "SICK" && wk ? wk.regularRate : w.hourlyRate;
         exact += a.quantity * rate;
-        parts.push(`${pretty(a.date)} ${h2(a.quantity)} hrs × ${money(rate)}${code === "SICK" ? " (regular rate of pay)" : ""}`);
+        items.push({ hours: a.quantity, rate });
       }
       const hours = taken.reduce((s, a) => s + a.quantity, 0);
-      out.push(line(code, roundCents(exact * 100), parts.join("; "), { hours, state: last.workState, costCenterId: last.costCenterId }));
+      out.push(line(code, roundCents(exact * 100), hoursByRate(items, code === "SICK" ? " (regular rate of pay)" : ""), { hours, state: last.workState, costCenterId: last.costCenterId }));
     }
     // Other paid leave without a balance (bereavement, jury duty): hours × base rate.
     const other = input.absencesTaken.filter((a) => a.status === "Approved" && a.date >= period.start && a.date <= period.end && PLAN[a.plan]?.paid && PLAN[a.plan]?.country === "USA" && PLAN[a.plan]?.accrualMethod === "none" && PLAN[a.plan]?.isEligible(w));
     if (other.length) {
-      const parts = other.map((a) => `${PLAN[a.plan].name} ${pretty(a.date)} ${h2(a.quantity)} hrs × ${money(w.hourlyRate)}`);
+      const parts = [...new Set(other.map((a) => a.plan))].map((pl) => `${PLAN[pl].name} ${h2(other.filter((a) => a.plan === pl).reduce((t, a) => t + a.quantity, 0))} hrs × ${money(w.hourlyRate)}`);
       const hours = other.reduce((s, a) => s + a.quantity, 0);
       out.push(line("LEAVE_PAID", roundCents(hours * w.hourlyRate * 100), parts.join("; "), { hours, state: last.workState, costCenterId: last.costCenterId }));
     }
@@ -262,19 +279,20 @@ function salariedTimeOff(input: WorkerPayInput, period: PayPeriod, sal: PayLine[
   for (const plan of [...new Set(taken.map((a) => a.plan))]) {
     const days = taken.filter((a) => a.plan === plan).sort((a, b) => (a.date < b.date ? -1 : 1));
     let exact = 0;
-    const parts: string[] = [];
+    const items: { hours: number; rate: number }[] = [];
     for (const a of days) {
       const rate = hourlyEquivalent(paidDays.get(a.date)!.annualSalary);
       exact += a.quantity * rate;
-      parts.push(`${pretty(a.date)} ${h2(a.quantity)} hrs × ${money(rate)}`);
+      items.push({ hours: a.quantity, rate });
     }
     const hours = days.reduce((s, a) => s + a.quantity, 0);
     const last = sal[sal.length - 1];
     const amount = Math.min(roundCents(exact * 100), last.amount);
     if (amount <= 0) continue;
     last.amount -= amount;
-    last.explain += `; less ${fmt(amount)} paid as ${PLAN[plan]?.name ?? plan} (${h2(hours)} hrs)`;
-    out.push(line("PTO_TAKEN", amount, `${PLAN[plan]?.name ?? plan}: ${parts.join("; ")} (hourly equivalent = salary ÷ ${STANDARD_ANNUAL_HOURS})`, { hours, state: last.state, costCenterId: last.costCenterId }));
+    if (last.hours !== undefined) last.hours = Math.max(0, Math.round((last.hours - hours) * 100) / 100);
+    last.explain += `; less ${h2(hours)} hrs time off (${fmt(amount)})`;
+    out.push(line("PTO_TAKEN", amount, `${PLAN[plan]?.name ?? plan}: ${hoursByRate(items)} (salary ÷ ${STANDARD_ANNUAL_HOURS})`, { hours, state: last.state, costCenterId: last.costCenterId }));
   }
   return out;
 }

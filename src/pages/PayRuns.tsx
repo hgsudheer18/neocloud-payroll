@@ -195,7 +195,7 @@ function PayResults({ workers, label }: { workers: UsWorkerCalc[]; label: string
               <tr key={c.worker.id} className={`click ${open === c.worker.id ? "sel" : ""}`} onClick={() => setOpen(open === c.worker.id ? "" : c.worker.id)}>
                 <td><a href={`#/register/${c.worker.id}`} onClick={(e) => e.preventDefault()}>{c.worker.id}</a> {c.worker.name}<div className="faint small">{c.worker.jobProfile}, {c.worker.workState}</div></td>
                 <td>{c.worker.payType}</td>
-                <td className="n">{c.worker.payType === "Hourly" ? hours(c, ["REG"]).toFixed(2) : ""}</td>
+                <td className="n">{hours(c, c.worker.payType === "Hourly" ? ["REG"] : ["SAL"]).toFixed(2)}{hours(c, ["PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID"]) ? <div className="faint small">+ {hours(c, ["PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID"]).toFixed(2)} time off</div> : null}</td>
                 <td className="n">{hours(c, ["OT"]) ? hours(c, ["OT"]).toFixed(2) : ""}</td>
                 <td className="n">{hours(c, ["DT"]) ? hours(c, ["DT"]).toFixed(2) : ""}</td>
                 <td className="n"><Money c={c.pay.totals.gross} /></td>
