@@ -5,6 +5,7 @@ import * as esbuild from "esbuild";
 import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+import { createHash } from "node:crypto";
 
 const root = process.cwd();
 const dist = join(root, "dist");
@@ -26,8 +27,10 @@ export const buildOptions = {
 export function copyStatic() {
   mkdirSync(join(dist, "data"), { recursive: true });
   mkdirSync(join(dist, "docs"), { recursive: true });
-  cpSync(join(root, "index.html"), join(dist, "index.html"));
   cpSync(join(root, "src/styles.css"), join(dist, "styles.css"));
+  // Version the app files so a browser never keeps running an old copy after a deploy.
+  const version = (f) => (existsSync(join(dist, f)) ? createHash("sha256").update(readFileSync(join(dist, f))).digest("hex").slice(0, 10) : String(Date.now()));
+  writeFileSync(join(dist, "index.html"), readFileSync(join(root, "index.html"), "utf8").replace('href="styles.css"', `href="styles.css?v=${version("styles.css")}"`).replace('src="app.js"', `src="app.js?v=${version("app.js")}"`));
   const csvs = readdirSync(join(root, "data")).filter((f) => f.endsWith(".csv")).sort();
   for (const f of csvs) cpSync(join(root, "data", f), join(dist, "data", f));
   writeFileSync(join(dist, "data/manifest.json"), JSON.stringify(csvs));
