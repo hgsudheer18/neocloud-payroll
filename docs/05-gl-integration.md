@@ -63,7 +63,7 @@ The journal is summarized by subsidiary, account, department and location: 82 li
 | Employer tax and benefit liabilities | | 2111–2113, 2130 |
 | Net pay | | 2100 Net Pay Clearing |
 
-Debits ($2,299,341.55 this period) equal register cost to company, and credits equal the same figure. That tie is one of the app's control totals.
+Debits ($2,300,424.38 this period) equal register burdened cost, and credits equal the same figure. That tie is one of the app's control totals.
 
 ### How liabilities are booked and cleared
 
@@ -85,7 +85,7 @@ Semi-monthly periods end on the 15th and the last day of the month, so a US peri
 
 If a journal cannot be posted before the month is closed (for example the Oct 16–31 payroll calculates on Nov 2 and close is Nov 3, or a future biweekly pay group straddles month end):
 
-1. Post an **accrual** on the last day of the month: Dr wage, tax and benefit expense by department / Cr 2190 Accrued Payroll, estimated as the prior period's cost-to-company cost × (working days to accrue ÷ working days in that period), plus known one-offs such as terminations.
+1. Post an **accrual** on the last day of the month: Dr wage, tax and benefit expense by department / Cr 2190 Accrued Payroll, estimated as the prior period's burdened cost × (working days to accrue ÷ working days in that period), plus known one-offs such as terminations.
 2. Set it as an **auto-reversing** journal on the first day of the next month.
 3. Post the actual payroll journal when it is ready; the reversal plus the actual leaves exactly the actual in each month (the estimate's error lands in the month the actual posts and is reviewed in flux analysis).
 

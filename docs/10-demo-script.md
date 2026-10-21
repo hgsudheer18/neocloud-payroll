@@ -9,7 +9,7 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 1. **Period overview.** The first thing on screen is the control-total ledger: "Before anyone looks at a number, the question is whether the period ties." Walk through the eight ties.
 2. **Payroll register → E0148.** Termination: 7 of 11 days of salary, plus the vacation payout of 33.15 hours (31.00 opening + 2.15 final accrual) at $165,000 ÷ 2,080 = $2,629.69. The red banner says California final pay is due on the last day, so it goes on an on-demand payment.
 3. **Time calculation → E0021.** Oct 1 late meal (the brief didn't flag it), Oct 2 double time, Oct 3 missed meal plus 8 hours of weekly overtime because Sep 28–Oct 2 already reached 40.
-4. **Reconciliation → E0203.** Every variance is proven by recalculating with the cause. Then **E0003**: "Here legacy is right. The brief's $168,600 is the 2024 Social Security wage base; 2026 is $184,500. In a real parallel I'd fix Workday."
+4. **Reconciliation → E0203.** Every variance is proven by recalculating with the cause. Then **E0015**: Social Security stops mid-period at the 2026 wage base ($184,500), matching legacy to the cent. "The brief quoted $168,600, the 2024 base; I configured the 2026 figure."
 
 ## Part 2. Run the first payroll (3 min)
 
@@ -35,7 +35,7 @@ A hands-on walkthrough for the CFO, Controller and Head of People Technology. St
 ## Part 5. Run the next cycle (3 min)
 
 17. **Pay period: Oct 16–31 semi-monthly (salaried). Signed in as Sam → Pay runs → Calculate.** The blue banner shows **E0057 retro $151.51**: the raise backdated into the completed period, paid now. Open **Payroll register → E0057** to show the RETRO line and its explanation.
-18. Point out that year-to-date carried forward: E0012 crossed the Social Security wage base in Oct 1–15, so no Social Security now.
+18. Point out that year-to-date carried forward: E0015 crossed the Social Security wage base ($184,500) in Oct 1–15, so no Social Security now.
 19. **Pay period: Oct 16–31 biweekly transition (hourly). Pay runs → Calculate.** 26 technicians, including Alex. Explain the 2-day stub that completes the Oct 11–17 workweek, then clean two-week periods.
 20. **Signed in as Priya → Approve → Complete.** Then **General ledger**: the biweekly journal balances and is ready for NetSuite.
 

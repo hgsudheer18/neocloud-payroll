@@ -9,10 +9,10 @@ Pay groups: salaried employees are paid **semi-monthly**; hourly employees move 
 
 Parallel-run results (Oct 1–15):
 
-- 280 US workers paid, $1,973,794.91 gross, $2,299,341.55 cost to company (gross plus employer taxes and benefits)
+- 280 US workers paid, $1,973,794.91 gross, $2,300,424.38 burdened cost (gross plus employer taxes and benefits)
 - 25 non-exempt technicians under California and FLSA time rules
 - Absence balances for six accruing plans across four countries, plus sick, bereavement and jury duty time off types without a balance
-- Employee-level reconciliation to the legacy Rippling register: 262 match to the cent, 19 variances explained by re-performance, 0 unexplained
+- Employee-level reconciliation to the legacy Rippling register: 267 match to the cent, 14 variances explained by re-performance, 0 unexplained
 - Five balanced, fully mapped journals with a validated NetSuite export
 - Every control total ties
 
@@ -85,7 +85,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Benefits | ERP | Your benefit enrolments by type (healthcare: medical; retirement: 401(k)), with this pay period's deduction; payroll can view anyone's. Benefits a worker is not enrolled in are not shown |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |
-| Period overview | 2 | Control-total tie-out, period totals, cost to company rollup by department, location or cost center (filterable), variance summary |
+| Period overview | 2 | Control-total tie-out, period totals, burdened cost rollup by department, location or cost center (filterable), variance summary |
 | Payroll register | 2 | Gross to net for every worker; payslip drill-down with the calculation behind every line |
 | Time calculation | 3 | Hours by category per technician, daily detail with meal checks and workweeks, exceptions, category-to-component mapping |
 | Absence › Absence Balances | 4 | Tab of Absence for managers (their team) and payroll: sample-worker ending balances, payout to payroll, plan configuration, all balances |
@@ -144,7 +144,7 @@ The full decision log, with alternatives considered for each choice, is [docs/08
 **What I would do differently with more time.**
 - A server-side store and single sign-on so every reviewer shares one live dataset with real logins, instead of per-browser state.
 - On-demand payments: a terminated worker's final check run on its own on the last day (California), without completing the regular run.
-- A real tax engine (or Workday's) instead of approximations; Colorado FAMLI, local taxes, the 2026 Social Security wage base.
+- A real tax engine (or Workday's) instead of approximations; Colorado FAMLI and local taxes.
 - Year-end: W-2 generation, review, publishing and SSA filing; a holiday calendar for check dates; a second meal per day on the timesheet.
 - End-to-end UI tests alongside the engine tests, and the Workato integration to NetSuite in place of the manual export.
 
@@ -178,7 +178,7 @@ tests/                    automated tests
 
 - **Data package.** The brief's package contained sample rows only ("Extend the samples to the full population before sending"). `scripts/generate-data.ts` extends them deterministically, keeping every sample row as given and adding every edge case the brief lists. The legacy register and provider results are generated with documented seeded differences that the reconciliation must rediscover (see ADR-09).
 - **Pay periods.** Parallel run Oct 1–15, 2026 (11 working days), check date Tue Oct 20. Then Oct 16–31 semi-monthly (salaried, paid Nov 5), Oct 16–31 biweekly transition (hourly, paid Fri Nov 6) and Nov 1–14 biweekly (paid Fri Nov 20). International: October 2026, change cutoff Oct 20, pay date Oct 28.
-- **Rates.** As given in the brief. The Social Security wage base of $168,600 is the 2024 value (2026 actual: $184,500); the app uses the brief's figure and the reconciliation shows the impact. Federal withholding uses the 2026 brackets in a simplified annualized method; state taxes are approximations.
+- **Rates.** As given in the brief. The brief stated a Social Security wage base of $168,600, which is the 2024 value; the app uses the 2026 base of $184,500, which also matches the legacy register. Federal withholding uses the 2026 brackets in a simplified annualized method; state taxes are approximations.
 - **Day mapping.** Timesheet "Day N" = October N, 2026.
 - **Workweek.** Sunday to Saturday.
 
@@ -213,6 +213,7 @@ The app was built with Claude (Anthropic) acting as the coding agent, directed a
 | Recommended a single semi-monthly pay group for everyone | My own preference and research on FLSA workweeks | Hourly moved to biweekly (ADR-16) |
 | A meal typed outside clock in and clock out (for example 1:00 meant as 1 pm) was still subtracted, so a day could show negative or far too few hours | My own timesheet testing | Hours now run from clock in to clock out; only a real meal inside the shift (up to 2 hours) is deducted; anything else is a warning (ADR-18) |
 | The register download took its columns from the first worker, so pay codes such as overtime could be missing from the file | Reviewing the CSV | Columns are the union of every pay code |
+| Kept the brief's Social Security wage base ($168,600, the 2024 figure) and treated the resulting differences as a configuration difference | My own review of the reconciliation: a wrong wage base under-withholds for every high earner | Configured the 2026 base ($184,500); the five affected employees now match legacy to the cent |
 | The presenter's scenario loaded only on a browser's very first visit, and browsers kept running a cached copy of the old app after a deploy | Opening the live site in a private window | Any browser with no entries of its own loads the scenario; app files are versioned on every build |
 
 ## Limitations

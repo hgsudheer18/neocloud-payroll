@@ -6,14 +6,14 @@
 
 | Control | Left | Right | Ties |
 |---|---|---|---|
-| Gross − pre-tax − EE taxes − post-tax = net | $1,313,119.26 | $1,313,119.26 | Yes |
-| US journal balances | $2,299,341.55 | $2,299,341.55 | Yes |
-| Register cost to company = journal expense debits | $2,299,341.55 | $2,299,341.55 | Yes |
+| Gross − pre-tax − EE taxes − post-tax = net | $1,312,036.43 | $1,312,036.43 | Yes |
+| US journal balances | $2,300,424.38 | $2,300,424.38 | Yes |
+| Register burdened cost = journal expense debits | $2,300,424.38 | $2,300,424.38 | Yes |
 | Approved time hours = hours paid (REG+OT+DT) | 2281.92 | 2281.92 | Yes |
 | Hourly PTO taken = PTO hours paid | 24.00 | 24.00 | Yes |
 | Termination payout hours = payout hours paid | 33.15 | 33.15 | Yes |
 | Headcount: eligible = paid + zero-pay | 280 | 280 | Yes |
-| Every legacy variance explained | 19 | 19 | Yes |
+| Every legacy variance explained | 14 | 14 | Yes |
 
 ## US payroll totals
 
@@ -22,12 +22,12 @@
 | Workers paid | 280 |
 | Gross | $1,973,794.91 |
 | Pre-tax deductions | $137,585.86 |
-| Employee taxes | $522,639.79 |
+| Employee taxes | $523,722.62 |
 | Post-tax deductions | $450.00 |
-| Net pay | $1,313,119.26 |
-| Employer taxes | $128,167.06 |
+| Net pay | $1,312,036.43 |
+| Employer taxes | $129,249.89 |
 | Benefits load (10%) | $197,379.58 |
-| Total cost to company | $2,299,341.55 |
+| Total burdened cost | $2,300,424.38 |
 
 ## Gross by pay component
 
@@ -46,21 +46,21 @@
 | RETRO Retro Pay | $243.38 |
 | PTO_PAYOUT Vacation Payout on Termination | $2,629.69 |
 
-## Cost to Company (total burdened cost) by department (US + international in USD)
+## Total burdened cost by department (US + international in USD)
 
-| Department | Workers | Gross | Employer taxes | Benefits | Cost to Company |
+| Department | Workers | Gross | Employer taxes | Benefits | Burdened cost |
 |---|---|---|---|---|---|
-| Engineering | 144 | $1,075,241.00 | $72,651.38 | $89,698.25 | $1,237,590.63 |
-| GPU Cloud | 90 | $683,968.92 | $51,718.06 | $62,255.00 | $797,941.98 |
-| On-Prem | 75 | $484,169.55 | $39,010.46 | $43,580.42 | $566,760.43 |
-| G&A | 40 | $306,503.79 | $17,439.60 | $30,650.38 | $354,593.77 |
+| Engineering | 144 | $1,075,241.00 | $72,749.13 | $89,698.25 | $1,237,688.38 |
+| GPU Cloud | 90 | $683,968.92 | $52,355.32 | $62,255.00 | $798,579.24 |
+| On-Prem | 75 | $484,169.55 | $39,079.28 | $43,580.42 | $566,829.25 |
+| G&A | 40 | $306,503.79 | $17,718.60 | $30,650.38 | $354,872.77 |
 
-## Cost to Company (total burdened cost) by location
+## Total burdened cost by location
 
-| Location | Workers | Cost to Company |
+| Location | Workers | Burdened cost |
 |---|---|---|
-| San Francisco HQ | 178 | $1,537,055.41 |
-| Remote - US | 55 | $459,770.57 |
+| San Francisco HQ | 178 | $1,538,069.42 |
+| Remote - US | 55 | $459,839.39 |
 | Toronto | 26 | $301,195.71 |
 | London | 23 | $257,794.87 |
 | San Jose Data Center | 27 | $179,539.40 |
@@ -158,14 +158,13 @@ E0148 payout flowing to payroll: **$2,629.69** (33.15 hrs (31.00 opening + 2.15 
 
 ## Legacy register reconciliation
 
-Matched to the cent: 262. Explained: 17. Only in legacy: 1. Only in Workday: 1. Unexplained: 0.
+Matched to the cent: 267. Explained: 12. Only in legacy: 1. Only in Workday: 1. Unexplained: 0.
 
-Legacy gross $1,986,453.42 vs Workday $1,973,794.91 (legacy − Workday $12,658.51); net legacy − Workday $7,107.36.
+Legacy gross $1,986,453.42 vs Workday $1,973,794.91 (legacy − Workday $12,658.51); net legacy − Workday $8,190.19.
 
 | Root cause | Classification | Correct | Employees | Gross impact | Net impact | ER tax impact |
 |---|---|---|---|---|---|---|
 | Contingent worker paid through payroll | Data | Workday | C0003 | $6,500.00 | $4,388.71 | $757.25 |
-| Social Security wage base | Configuration difference | Legacy | E0003, E0012, E0015, E0106, E0125 | $0.00 | -$1,082.83 | $1,082.83 |
 | CA meal premiums not calculated in legacy | Configuration difference | Workday | E0021, E0029, E0030, E0031, E0032, E0035 | -$344.06 | -$215.00 | -$26.34 |
 | Garnishment not deducted in legacy | Legacy error | Workday | E0031 | $0.00 | $450.00 | $0.00 |
 | Prior-period timesheet correction not yet in legacy | Timing | Workday | E0033 | -$243.38 | -$172.44 | -$18.62 |
@@ -182,18 +181,6 @@ Legacy gross $1,986,453.42 vs Workday $1,973,794.91 (legacy − Workday $12,658.
 **C0003** (Only in legacy): gross $6,500.00, net $4,388.71, employer taxes $757.25 (legacy − Workday).
 
 - *Contingent worker paid through payroll* (Data; correct: Workday). C0003 is a Contingent Worker (contractor). Legacy paid them as a W-2 employee. **Action:** Remove from the payroll pay group; pay through AP on vendor invoices (1099). Ask Legal/HR to review classification and whether any W-2 wages must be corrected (W-2c, 941-X).
-
-**E0003** (Explained): gross $0.00, net -$588.90, employer taxes $588.90 (legacy − Workday).
-
-- *Social Security wage base* (Configuration difference; correct: Legacy). YTD SS wages $170,970.00. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER). **Action:** Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.
-
-**E0012** (Explained): gross $0.00, net -$97.75, employer taxes $97.75 (legacy − Workday).
-
-- *Social Security wage base* (Configuration difference; correct: Legacy). YTD SS wages $161,220.00. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER). **Action:** Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.
-
-**E0015** (Explained): gross $0.00, net -$279.00, employer taxes $279.00 (legacy − Workday).
-
-- *Social Security wage base* (Configuration difference; correct: Legacy). YTD SS wages $180,000.00. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER). **Action:** Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.
 
 **E0021** (Explained): gross -$126.00, net -$75.29, employer taxes -$9.63 (legacy − Workday).
 
@@ -232,14 +219,6 @@ Legacy gross $1,986,453.42 vs Workday $1,973,794.91 (legacy − Workday $12,658.
 **E0088** (Explained): gross $0.00, net -$172.86, employer taxes $0.00 (legacy − Workday).
 
 - *Work-state change not in legacy* (Data; correct: Workday). Work location moved CA → CO effective Tue Oct 6. Legacy withheld CA taxes on all wages. **Action:** Workday is correct (wages sourced by work state). Production: register a CO withholding account before the move; refund CA over-withholding in the same quarter.
-
-**E0106** (Explained): gross $0.00, net -$48.36, employer taxes $48.36 (legacy − Workday).
-
-- *Social Security wage base* (Configuration difference; correct: Legacy). YTD SS wages $183,720.00. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER). **Action:** Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.
-
-**E0125** (Explained): gross $0.00, net -$68.82, employer taxes $68.82 (legacy − Workday).
-
-- *Social Security wage base* (Configuration difference; correct: Legacy). YTD SS wages $183,390.00. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER). **Action:** Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.
 
 **E0148** (Explained): gross -$2,629.69, net -$1,539.92, employer taxes -$201.17 (legacy − Workday).
 
@@ -280,7 +259,7 @@ Provider reconciliation:
 
 | Journal | Currency | Lines | Debits | Credits |
 |---|---|---|---|---|
-| PR-2026-10-SM1-NC-US | USD | 82 | $2,299,341.55 | $2,299,341.55 |
+| PR-2026-10-SM1-NC-US | USD | 82 | $2,300,424.38 | $2,300,424.38 |
 | PR-2026-10-NC-CA | CAD | 12 | C$433,690.52 | C$433,690.52 |
 | PR-2026-10-NC-IN | INR | 7 | ₹81,75,890.00 | ₹81,75,890.00 |
 | PR-2026-10-NC-UK | GBP | 10 | £202,988.05 | £202,988.05 |
@@ -301,5 +280,5 @@ Validation issues: 0.
 | Warning: Time: duplicate punch | 1 |
 | Warning: Absence: US Hourly Vacation | 1 |
 | Warning: Trailing-average drop | 1 |
-| Info: Wage base crossed | 1 |
+| Info: Wage base crossed | 3 |
 | Info: Multi-state wages | 1 |

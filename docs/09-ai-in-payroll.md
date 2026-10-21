@@ -32,9 +32,9 @@ The app does this in two layers (Reconciliation → Controller commentary):
 
 ## Example (deterministic draft for this period)
 
-> Payroll for 2026-10-01 to 2026-10-15 (check date 2026-10-20): Workday calculated 280 workers, gross $1,973,794.91 and net $1,313,119.26. The legacy register has 280 rows, gross $1,986,453.42, so legacy is $12,658.51 higher on gross and $7,107.36 on net.
+> Payroll for 2026-10-01 to 2026-10-15 (check date 2026-10-20): Workday calculated 280 workers, gross $1,973,794.91 and net $1,312,036.43. The legacy register has 280 rows, gross $1,986,453.42, so legacy is $12,658.51 higher on gross and $8,190.19 on net.
 > All control totals tie: gross to net, register to journal, time to pay and headcount.
-> 12 root causes explain every variance; 0 remain unexplained.
+> 11 root causes explain every variance; 0 remain unexplained.
 
 ## What would come next
 

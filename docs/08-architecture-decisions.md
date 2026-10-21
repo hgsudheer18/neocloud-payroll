@@ -51,7 +51,7 @@ CSV text → loadDataset() → Dataset → runPeriod() → PeriodResult → Reac
 
 **Decision.** Tax tables (`lib/config/usTax.ts`), pay components, absence plans, country rules and the control matrix are data. Each tax table has an effective date and a source note (EXERCISE value from the brief vs ACTUAL published value). The engine looks rules up `asOf(checkDate)`, so a new tax year is a new row, and a change is reviewed like code (pull request = change ticket, see control PR-10).
 
-The brief's Social Security wage base ($168,600) is the 2024 value; the actual 2026 base is $184,500. Both are recorded; the engine uses the brief's value as instructed, and the reconciliation shows the impact and states that legacy is right in real life.
+The brief's Social Security wage base ($168,600) is the 2024 value; the engine uses the 2026 base of $184,500, with the source noted on the tax table row. An earlier version kept the brief's figure, which made five high earners differ from the legacy register; it was corrected because a wrong wage base is a real payroll tax error, not a modeling choice.
 
 Tax calculations are deliberately approximate (annualized federal percentage method with 2026 brackets, a progressive CA table, flat rates for other states). The brief tests structure, so the structure is exact: each tax has its own taxable wage base built from component taxability.
 
@@ -199,7 +199,7 @@ Preventing a bad entry is cheaper than explaining it in a reconciliation.
 | Engine code | Generated nearly all of `lib/` | Rules, order of evaluation and edge-case treatments specified and reviewed line by line against hand calculations |
 | Pay group design | Proposed one semi-monthly pay group for everyone | Overridden: hourly workers on a biweekly pay group so overtime weeks are never split (ADR-16) |
 | Scope | Built the brief's calculate-and-reconcile app first | Extended to a working ERP with business processes and pay runs, because the panel will use it hands-on (ADR-14) |
-| Wage base | Flagged that the brief's $168,600 is the 2024 figure | Decision: keep the brief's value, record the actual, surface it as a configuration difference |
+| Wage base | Flagged that the brief's $168,600 is the 2024 figure | First kept the brief's value and showed it as a configuration difference; then corrected Workday to the 2026 base ($184,500), because a payroll tax setting must be right |
 | Reconciliation method | Proposed re-performance of hypotheses | Accepted; added the rule that the reconciler never reads the seeded-error list |
 | Data generation | Generated the population and edge cases | Required all sample rows kept verbatim; required generated data to pass the same validation as uploaded data |
 | Documents | Drafted all documents | Every figure checked against engine output; the period results document is generated from the engine to prevent drift |

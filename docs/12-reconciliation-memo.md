@@ -1,15 +1,15 @@
 # Memo: Oct 1–15, 2026 parallel run reconciliation
 
 **To:** Controller, NeoCloud Inc.
-**From:** Payroll Implementation Lead
+**From:** Sudheer, Workday Payroll Implementation Lead
 **Date:** 10/20/2026
 **Subject:** Workday vs Rippling parallel run, US semi-monthly Oct 1–15 (check date 10/20/2026)
 
 ## 1. Recommendation
 
-**This period passes parallel, with one condition.** Every one of the 280 Workday payees and every legacy register row is reconciled: 262 employees match Rippling to the cent, 19 differences are explained and proven by recalculation, and none is unexplained. All eight control totals tie and the US journal balances at $2,299,341.55 with every line mapped to NetSuite.
+**This period passes parallel.** Every one of the 280 Workday payees and every legacy register row is reconciled: 267 employees match Rippling to the cent, 14 differences are explained and proven by recalculation, and none is unexplained. In every one of the 14, Workday is correct. All eight control totals tie and the US journal balances at $2,300,424.38 with every line mapped to NetSuite.
 
-The condition: in five of the 19 cases **Rippling is right**. Workday is configured with a Social Security wage base of $168,600 (the figure in the implementation brief, which is the 2024 base); the 2026 base is $184,500. The tax configuration must be corrected and those five employees re-run before this parallel is signed off. It does not block starting the next parallel. In every other case Workday is correct, and two of them are legacy errors that need action now regardless of go-live.
+Two of the differences are Rippling errors with legal exposure (a child support order not withheld, and a California vacation payout missing from final pay); they need action now regardless of go-live. One configuration point was checked rather than copied: the implementation brief quoted a Social Security wage base of $168,600, which is the 2024 figure. Workday is configured with the 2026 base of $184,500, the same as Rippling, so high earners reconcile to the cent.
 
 ## 2. Headcount
 
@@ -32,8 +32,8 @@ Movement: 278 active on Oct 1, plus 2 hires (E0203, E0345), less 1 termination (
 | | Rippling | Workday | Rippling − Workday |
 |---|---|---|---|
 | Gross pay | $1,986,453.42 | $1,973,794.91 | $12,658.51 |
-| Net pay | | | $7,107.36 |
-| Workday Cost to Company (gross + employer taxes + benefits) | | $2,299,341.55 | |
+| Net pay | | $1,312,036.43 | $8,190.19 |
+| Total burdened cost (gross + employer taxes + benefits) | | $2,300,424.38 | |
 
 ## 4. Variances, root cause and disposition
 
@@ -42,7 +42,6 @@ Amounts are Rippling minus Workday.
 | Root cause | Class | Correct | Employees | Gross | Net | Disposition |
 |---|---|---|---|---|---|---|
 | Contractor paid through payroll | Data | Workday | C0003 | $6,500.00 | $4,388.71 | Remove from payroll; pay through AP on invoices (1099). Legal and HR to review classification and whether W-2c / 941-X corrections are needed |
-| Social Security wage base | Configuration | **Rippling** | E0003, E0012, E0015, E0106, E0125 | $0.00 | −$1,082.83 | **Correct Workday's wage base to $184,500 and re-run these five before sign-off** |
 | CA meal premiums not calculated in Rippling | Configuration | Workday | E0021, E0029, E0030, E0031, E0032, E0035 | −$344.06 | −$215.00 | Workday applies Labor Code 226.7 at the regular rate. Quantify Rippling's exposure for prior periods and raise with Legal |
 | Garnishment not deducted in Rippling | Legacy error | Workday | E0031 | $0.00 | $450.00 | Active child support order not withheld. Confirm the order date, deduct and remit, notify the agency: the employer is liable for missed amounts |
 | Prior-period timesheet correction not yet in Rippling | Timing | Workday | E0033 | −$243.38 | −$172.44 | Expected. Confirm Rippling does not also pay it next cycle (double-payment risk at cutover) |
@@ -60,12 +59,11 @@ Every explanation was proven by re-performance: recalculating the employee in Wo
 
 | # | Action | Owner | When |
 |---|---|---|---|
-| 1 | Approve correcting the Social Security wage base to $184,500 and re-running the five affected employees | Controller / Payroll Manager | Before P1 sign-off |
+| 1 | Issue E0148's vacation payout (California final pay) | Payroll Manager | Immediately |
 | 2 | Withhold and remit E0031's child support order; notify the agency | Payroll Manager | Next cycle |
-| 3 | Issue E0148's vacation payout (California final pay) | Payroll Manager | Immediately |
-| 4 | Recover overpayments: E0035 (duplicate punch), E0149 (unpaid leave), E0203 (hire date) | Payroll Manager with HR | Per recovery policy |
-| 5 | Move C0003 to AP; Legal and HR classification review | HR, Legal, AP | Before next cycle |
-| 6 | Quantify prior-period CA meal premium exposure in Rippling | Legal, Payroll | This quarter |
-| 7 | Confirm working-day proration policy for mid-period changes | Total Rewards | Before P2 |
+| 3 | Recover overpayments: E0035 (duplicate punch), E0149 (unpaid leave), E0203 (hire date) | Payroll Manager with HR | Per recovery policy |
+| 4 | Move C0003 to AP; Legal and HR classification review | HR, Legal, AP | Before next cycle |
+| 5 | Quantify prior-period CA meal premium exposure in Rippling | Legal, Payroll | This quarter |
+| 6 | Confirm working-day proration policy for mid-period changes | Total Rewards | Before P2 |
 
-With action 1 complete, I recommend signing off this parallel and proceeding to P2 (Oct 16–31), which adds month-end benefit deductions and the full GL cycle.
+I recommend signing off this parallel and proceeding to P2 (Oct 16–31), which adds month-end benefit deductions and the full GL cycle.

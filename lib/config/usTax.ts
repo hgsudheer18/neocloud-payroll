@@ -31,12 +31,12 @@ export interface FicaConfig {
 export const FICA: Dated<FicaConfig>[] = [
   {
     effective: "2026-01-01",
-    value: { ssRate: 0.062, ssWageBase: 168_600, medicareRate: 0.0145, addlMedicareRate: 0.009, addlMedicareThreshold: 200_000 },
-    source: "EXERCISE: brief says 7.65% FICA on wages up to $168,600. NOTE: the ACTUAL 2026 SSA wage base is $184,500.",
+    value: { ssRate: 0.062, ssWageBase: 184_500, medicareRate: 0.0145, addlMedicareRate: 0.009, addlMedicareThreshold: 200_000 },
+    source: "2026 SSA Social Security wage base $184,500. The brief stated $168,600, which is the 2024 base; corrected to the 2026 figure.",
   },
 ];
 
-/** The value the legacy system (Rippling) is configured with. Used to explain variances. */
+/** The 2026 base, as configured in the legacy system (Rippling) and now in Workday. Used to explain variances if the configuration ever differs. */
 export const ACTUAL_2026_SS_WAGE_BASE = 184_500;
 
 export interface UnemploymentConfig {

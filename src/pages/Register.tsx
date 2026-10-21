@@ -43,11 +43,11 @@ export default function Register({ id, query }: { id?: string; query: URLSearchP
           employee_id: c.worker.id, name: c.worker.name, department: c.worker.department, cost_center: c.worker.costCenterId, location: c.worker.locationId, work_state: c.worker.workState,
           ...Object.fromEntries(Array.from(c.pay.lines.reduce((m, l) => m.set(l.code, (m.get(l.code) ?? 0) + l.amount), new Map<string, number>()).entries(), ([k, v]) => [k, toDecimalString(v)])),
           ...(() => { const hs = (codes: string[]) => c.pay.lines.filter((l) => codes.includes(l.code)).reduce((t, l) => t + (l.hours ?? 0), 0).toFixed(2); return { regular_hours: hs(["SAL", "REG"]), overtime_hours: hs(["OT"]), double_time_hours: hs(["DT"]), time_off_hours: hs(["PTO_TAKEN", "VAC", "SICK", "LEAVE_PAID"]) }; })(),
-          gross: toDecimalString(c.pay.totals.gross), net: toDecimalString(c.pay.totals.net), employer_taxes: toDecimalString(c.pay.totals.erTaxes), benefits: toDecimalString(c.pay.totals.benefits), cost_to_company: toDecimalString(c.pay.totals.burdened),
+          gross: toDecimalString(c.pay.totals.gross), net: toDecimalString(c.pay.totals.net), employer_taxes: toDecimalString(c.pay.totals.erTaxes), benefits: toDecimalString(c.pay.totals.benefits), burdened: toDecimalString(c.pay.totals.burdened),
         }) as Record<string, string>);
     // Every pay code any worker has, in a fixed order, so no column is lost.
     const fixed = ["employee_id", "name", "department", "cost_center", "location", "work_state"];
-    const tail = ["regular_hours", "overtime_hours", "double_time_hours", "time_off_hours", "gross", "net", "employer_taxes", "benefits", "cost_to_company"];
+    const tail = ["regular_hours", "overtime_hours", "double_time_hours", "time_off_hours", "gross", "net", "employer_taxes", "benefits", "burdened"];
     const codes = [...new Set(out.flatMap((o) => Object.keys(o)))].filter((k) => !fixed.includes(k) && !tail.includes(k));
     downloadText(`payroll-register-${r.period.id}.csv`, toCsv(out.map((o) => Object.fromEntries([...fixed, ...codes, ...tail].map((k) => [k, o[k] ?? ""]))), [...fixed, ...codes, ...tail]));
   };
@@ -86,7 +86,7 @@ export default function Register({ id, query }: { id?: string; query: URLSearchP
               <th className="n">Net</th>
               <th className="n">ER taxes</th>
               <th className="n">Benefits</th>
-              <th className="n">Cost to Company</th>
+              <th className="n">Burdened cost</th>
               <th>Notes</th>
             </tr>
           </thead>
@@ -216,7 +216,7 @@ export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: 
             {!mine && <>
             <dt>Employer taxes</dt><dd><Money c={p.totals.erTaxes} /></dd>
             <dt>Benefits load</dt><dd><Money c={p.totals.benefits} /></dd>
-            <dt><strong>Cost to Company (burdened)</strong></dt><dd><strong><Money c={p.totals.burdened} /></strong></dd>
+            <dt><strong>Burdened cost</strong></dt><dd><strong><Money c={p.totals.burdened} /></strong></dd>
             </>}
           </dl>
           <h3 style={{ marginTop: 20 }}>Taxable wages (each tax has its own base)</h3>
@@ -258,7 +258,7 @@ export function Payslip({ c, mine = false, onClose }: { c: UsWorkerCalc; mine?: 
   );
 }
 
-const TOTALS: [keyof UsWorkerCalc["pay"]["totals"], string][] = [["gross", "Gross pay"], ["preTax", "Pre-tax deductions"], ["eeTaxes", "Employee taxes"], ["postTax", "Post-tax deductions"], ["net", "Net pay"], ["erTaxes", "Employer taxes"], ["benefits", "Benefits load"], ["burdened", "Cost to Company"]];
+const TOTALS: [keyof UsWorkerCalc["pay"]["totals"], string][] = [["gross", "Gross pay"], ["preTax", "Pre-tax deductions"], ["eeTaxes", "Employee taxes"], ["postTax", "Post-tax deductions"], ["net", "Net pay"], ["erTaxes", "Employer taxes"], ["benefits", "Benefits load"], ["burdened", "Burdened cost"]];
 
 /**
  * Preview of this worker's pay if their pending requests (time, time off, payroll

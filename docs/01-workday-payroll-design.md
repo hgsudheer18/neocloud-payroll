@@ -91,7 +91,7 @@ Taxability columns: FIT = federal income tax, FICA = Social Security and Medicar
 | SUI | State Unemployment | 3.4% on first $7,000 (brief's simplification; real wage bases vary by state) | 6200 + 2113 |
 | BEN_LOAD | Employer Benefits | 10% of gross (US), 5% (international) | 6300 + 2130 |
 
-> **Wage base note.** The exercise specifies a Social Security wage base of $168,600 (the 2024 figure). The actual 2026 base is $184,500. The app uses the brief's number as configured, and the reconciliation shows it as a configuration difference where legacy is correct. In a real implementation the Workday tax configuration would be corrected before parallel testing.
+> **Wage base note.** The brief states a Social Security wage base of $168,600, which is the 2024 figure. Workday is configured with the 2026 base of $184,500, which is also what the legacy system uses, so high earners reconcile to the cent. A tax table change like this goes through change control (PR-10) and is effective-dated by tax year.
 
 ### How the components are built in Workday
 

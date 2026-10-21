@@ -59,7 +59,7 @@ Three workers to show both pay groups and both state rule sets. Pay results: **P
 - **Maya, 48-hour week** (12, 8, 12, 8, 8): 40 regular + 8 weekly overtime = $1,470.00 + $441.00 = **$1,911.00**. Same days for Emma give 8 daily overtime instead, no weekly overtime.
 - **Liam, full period**: Regular Salary 86.67 standard hours, $12,500.00 ($300,000 ÷ 24).
 - **Liam, 8 hrs Flexible PTO**: Regular Salary 78.67 hrs $11,346.15 + Time Off Taken 8.00 hrs $1,153.85 (8 × $144.23 = salary ÷ 2,080). Gross unchanged at $12,500.00; Hours box totals 86.67.
-- **Liam, Social Security**: $0.00 this period: his year-to-date wages are past the configured wage base ($168,600, the brief's figure; real 2026 base $184,500).
+- **Liam, Social Security**: $0.00 this period: his year-to-date Social Security wages have reached the 2026 wage base of $184,500.
 
 ## 3. Closing Oct 1–15 (the parallel run)
 
@@ -150,7 +150,7 @@ Tip: before Ethan approves anything, Payroll register → the worker → Preview
 
 Where: pay period Oct 1–15 → **Reconciliation → Legacy register**.
 
-1. **Headline:** 262 matched to the cent, 17 explained, 1 only in legacy, 1 only in Workday, **0 unexplained**. Legacy paid $12,658.51 more gross and $7,107.36 more net.
+1. **Headline:** 267 matched to the cent, 12 explained, 1 only in legacy, 1 only in Workday, **0 unexplained**. Legacy paid $12,658.51 more gross and $8,190.19 more net.
 2. **Variances by root cause:** 12 causes, each with classification (legacy error, configuration, timing, data), the correct system and the impact. Click a worker to jump to the proof.
 3. **Show explanations and actions:** the full story for each variance in one scrolling table. **Download CSV** for the variance log.
 4. **Register totals:** Workday vs legacy for every column.
@@ -160,9 +160,9 @@ Talking points that sway a decision:
 
 - **The bar is "every variance explained", not "within 1%".** Payroll errors are individual: an aggregate tolerance can hide one person's missed garnishment (E0031).
 - **Explanations are proven, not asserted.** Recalculating with the identified cause reproduces the legacy number to the cent.
-- **Workday is right in 17 of 19 variances**, including two legacy errors with legal exposure: the missed child support garnishment (E0031) and the missing California vacation payout at termination (E0148).
-- **Legacy is right on the Social Security wage base.** The brief's $168,600 is the 2024 figure; 2026 is $184,500. Saying so shows the reconciliation is honest, not built to favour Workday. Fix the configuration before production.
-- Good workers to click: **E0148** (vacation payout), **E0057** (mid-period raise prorated by working days, $530.30), **E0088** (CA → CO move), **E0035** (duplicate punch), **E0003** (wage base).
+- **Workday is right in all 14 variances**, including two legacy errors with legal exposure: the missed child support garnishment (E0031) and the missing California vacation payout at termination (E0148).
+- **The Social Security wage base was checked, not copied.** The brief quoted $168,600, the 2024 figure; Workday is configured with the 2026 base of $184,500, which is why high earners such as E0015 match legacy to the cent. A wrong wage base would have under-withheld Social Security for every high earner.
+- Good workers to click: **E0148** (vacation payout), **E0057** (mid-period raise prorated by working days, $530.30), **E0088** (CA → CO move), **E0035** (duplicate punch), **E0015** (Social Security stops at the 2026 wage base).
 - Method (doc 06): three parallels, $0.00 unexplained per employee, two consecutive clean parallels to exit, sign-off by Payroll Manager, Controller, Head of People Technology and CFO.
 
 ## 9. Design decisions in one line each
@@ -176,7 +176,7 @@ Talking points that sway a decision:
 ### Final pay for a mid-period termination (known simplification)
 
 - **What the app does:** a California termination (E0148 in Oct 1–15, Sofia Davis E0024 on 10/23 in testing) raises a critical audit item: final pay is due on the last day (Labor Code 201/202), not the regular check date. The approver must record how it was paid (e.g. "E0024 final pay issued as on-demand payment on 10/23/2026") before the pay run can be approved. Her pay is calculated and completed with the regular run.
-- **Expected for Sofia (last day 10/23):** 48.00 hrs × $38.25 = $1,836.00 + vacation payout 69.93 hrs × $38.25 = $2,674.82; gross $4,510.82; net $3,102.91; Cost to Company $5,300.98.
+- **Expected for Sofia (last day 10/23):** 48.00 hrs × $38.25 = $1,836.00 + vacation payout 69.93 hrs × $38.25 = $2,674.82; gross $4,510.82; net $3,102.91; Burdened cost $5,300.98.
 - **Talk track:** "Sofia is terminated in California, so her final pay is due on her last day. The engine flags it as critical and blocks approval until payroll records the on-demand payment. In production that is a Workday On-Demand Payment: a separate one-person run check-dated 10/23, so the regular run is not held up or completed early. Here I have modeled the control and the flag; the separate run is the next build."
 - **What the next build adds:** a "Pay final check now" run for one worker, approved by a second person; her result locked at that point (later changes flow as retro); the regular run shows her as paid on demand (out of its bank file, kept in totals, year-to-date and reconciliation); a separate journal for the on-demand check.
 
@@ -191,9 +191,9 @@ Talking points that sway a decision:
   5. **Corrections** after publishing go out as a W-2c.
 - **Where it would live:** Payroll → Year-end, and the employee's Documents.
 
-### Cost to Company
+### Burdened cost
 
-The total cost of employing someone: gross pay + employer taxes (Social Security, Medicare, FUTA, SUI) + employer benefits. Not a legal term (finance also calls it burdened or fully loaded cost). Oct 1–15: $1,973,794.91 gross, **$2,299,341.55 Cost to Company**. It is what the journal debits to expense (6100–6300) and what Finance budgets headcount on; a $190,000 salary is roughly $230,000 a year. Employer benefits are a 10% load in this app (the brief gave no premiums); production uses actual premiums and 401(k) match.
+The total cost of employing someone: gross pay + employer taxes (Social Security, Medicare, FUTA, SUI) + employer benefits. The brief's term; finance also calls it fully loaded cost or cost to company. Not a legal term. Oct 1–15: $1,973,794.91 gross, **$2,300,424.38 Burdened cost**. It is what the journal debits to expense (6100–6300) and what Finance budgets headcount on; a $190,000 salary is roughly $230,000 a year. Employer benefits are a 10% load in this app (the brief gave no premiums); production uses actual premiums and 401(k) match.
 
 ### Why the first biweekly period is 16 days (Oct 16–31)
 
@@ -221,8 +221,8 @@ Present from the browser that holds your data (or Load demo data first). Share y
 | # | Minutes | Signed in as | Show | Say / expected |
 |---|---|---|---|---|
 | 1 | 2 | Anyone | Home, then the deck's brief slide if useful | 280 US workers, 4 countries, IPO-track controls; Workday-style HCM, time and payroll posting to NetSuite |
-| 2 | 5 | Diego | Period overview (Oct 1–15): 8 control ties; **Reconciliation → Legacy register**: variances by root cause, Show explanations, E0148, E0057, E0003 | 262 matched, 17 explained, 0 unexplained; legacy pays $12,658.51 more gross; "every variance explained, proven by recalculation"; legacy is right on the wage base |
-| 3 | 3 | Diego, then Aisha | **Pay runs → Oct 1–15**: Calculate; Aisha records the E0148 resolution, Approve, Complete | Segregation of duties: Diego cannot approve; CA final pay critical item needs a recorded resolution; $1,973,794.91 gross, $2,299,341.55 Cost to Company |
+| 2 | 5 | Diego | Period overview (Oct 1–15): 8 control ties; **Reconciliation → Legacy register**: variances by root cause, Show explanations, E0148, E0057, E0003 | 267 matched, 12 explained, 0 unexplained; legacy pays $12,658.51 more gross; "every variance explained, proven by recalculation"; legacy is right on the wage base |
+| 3 | 3 | Diego, then Aisha | **Pay runs → Oct 1–15**: Calculate; Aisha records the E0148 resolution, Approve, Complete | Segregation of duties: Diego cannot approve; CA final pay critical item needs a recorded resolution; $1,973,794.91 gross, $2,300,424.38 Burdened cost |
 | 4 | 3 | Chloe | **Workers → Hire a worker → Position REQ-H1** (hourly, San Jose, $40) from 10/19; **REQ-S2** (salaried) from 10/22 at $190,000, married filing jointly, medical $200 | Position pre-fills job, pay, cost center, manager; approvals go to Ethan / Morgan |
 | 5 | 2 | Chloe | **Workers → E0024 Sofia Davis → Terminate**, last day 10/23 | CA final pay due on the last day; on-demand payment talk track (section 9) |
 | 6 | 4 | Emma, then Maya, then Ethan | **Enter time**, week of 10/18: Emma Mon 08:00–20:30, Wed 08:00–21:30; Maya same days; Ethan approves | Emma (CA): daily OT, double time over 12, meal premium; Maya (TX): weekly OT over 40 only; meal entries never reduce hours, they warn |
@@ -232,7 +232,7 @@ Present from the browser that holds your data (or Load demo data first). Share y
 | 10 | 2 | Diego | **General ledger**: journals balance → Post journals to NetSuite | Manual post by payroll after completion; summarized journal by account, cost center, location |
 | 11 | 2 | Diego, then Aisha | **Payroll inputs**: a bonus for a worker; Aisha sees the SOX audit alert and approves | Either payroll role enters, the other approves and is alerted |
 | 12 | 1 | Emma | **Pay Slip**: net pay masked until clicked; Hours box | Employee self-service |
-| 13 | 2 | Anyone | Wrap up: design decisions (section 9), open items (on-demand final pay, W-2s at year-end, wage base, holidays) | What is next |
+| 13 | 2 | Anyone | Wrap up: design decisions (section 9), open items (on-demand final pay, W-2s at year-end, holidays, tax approximations) | What is next |
 
 Expected amounts in rows 6–9 assume the dates and inputs above; different dates change them (the payroll register preview shows the effect before approving).
 

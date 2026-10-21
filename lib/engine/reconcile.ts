@@ -142,9 +142,10 @@ export const HYPOTHESES: Hypothesis[] = [
     },
     explain: (c) => {
       const ytd = c.ds.ytd.find((y) => y.employeeId === c.worker.id)?.ssWages ?? 0;
-      return `YTD SS wages ${ytd.toLocaleString("en-US", { style: "currency", currency: "USD" })}. Workday uses the exercise wage base $168,600; legacy uses the actual 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER).`;
+      const fica = asOf(FICA, c.period.checkDate);
+      return `YTD SS wages ${ytd.toLocaleString("en-US", { style: "currency", currency: "USD" })}. Workday is configured with a wage base of ${fica.ssWageBase.toLocaleString("en-US", { style: "currency", currency: "USD" })}; legacy uses the 2026 SSA base $184,500, so legacy keeps withholding 6.2% (EE and ER).`;
     },
-    action: () => "Legacy is right for real life. In a real parallel, correct the Workday tax configuration to $184,500 (the $168,600 figure is the 2024 base) and re-run. For this exercise we keep the brief's rate.",
+    action: () => "Legacy is right. Correct the Workday tax configuration to the 2026 base ($184,500) and re-run the affected employees.",
   },
   {
     id: "keepDuplicatePunches",

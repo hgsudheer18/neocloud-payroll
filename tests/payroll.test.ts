@@ -71,10 +71,10 @@ test("Garnishment is post-tax and within the CCPA disposable-earnings limit", ()
   assert.ok(g > 0 && g <= Math.round(p.taxable.disposable * 0.6));
 });
 
-test("Social Security stops at the wage base (E0012 crosses it this period)", () => {
-  const p = pay("E0012").pay;
-  const ytd = ds.ytd.find((y) => y.employeeId === "E0012")!;
-  assert.equal(p.taxable.ssTaxable, Math.round((168_600 - ytd.ssWages) * 100));
+test("Social Security stops at the 2026 wage base (E0015 crosses it this period)", () => {
+  const p = pay("E0015").pay;
+  const ytd = ds.ytd.find((y) => y.employeeId === "E0015")!;
+  assert.equal(p.taxable.ssTaxable, Math.round((184_500 - ytd.ssWages) * 100));
   assert.ok(p.taxable.ssTaxable < p.taxable.fica);
   assert.equal(pay("E0001").pay.taxable.ssTaxable, 0, "already over the base");
 });

@@ -67,8 +67,8 @@ test("Change to a completed period is paid as retro in the next period", () => {
 
 test("Year-to-date rolls forward: the Social Security wage base keeps working", () => {
   const v = computePeriod(base, erp([], { [SM1]: "2026-10-19T12:00:00Z" }), SM2);
-  // E0012 crossed the $168,600 base in Oct 1–15, so no Social Security in Oct 16–31.
-  assert.equal(v.result.us.find((x) => x.worker.id === "E0012")!.pay.taxable.ssTaxable, 0);
+  // E0015 crossed the 2026 $184,500 base in Oct 1–15, so no Social Security in Oct 16–31.
+  assert.equal(v.result.us.find((x) => x.worker.id === "E0015")!.pay.taxable.ssTaxable, 0);
   // E0148 terminated Oct 9: not in Oct 16–31.
   assert.equal(v.result.us.some((x) => x.worker.id === "E0148"), false);
 });

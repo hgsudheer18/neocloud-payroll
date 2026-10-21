@@ -70,7 +70,7 @@ The bar is "every variance explained", not "within 1%". Payroll errors are indiv
 
 1. The app (or the equivalent Workday reconciliation report) compares every register column per employee.
 2. Each variance gets a root cause and classification: **legacy error**, **configuration difference**, **timing** or **data**, and which system is correct.
-3. Root causes are proven by re-performance: recalculating under the identified cause must reproduce the legacy number to the cent. That is how the app explains all 19 variances in this period.
+3. Root causes are proven by re-performance: recalculating under the identified cause must reproduce the legacy number to the cent. That is how the app explains all 14 variances in this period.
 4. Workday defects are fixed in sandbox, retested, migrated under change control, and the parallel is rerun for affected employees.
 5. A variance log records owner, root cause, decision, fix and retest evidence; the Payroll Manager and Controller sign it at the end of each parallel.
 
@@ -79,7 +79,7 @@ Results from this period's parallel:
 | Classification | Root causes | Correct system |
 |---|---|---|
 | Legacy error | Garnishment not deducted (E0031); vacation payout missing at termination (E0148) | Workday |
-| Configuration difference | Mid-period comp change applied to full period (E0057); CA meal premiums not calculated (6 workers); Social Security wage base (5 workers) | Workday, except the wage base: **legacy is right** ($184,500 is the 2026 base); fix Workday |
+| Configuration difference | Mid-period comp change applied to full period (E0057); CA meal premiums not calculated (6 workers) | Workday |
 | Timing | Unpaid leave entered after legacy cutoff (E0149); timesheet correction not yet in legacy (E0033); new hire entered after legacy cutoff (E0345) | Workday |
 | Data | Contractor paid through payroll (C0003); hire date (E0203); work-state change not sent (E0088); duplicate punch (E0035) | Workday |
 
