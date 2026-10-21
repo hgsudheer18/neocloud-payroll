@@ -33,7 +33,8 @@
 
 | Component | Amount |
 |---|---|
-| SAL Regular Salary | $1,874,185.68 |
+| SAL Regular Salary | $1,871,858.76 |
+| PTO_TAKEN Time Off Taken (Salaried) | $2,326.92 |
 | REG Regular Hours | $88,462.64 |
 | OT Overtime 1.5x | $5,880.58 |
 | DT Double Time 2.0x | $370.50 |
@@ -114,13 +115,24 @@
 | Worker | Plan | Opening | Accrual | Taken | Paid out | Ending | Accrual basis |
 |---|---|---|---|---|---|---|---|
 | E0001 | US Flexible PTO | unlimited | 0.00 | 8.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0001 | US Sick Time | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0001 | US Bereavement Leave | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0001 | US Jury Duty | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0021 | US Hourly Vacation | 46.50 | 3.99 | 0.00 | 0.00 | 50.49 hours | 103.75 hrs worked (time tracking) × 0.0385 = 3.99 hrs |
 | E0021 | California Paid Sick Leave | 28.00 | 3.46 | 0.00 | 0.00 | 31.46 hours | 103.75 hrs worked (time tracking) × 0.0333 = 3.46 hrs |
+| E0021 | US Bereavement Leave | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0021 | US Jury Duty | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0148 | US Flexible PTO | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0148 | US Hourly Vacation | 31.00 | 2.15 | 0.00 | 33.15 | 0.00 hours | 56.00 hrs worked (work schedule: 7 paid days × 8) × 0.0385 = 2.15 hrs |
+| E0148 | US Sick Time | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0148 | US Bereavement Leave | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
+| E0148 | US Jury Duty | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0006 | UK Annual Leave | 14.50 | 2.08 | 2.00 | 0.00 | 14.58 days | 2.0833 days/month (full month) |
+| E0006 | UK Sick Leave | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0008 | Ontario Vacation | 9.00 | 1.25 | 1.00 | 0.00 | 9.25 days | 1.2500 days/month (full month) |
+| E0008 | Ontario Sick Days (ESA) | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 | E0009 | India Earned Leave (Karnataka) | 11.00 | 1.50 | 3.00 | 0.00 | 9.50 days | 1.5000 days/month (full month) |
+| E0009 | India Sick and Casual Leave | unlimited | 0.00 | 0.00 | 0.00 | n/a | No accrual (non-balance plan). |
 
 E0148 payout flowing to payroll: **$2,629.69** (33.15 hrs (31.00 opening + 2.15 final accrual − 0.00 taken) × $165,000.00 ÷ 2080 = $79.3269).
 
