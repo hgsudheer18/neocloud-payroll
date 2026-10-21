@@ -34,6 +34,32 @@ Key steps, expected numbers and talking points for testing and presenting the Ne
 
 The person who calculates a pay run can never approve it. Payroll inputs entered by one payroll role are approved by the other, who also gets a SOX audit alert.
 
+### Demo test users
+
+Three workers to show both pay groups and both state rule sets. Pay results: **Pay runs → click the pay group row → Pay results → click the worker** (or Payroll register, same period).
+
+| | Emma Kim | Maya Costa | Liam Singh |
+|---|---|---|---|
+| Worker ID | E0021 | E0037 | E0002 |
+| Job | Data Center Technician, San Jose CA | Data Center Technician, Austin TX | VP, GPU Cloud, San Francisco CA |
+| Pay | $42.00/hr, non-exempt | $36.75/hr, non-exempt | $300,000/yr, exempt |
+| Pay group from 10/16 | US Biweekly (Oct 16–31 transition, check 11/06) | US Biweekly (Oct 16–31 transition, check 11/06) | US Semi-Monthly (Oct 16–31, check 11/05) |
+| Manager (approves) | Ethan Fischer | Ethan Fischer | Morgan Hale |
+| Sign in as | Emma Kim (Employee) | Maya Costa (Employee) | Not a persona: Chloe enters for him |
+| Enter time | Enter time (or Ethan → Team Timesheets) | Enter time (or Ethan → Team Timesheets) | No time entry (salaried) |
+| Enter absence | Absence → US Hourly Vacation (opening balance 46.5 hrs) or CA sick (28 hrs) | Absence → US Hourly Vacation (opening balance 14.5 hrs) | Chloe → Workers → E0002 → Request time off → US Flexible PTO (no balance) |
+| Overtime rules | California: over 8/day 1.5x, over 12/day 2x, 7th day, weekly over 40; meal premium | Texas (federal): weekly over 40 only; no daily OT, double time or meal premium | Exempt: no overtime |
+| Deductions | Medical $133.85 a biweekly period ($145 × 24/26); no 401(k) | Medical $133.85; 401(k) 3% | Medical $210.00; 401(k) 3% |
+
+**Expected results to quote**
+
+- **Emma, 12-hour day** (08:00–20:30, 30-min meal): 8 regular + 4 daily overtime. **13-hour day**: 8 regular + 4 overtime + 1 double time + 1 meal premium (no second meal). Rates: $42 regular, $63 overtime, $84 double time, $42 meal premium.
+- **Emma, 8 hrs vacation**: $336.00 (8 × $42), balance down by 8.
+- **Maya, 48-hour week** (12, 8, 12, 8, 8): 40 regular + 8 weekly overtime = $1,470.00 + $441.00 = **$1,911.00**. Same days for Emma give 8 daily overtime instead, no weekly overtime.
+- **Liam, full period**: Regular Salary 86.67 standard hours, $12,500.00 ($300,000 ÷ 24).
+- **Liam, 8 hrs Flexible PTO**: Regular Salary 78.67 hrs $11,346.15 + Time Off Taken 8.00 hrs $1,153.85 (8 × $144.23 = salary ÷ 2,080). Gross unchanged at $12,500.00; Hours box totals 86.67.
+- **Liam, Social Security**: $0.00 this period: his year-to-date wages are past the configured wage base ($168,600, the brief's figure; real 2026 base $184,500).
+
 ## 3. Closing Oct 1–15 (the parallel run)
 
 The only critical audit item is **E0148 Felix Fischer**: terminated Oct 9 in California, so final pay is due on his last day and cannot wait for the regular check date. Nothing in the data needs fixing; the approver records how it was handled.
