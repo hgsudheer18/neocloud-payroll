@@ -84,6 +84,7 @@ The app reads the files in `data/`. To use the hiring team's files, either repla
 | Absence | 4, ERP | One section with tabs: My Time Off, Team Time Off and Upcoming Time Off (managers), Absence Balances (managers and payroll). Time off requests for past or future dates with balance and eligibility checks; changes and cancellations of approved time off go to the manager; the year's absence by plan |
 | Benefits | ERP | Your benefit enrolments by type (healthcare: medical; retirement: 401(k)), with this pay period's deduction; payroll can view anyone's. Benefits a worker is not enrolled in are not shown |
 | Organization setup | ERP | Companies, locations, supervisory orgs and cost centers, job profiles, pay groups and calendars |
+| Pay components | 1 | The pay component catalog: every component's feed, calculation basis, taxability, 401(k) eligibility, Workday and NetSuite account, and this period's amount |
 | Pay runs | 2, 7, ERP | Calculate, approve (segregation of duties), complete, per period; stale-input and critical-finding checks |
 | Period overview | 2 | Control-total tie-out, period totals, burdened cost rollup by department, location or cost center (filterable), variance summary |
 | Payroll register | 2 | Gross to net for every worker; payslip drill-down with the calculation behind every line |
